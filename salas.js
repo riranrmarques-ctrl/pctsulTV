@@ -452,19 +452,12 @@ function aplicarDadosCentral(dados) {
 }
 
 async function buscarStatusReaisSalas() {
-  const tabelas = ["status_salas", "statuspontos"];
-  const ordenacoes = ["ultimo_ping", "data_hora", "created_at"];
+  const { data, error } = await supabaseClient
+    .from("status_salas")
+    .select("*")
+    .order("ultimo_ping", { ascending: false });
 
-  for (const tabela of tabelas) {
-    for (const ordem of ordenacoes) {
-      const { data, error } = await supabaseClient
-        .from(tabela)
-        .select("*")
-        .order(ordem, { ascending: false });
-
-      if (!error) return data || [];
-    }
-  }
+  if (!error) return data || [];
 
   return [];
 }
@@ -623,6 +616,7 @@ function abrirSala(ponto) {
   setTexto("salaEndereco", endereco);
   setTexto("salaCodigo", codigo);
   setTexto("salaStatusTopo", textoStatusSala(ponto));
+  aplicarClasseStatusSala(ponto.status_final);
   setTexto("salaTotalMidias", totalMidiasPonto(ponto));
   setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
   setTexto("salaDiasOnline", totalTelasPonto(ponto, 0));
@@ -838,7 +832,7 @@ function mensagemErroNovoPonto(erro) {
 function mensagemErroMaterial(erro) {
   const texto = String(erro?.message || erro?.details || erro?.hint || "");
 
-  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("materiais_salas")) {
+  if (erro?.code === "PGRST205" || erro?.status === 404) {
     return "A tabela materiais_salas ainda nao existe no banco novo. Crie a tabela materiais_salas no Supabase.";
   }
 
@@ -846,7 +840,13 @@ function mensagemErroMaterial(erro) {
     return "Nao foi possivel enviar o arquivo. Crie o bucket publico materiais-salas no Storage do Supabase.";
   }
 
-  if (erro?.code === "PGRST204" || texto.includes("arquivo_url")) {
+  if (
+    erro?.code === "PGRST204" ||
+    erro?.status === 400 ||
+    texto.includes("arquivo_url") ||
+    texto.includes("data_postagem") ||
+    texto.includes("data_encerramento")
+  ) {
     return "Faltam colunas na tabela materiais_salas. Adicione arquivo_url, arquivo_nome, arquivo_tipo, arquivo_tamanho, data_postagem e data_encerramento.";
   }
 
@@ -986,14 +986,25 @@ function renderizarHistoricosSala() {
     radioTv.innerHTML = `
       <div class="radio-tv-item">
         <strong>1.</strong>
-        <span>Nenhum item RadioTV cadastrado.</span>
+        <span>Nenhum item cadastrado</span>
         <time>Noticias, rodape ou musica</time>
       </div>
     `;
   }
 
   if (status) {
-    status.innerHTML = `<div><span>Nenhum historico de status.</span></div>`;
+    const statusAtual = salaAtual?.status_final || "inativo";
+    const classe = statusAtual === "ativo" ? "status-ativo" : "status-inativo";
+    const texto = statusAtual === "ativo" ? "Ativo" : "Inativo";
+    const data = salaAtual?.ultimo_ping_final ? formatarDataHora(salaAtual.ultimo_ping_final) : "Sem conexao registrada";
+
+    status.innerHTML = `
+      <div>
+        <strong>1.</strong>
+        <span class="${classe}">${texto}</span>
+        <time>${escaparHtml(data)}</time>
+      </div>
+    `;
   }
 }
 
@@ -1214,6 +1225,14 @@ function textoStatusSala(ponto) {
     : "Inativo - sem conexao";
 }
 
+function aplicarClasseStatusSala(status) {
+  const badge = document.getElementById("salaStatusTopo");
+  if (!badge) return;
+
+  badge.classList.remove("ativo", "inativo", "desativado");
+  badge.classList.add(classeStatusVisual(status));
+}
+
 function classeStatusVisual(status) {
   if (status === "ativo") return "ativo";
   if (status === "inativo") return "inativo";
@@ -1262,23 +1281,30 @@ async function copiarTexto(texto) {
       input.remove();
     }
 
-    avisarCodigoCopiado();
+    mostrarStatusFlutuante("Codigo copiado");
   } catch (erro) {
     console.error("Erro ao copiar codigo:", erro);
-    alert("Nao foi possivel copiar o codigo.");
+    mostrarStatusFlutuante("Nao foi possivel copiar o codigo", "erro");
   }
 }
 
-function avisarCodigoCopiado() {
-  const codigo = document.getElementById("salaCodigo");
-  if (!codigo) return;
+function mostrarStatusFlutuante(mensagem, tipo = "ok") {
+  let aviso = document.getElementById("statusFlutuante");
 
-  const textoOriginal = codigo.textContent;
-  codigo.textContent = "Copiado!";
+  if (!aviso) {
+    aviso = document.createElement("div");
+    aviso.id = "statusFlutuante";
+    aviso.className = "status-flutuante";
+    document.body.appendChild(aviso);
+  }
 
-  setTimeout(() => {
-    codigo.textContent = textoOriginal;
-  }, 900);
+  aviso.textContent = mensagem;
+  aviso.className = `status-flutuante ativo ${tipo}`;
+
+  clearTimeout(mostrarStatusFlutuante.timer);
+  mostrarStatusFlutuante.timer = setTimeout(() => {
+    aviso.classList.remove("ativo");
+  }, 1800);
 }
 
 function escaparHtml(valor) {
