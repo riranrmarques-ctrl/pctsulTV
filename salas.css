@@ -1391,16 +1391,7 @@ body.modo-sala .conteudo-principal {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 20px 0 14px;
-}
-
-.sala-disponivel {
-  padding: 9px 16px;
-  border-radius: 999px;
-  background: #47ad59;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 900;
+  margin: 18px 0 14px;
 }
 
 .sala-codigo-linha strong {
@@ -1410,7 +1401,7 @@ body.modo-sala .conteudo-principal {
 
 .sala-metricas {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin: 18px 0 18px;
   padding-top: 18px;
@@ -1615,8 +1606,7 @@ body,
   color: #d7dbe2;
 }
 
-.sala-topbar > strong,
-.sala-disponivel {
+.sala-topbar > strong {
   background: rgba(22, 184, 97, 0.2);
   color: #70e08c;
 }
