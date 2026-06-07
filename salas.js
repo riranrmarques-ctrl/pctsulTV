@@ -13,6 +13,7 @@ let playlistsAtivas = 0;
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
   configurarFiltros();
+  configurarLogout();
 });
 
 function iniciarLoginCentral() {
@@ -68,6 +69,16 @@ function configurarFiltros() {
     if (!elemento) return;
     elemento.addEventListener("input", atualizarPainelFiltrado);
     elemento.addEventListener("change", atualizarPainelFiltrado);
+  });
+}
+
+function configurarLogout() {
+  const btnLogout = document.getElementById("btnLogout");
+  if (!btnLogout) return;
+
+  btnLogout.addEventListener("click", () => {
+    sessionStorage.removeItem("painelLiberado");
+    window.location.reload();
   });
 }
 
