@@ -1408,6 +1408,40 @@ body.modo-sala .conteudo-principal {
   letter-spacing: 0.08em;
 }
 
+.sala-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sala-metrica {
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.sala-metrica strong {
+  color: #ffffff;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.sala-metrica span {
+  color: #d7dbe2;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .sala-acoes {
   display: flex;
   gap: 12px;
@@ -1540,6 +1574,7 @@ body.modo-sala .conteudo-principal {
   .sala-topbar,
   .sala-hero,
   .sala-historicos,
+  .sala-metricas,
   .sala-playlist-item {
     grid-template-columns: 1fr;
   }
@@ -1597,7 +1632,7 @@ body,
 }
 
 .sala-playlist h3 {
-  color: #70e08c;
+  color: #ffffff;
 }
 
 .sala-playlist-item {
