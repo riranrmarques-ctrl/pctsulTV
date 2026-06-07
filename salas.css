@@ -748,3 +748,388 @@ button {
     bottom: 16px;
   }
 }
+
+/* Ajuste compacto: tudo dentro de uma tela, com rolagem interna nos pontos */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.dashboard-shell {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 220px;
+  padding: 22px 20px;
+  overflow: hidden;
+}
+
+.brand {
+  gap: 7px;
+  padding-left: 14px;
+}
+
+.brand-logo {
+  font-size: 34px;
+}
+
+.brand-texto {
+  max-width: 124px;
+  font-size: 8px;
+}
+
+.menu-lateral {
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.menu-item {
+  min-height: 40px;
+  padding: 0 14px;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.menu-icone {
+  width: 18px;
+  font-size: 16px;
+}
+
+.sidebar-spacer {
+  min-height: 16px;
+}
+
+.resumo-card {
+  padding: 14px 16px;
+}
+
+.resumo-card h3 {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  font-size: 14px;
+}
+
+.resumo-linha {
+  gap: 1px;
+  margin-top: 8px;
+}
+
+.resumo-linha span {
+  font-size: 12px;
+}
+
+.resumo-linha strong {
+  font-size: 16px;
+}
+
+.suporte-card {
+  margin-top: 16px;
+  padding: 14px;
+}
+
+.suporte-icone {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.suporte-card h3 {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.suporte-card p {
+  margin-bottom: 10px;
+  font-size: 11px;
+}
+
+.suporte-card button {
+  height: 34px;
+  font-size: 12px;
+}
+
+.conteudo-principal {
+  height: 100vh;
+  min-height: 0;
+  margin-left: 220px;
+  padding: 26px 30px 20px;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.cabecalho-painel {
+  align-items: flex-start;
+  gap: 18px;
+  padding-bottom: 18px;
+}
+
+.cabecalho-texto h1 {
+  font-size: clamp(30px, 3vw, 42px);
+}
+
+.cabecalho-texto p {
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+.cabecalho-acoes {
+  min-width: 260px;
+  grid-template-columns: 1fr 42px;
+  gap: 12px 12px;
+}
+
+.usuario-topo {
+  gap: 8px;
+  font-size: 14px;
+}
+
+.usuario-icone {
+  font-size: 16px;
+}
+
+.tema-botao {
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+}
+
+.sistema-online {
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.sistema-online span {
+  width: 9px;
+  height: 9px;
+}
+
+.filtros-pontos {
+  grid-template-columns: minmax(260px, 1fr) 140px 155px 160px 138px;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.campo-busca,
+.campo-select,
+.btn-novo-ponto {
+  min-height: 44px;
+}
+
+.campo-busca {
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.campo-busca span {
+  font-size: 20px;
+}
+
+.campo-busca input {
+  font-size: 13px;
+}
+
+.campo-select {
+  padding: 6px 12px;
+}
+
+.campo-select span {
+  font-size: 10px;
+}
+
+.campo-select select {
+  font-size: 13px;
+}
+
+.btn-novo-ponto {
+  gap: 7px;
+  font-size: 13px;
+}
+
+.btn-novo-ponto span {
+  font-size: 20px;
+}
+
+.pontos-box {
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
+  gap: 14px;
+  min-height: 0;
+  padding-right: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-content: start;
+}
+
+.pontos-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pontos-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pontos-box::-webkit-scrollbar-thumb {
+  background: #d7d7dc;
+  border-radius: 999px;
+}
+
+.point-card {
+  min-height: 0;
+  height: clamp(245px, calc((100vh - 230px) / 2), 315px);
+  padding: 10px;
+}
+
+.card-topo {
+  min-height: 24px;
+  margin-bottom: 8px;
+}
+
+.status-pill {
+  min-height: 24px;
+  gap: 6px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.status-pill::before {
+  width: 9px;
+  height: 9px;
+}
+
+.btn-mais {
+  width: 28px;
+  height: 24px;
+  font-size: 18px;
+}
+
+.point-card img {
+  aspect-ratio: 16 / 7.4;
+}
+
+.point-card h3 {
+  margin: 10px 0 6px;
+  font-size: 16px;
+  line-height: 1.12;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-info {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-info p {
+  min-height: 0;
+  font-size: 11px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.codigo-pill {
+  padding: 7px 9px;
+  font-size: 10px;
+}
+
+.btn-detalhes {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.btn-detalhes span {
+  gap: 7px;
+}
+
+.rodape-lista {
+  margin-top: 12px;
+}
+
+.por-pagina select,
+.paginacao button {
+  min-height: 34px;
+}
+
+.por-pagina select {
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.paginacao button {
+  min-width: 34px;
+  font-size: 12px;
+}
+
+.painel-ativo-fixo {
+  right: 18px;
+  bottom: 18px;
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+@media (max-width: 1380px) {
+  .pontos-box {
+    grid-template-columns: repeat(4, minmax(170px, 1fr));
+  }
+
+  .filtros-pontos {
+    grid-template-columns: minmax(230px, 1fr) 125px 145px 145px 122px;
+  }
+
+  .campo-select:nth-of-type(3) {
+    display: flex;
+  }
+}
+
+@media (max-width: 1120px) {
+  .pontos-box {
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+  }
+
+  .filtros-pontos {
+    grid-template-columns: minmax(230px, 1fr) 125px 145px 122px;
+  }
+
+  .campo-select:nth-of-type(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 1060px) {
+  html,
+  body,
+  .dashboard-shell {
+    overflow: auto;
+    height: auto;
+  }
+
+  .conteudo-principal {
+    height: auto;
+    margin-left: 0;
+    padding: 24px 18px 70px;
+    overflow: visible;
+  }
+
+  .pontos-box {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .point-card {
+    height: auto;
+    min-height: 300px;
+  }
+}
