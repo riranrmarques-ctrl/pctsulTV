@@ -102,16 +102,38 @@ function configurarEdicaoSala() {
   const btnCancelar = document.getElementById("btnCancelarEditarSala");
   const btnSalvar = document.getElementById("btnSalvarEditarSala");
   const inputImagem = document.getElementById("editSalaImagem");
+  const btnAlterarImagem = document.getElementById("btnAlterarImagemSala");
+  const inputArquivoImagem = document.getElementById("inputImagemSala");
 
   if (btnEditar) btnEditar.addEventListener("click", abrirModalEditarSala);
   if (btnFechar) btnFechar.addEventListener("click", fecharModalEditarSala);
   if (btnCancelar) btnCancelar.addEventListener("click", fecharModalEditarSala);
   if (btnSalvar) btnSalvar.addEventListener("click", salvarEdicaoSala);
+  if (btnAlterarImagem && inputArquivoImagem) {
+    btnAlterarImagem.addEventListener("click", () => inputArquivoImagem.click());
+  }
 
   if (inputImagem) {
     inputImagem.addEventListener("input", () => {
       const preview = document.getElementById("editSalaPreview");
       if (preview) preview.src = inputImagem.value.trim() || "https://placehold.co/800x450/png";
+    });
+  }
+
+  if (inputArquivoImagem && inputImagem) {
+    inputArquivoImagem.addEventListener("change", () => {
+      const arquivo = inputArquivoImagem.files?.[0];
+      if (!arquivo) return;
+
+      const leitor = new FileReader();
+      leitor.onload = () => {
+        const imagemBase64 = String(leitor.result || "");
+        inputImagem.value = imagemBase64;
+
+        const preview = document.getElementById("editSalaPreview");
+        if (preview) preview.src = imagemBase64;
+      };
+      leitor.readAsDataURL(arquivo);
     });
   }
 }
@@ -393,10 +415,8 @@ function abrirModalEditarSala() {
   if (!salaAtual) return;
 
   setValor("editSalaNome", nomePonto(salaAtual));
-  setValor("editSalaCidade", salaAtual.cidade || salaAtual.regiao || salaAtual.bairro || "");
   setValor("editSalaEndereco", salaAtual.endereco || salaAtual.endereco_completo || salaAtual.localizacao || "");
   setValor("editSalaImagem", imagemPonto(salaAtual));
-  setValor("editSalaTelas", totalTelasPonto(salaAtual, 0));
 
   const preview = document.getElementById("editSalaPreview");
   if (preview) preview.src = imagemPonto(salaAtual);
@@ -420,17 +440,13 @@ async function salvarEdicaoSala() {
   }
 
   const nome = getValor("editSalaNome");
-  const cidade = getValor("editSalaCidade");
   const endereco = getValor("editSalaEndereco");
   const imagemUrl = getValor("editSalaImagem");
-  const totalTelas = Number(getValor("editSalaTelas") || 1);
 
   const dadosAtualizados = {
     nome,
-    cidade,
     endereco,
-    imagem_url: imagemUrl,
-    total_telas: Number.isFinite(totalTelas) && totalTelas > 0 ? totalTelas : 1
+    imagem_url: imagemUrl
   };
 
   const btnSalvar = document.getElementById("btnSalvarEditarSala");
