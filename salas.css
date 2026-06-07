@@ -2084,6 +2084,7 @@ body.modo-detalhe .topo-esquerda {
   justify-self: stretch !important;
 }
 
+/* Administrador na lateral */
 .admin-lateral {
   width: 100%;
   max-width: 280px;
