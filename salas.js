@@ -4,6 +4,7 @@ const SENHA_PAINEL = "@helena";
 
 const CACHE_CENTRAL_KEY = "central_painel_cache_v4";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
+const TABELA_SALAS = "salas";
 const STORAGE_CAPAS_BUCKET = "capas-salas";
 const STORAGE_MATERIAIS_BUCKET = "materiais-salas";
 
@@ -11,6 +12,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let todosOsPontos = [];
 let todasAsPlaylists = [];
+let todosOsMateriais = [];
 let playlistsAtivas = 0;
 let salaAtual = null;
 let imagemSalaSelecionada = null;
@@ -191,7 +193,7 @@ async function criarNovoPonto() {
 
   try {
     const { data, error } = await supabaseClient
-      .from("pontos")
+      .from(TABELA_SALAS)
       .insert(novoPonto)
       .select("*")
       .single();
@@ -242,31 +244,28 @@ async function adicionarMaterialSala(arquivo) {
     const arquivoUrl = await enviarMaterialSala(codigo, arquivo);
 
     const novoMaterial = {
-      codigo_cliente: codigo,
+      codigo_ponto: codigo,
       nome: nomeArquivoSemExtensao(arquivo.name),
-      descricao: arquivo.name,
       arquivo_url: arquivoUrl,
       arquivo_nome: arquivo.name,
       arquivo_tipo: arquivo.type || tipoArquivoPorNome(arquivo.name),
       arquivo_tamanho: arquivo.size || 0,
-      status: "ativo",
-      data_inicio: new Date().toISOString().slice(0, 10),
-      data_fim: null
+      status: "ativo"
     };
 
     const { data, error } = await supabaseClient
-      .from("playlists")
+      .from("materiais_salas")
       .insert(novoMaterial)
       .select("*")
       .single();
 
     if (error) throw error;
 
-    todasAsPlaylists = [data || novoMaterial, ...todasAsPlaylists];
-    playlistsAtivas = contarPlaylistsAtivas(todasAsPlaylists);
+    todosOsMateriais = [data || novoMaterial, ...todosOsMateriais];
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
 
     renderizarPlaylistSala(codigo);
+    setTexto("salaTotalMidias", materiaisDaSala(codigo).length);
     setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
     atualizarResumo(todosOsPontos);
   } catch (erro) {
@@ -321,7 +320,7 @@ async function carregarcentralpainel(opcoes = {}) {
     }
 
     const { data: pontos, error: erroPontos } = await supabaseClient
-      .from("pontos")
+      .from(TABELA_SALAS)
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -339,9 +338,22 @@ async function carregarcentralpainel(opcoes = {}) {
       playlists = respostaPlaylists.data || [];
     }
 
+    let materiais = [];
+
+    const respostaMateriais = await supabaseClient
+      .from("materiais_salas")
+      .select("*");
+
+    if (respostaMateriais.error) {
+      console.warn("Materiais nao carregaram:", respostaMateriais.error);
+    } else {
+      materiais = respostaMateriais.data || [];
+    }
+
     const dados = {
       pontos: pontos || [],
-      playlists
+      playlists,
+      materiais
     };
 
     salvarCacheCentral(dados);
@@ -355,8 +367,10 @@ async function carregarcentralpainel(opcoes = {}) {
 function aplicarDadosCentral(dados) {
   const pontos = dados?.pontos || [];
   const playlists = dados?.playlists || [];
+  const materiais = dados?.materiais || [];
 
   todasAsPlaylists = playlists;
+  todosOsMateriais = materiais;
   playlistsAtivas = contarPlaylistsAtivas(playlists);
   todosOsPontos = combinarPontosComStatus(pontos);
   atualizarPainelFiltrado();
@@ -586,7 +600,7 @@ async function salvarEdicaoSala() {
     };
 
     const { error } = await supabaseClient
-      .from("pontos")
+      .from(TABELA_SALAS)
       .upsert(dadosPersistencia, { onConflict: "codigo" });
 
     if (error) throw error;
@@ -735,10 +749,10 @@ function renderizarPlaylistSala(codigoSala) {
   const lista = document.getElementById("salaPlaylistLista");
   if (!lista) return;
 
-  const itens = playlistsDaSala(codigoSala);
+  const itens = materiaisDaSala(codigoSala);
 
   if (!itens.length) {
-    lista.innerHTML = `<div class="playlist-vazia">Nenhuma playlist cadastrada para esta sala.</div>`;
+    lista.innerHTML = `<div class="playlist-vazia">Nenhum material cadastrado para esta sala.</div>`;
     return;
   }
 
@@ -806,6 +820,20 @@ function playlistsDaSala(codigoSala) {
     return normalizarCodigo(
       item.codigo_cliente ||
       item.codigo_ponto ||
+      item.ponto_codigo ||
+      item.codigo ||
+      ""
+    ) === codigoNormalizado;
+  });
+}
+
+function materiaisDaSala(codigoSala) {
+  const codigoNormalizado = normalizarCodigo(codigoSala);
+
+  return todosOsMateriais.filter(item => {
+    return normalizarCodigo(
+      item.codigo_ponto ||
+      item.codigo_cliente ||
       item.ponto_codigo ||
       item.codigo ||
       ""
