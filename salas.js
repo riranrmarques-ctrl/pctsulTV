@@ -847,7 +847,7 @@ function mensagemErroMaterial(erro) {
     texto.includes("data_postagem") ||
     texto.includes("data_encerramento")
   ) {
-    return "Faltam colunas na tabela materiais_salas. Adicione arquivo_url, arquivo_nome, arquivo_tipo, arquivo_tamanho, data_postagem e data_encerramento.";
+    return "Faltam colunas na tabela materiais_salas. Execute o SQL atualizado e rode notify pgrst, 'reload schema'; no Supabase.";
   }
 
   return "Nao foi possivel adicionar o material.";
@@ -869,7 +869,7 @@ function renderizarPlaylistSala(codigoSala) {
       <span class="playlist-handle">⋮⋮</span>
       <strong>${index + 1}.</strong>
       <div>
-        <h4>${escaparHtml(item.arquivo_nome || item.nome || "Material sem nome")}</h4>
+        <h4>${escaparHtml(item.nome || item.arquivo_nome || "Material sem nome")}</h4>
       </div>
       <time>${escaparHtml(formatarDataHora(item.created_at))}</time>
       <div class="playlist-acoes">
@@ -885,15 +885,24 @@ function renderizarPlaylistSala(codigoSala) {
 
 function configurarAcoesMateriais() {
   document.querySelectorAll(".btn-renomear-material").forEach(botao => {
-    botao.addEventListener("click", () => renomearMaterial(botao.dataset.id));
+    botao.addEventListener("click", () => {
+      animarBotao(botao);
+      renomearMaterial(botao.dataset.id);
+    });
   });
 
   document.querySelectorAll(".btn-download-material").forEach(botao => {
-    botao.addEventListener("click", () => baixarMaterial(botao.dataset.id));
+    botao.addEventListener("click", () => {
+      animarBotao(botao);
+      baixarMaterial(botao.dataset.id);
+    });
   });
 
   document.querySelectorAll(".btn-deletar-material").forEach(botao => {
-    botao.addEventListener("click", () => deletarMaterial(botao.dataset.id));
+    botao.addEventListener("click", () => {
+      animarBotao(botao);
+      deletarMaterial(botao.dataset.id);
+    });
   });
 }
 
@@ -901,7 +910,7 @@ async function renomearMaterial(id) {
   const material = buscarMaterialPorId(id);
   if (!material) return;
 
-  const nomeAtual = material.nome || nomeArquivoSemExtensao(material.arquivo_nome);
+  const nomeAtual = material.nome || material.arquivo_nome || "Material sem nome";
   const novoNome = window.prompt("Novo nome do arquivo:", nomeAtual);
   if (!novoNome || novoNome.trim() === nomeAtual) return;
 
@@ -916,26 +925,56 @@ async function renomearMaterial(id) {
     material.nome = novoNome.trim();
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
     renderizarPlaylistSala(material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo);
+    mostrarStatusFlutuante("Nome atualizado");
   } catch (erro) {
     console.error("Erro ao renomear material:", erro);
-    alert("Nao foi possivel renomear o arquivo.");
+    mostrarStatusFlutuante("Nao foi possivel renomear", "erro");
   }
 }
 
-function baixarMaterial(id) {
+async function baixarMaterial(id) {
   const material = buscarMaterialPorId(id);
   if (!material?.arquivo_url) {
-    alert("Arquivo nao encontrado para download.");
+    mostrarStatusFlutuante("Arquivo nao encontrado", "erro");
     return;
   }
 
+  try {
+    const resposta = await fetch(material.arquivo_url);
+    if (!resposta.ok) throw new Error("Arquivo indisponivel");
+
+    const blob = await resposta.blob();
+    const url = URL.createObjectURL(blob);
+    baixarUrl(url, nomeDownloadMaterial(material));
+    URL.revokeObjectURL(url);
+    mostrarStatusFlutuante("Download iniciado");
+    return;
+  } catch (erro) {
+    console.error("Erro ao baixar material:", erro);
+  }
+
+  baixarUrl(material.arquivo_url, nomeDownloadMaterial(material));
+  mostrarStatusFlutuante("Download iniciado");
+}
+
+function baixarUrl(url, nomeArquivo) {
   const link = document.createElement("a");
-  link.href = material.arquivo_url;
-  link.download = material.arquivo_nome || material.nome || "material";
-  link.target = "_blank";
+  link.href = url;
+  link.download = nomeArquivo;
+  link.rel = "noopener";
   document.body.appendChild(link);
   link.click();
   link.remove();
+}
+
+function nomeDownloadMaterial(material) {
+  const nome = String(material?.nome || material?.arquivo_nome || "material").trim();
+  const arquivoNome = String(material?.arquivo_nome || "").trim();
+
+  if (/\.[a-z0-9]+$/i.test(nome) || !arquivoNome.includes(".")) return nome;
+
+  const extensao = arquivoNome.split(".").pop();
+  return `${nome}.${extensao}`;
 }
 
 async function deletarMaterial(id) {
@@ -968,10 +1007,23 @@ async function deletarMaterial(id) {
     const codigo = salaAtual?.codigo_final || salaAtual?.codigo || material.codigo_ponto || material.codigo_cliente;
     renderizarPlaylistSala(codigo);
     setTexto("salaTotalMidias", materiaisDaSala(codigo).length);
+    mostrarStatusFlutuante("Arquivo deletado");
   } catch (erro) {
     console.error("Erro ao deletar material:", erro);
-    alert("Nao foi possivel deletar o arquivo.");
+    mostrarStatusFlutuante("Nao foi possivel deletar", "erro");
   }
+}
+
+function animarBotao(botao) {
+  if (!botao) return;
+
+  botao.classList.remove("botao-clicado");
+  void botao.offsetWidth;
+  botao.classList.add("botao-clicado");
+
+  setTimeout(() => {
+    botao.classList.remove("botao-clicado");
+  }, 420);
 }
 
 function buscarMaterialPorId(id) {
