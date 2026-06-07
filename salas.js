@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
   configurarFiltros();
   configurarLogout();
+  configurarVoltarSala();
 });
 
 function iniciarLoginCentral() {
@@ -79,6 +80,17 @@ function configurarLogout() {
   btnLogout.addEventListener("click", () => {
     sessionStorage.removeItem("painelLiberado");
     window.location.reload();
+  });
+}
+
+function configurarVoltarSala() {
+  const btnVoltar = document.getElementById("btnVoltarSalas");
+  if (!btnVoltar) return;
+
+  btnVoltar.addEventListener("click", () => {
+    document.body.classList.remove("modo-sala");
+    const salaDetalhe = document.getElementById("salaDetalhe");
+    if (salaDetalhe) salaDetalhe.hidden = true;
   });
 }
 
@@ -307,13 +319,109 @@ function renderizarPontos(pontos) {
           <span class="codigo-pill">${escaparHtml(codigo)}</span>
         </div>
 
-        <button class="btn-detalhes" type="button">
+        <button class="btn-detalhes" type="button" data-codigo="${escaparHtml(codigo)}">
           <span>Entrar na sala</span>
           <strong>→</strong>
         </button>
       </article>
     `;
   });
+
+  lista.querySelectorAll(".btn-detalhes").forEach(botao => {
+    botao.addEventListener("click", () => {
+      const codigo = botao.dataset.codigo || "";
+      const ponto = pontos.find(item => normalizarCodigo(item.codigo_final) === normalizarCodigo(codigo));
+      if (ponto) abrirSala(ponto);
+    });
+  });
+}
+
+function abrirSala(ponto) {
+  const nome = nomePonto(ponto);
+  const endereco = enderecoPonto(ponto);
+  const imagem = imagemPonto(ponto);
+  const codigo = ponto.codigo_final || "------";
+  const status = textoStatus(ponto.status_final);
+  const agora = new Date().toLocaleString("pt-BR");
+
+  setTexto("salaTitulo", nome);
+  setTexto("salaEndereco", endereco);
+  setTexto("salaCodigo", codigo);
+  setTexto("salaStatusTopo", `${status} desde ${agora}`);
+
+  const salaImagem = document.getElementById("salaImagem");
+  if (salaImagem) {
+    salaImagem.src = imagem;
+    salaImagem.alt = nome;
+  }
+
+  renderizarPlaylistSala();
+  renderizarHistoricosSala();
+
+  const salaDetalhe = document.getElementById("salaDetalhe");
+  if (salaDetalhe) salaDetalhe.hidden = false;
+
+  document.body.classList.add("modo-sala");
+}
+
+function renderizarPlaylistSala() {
+  const lista = document.getElementById("salaPlaylistLista");
+  if (!lista) return;
+
+  const itens = [
+    ["Netplace Telecom", "provedora de internet", "05/05/2026, 19:52:23", "19/04/2027"],
+    ["Jhontanas", "Charles", "05/05/2026, 19:34:34", "04/07/2026"],
+    ["Jacqueline Pacheco Moreira", "dentistas", "07/05/2026, 11:09:40", "19/09/2026"],
+    ["Dr. Breno Souza Silva", "consultoria premium", "07/05/2026, 11:21:26", "19/06/2026"],
+    ["Jhontanas", "fernanda", "14/05/2026, 13:37:26", "13/06/2026"],
+    ["Jhontanas", "hotel", "23/05/2026, 01:14:26", "19/07/2026"]
+  ];
+
+  lista.innerHTML = itens.map((item, index) => `
+    <article class="sala-playlist-item">
+      <span class="playlist-handle">⋮⋮</span>
+      <strong>${index + 1}.</strong>
+      <div>
+        <h4>${escaparHtml(item[0])}</h4>
+        <p>${escaparHtml(item[1])}</p>
+      </div>
+      <time>${escaparHtml(item[2])}</time>
+      <time>${escaparHtml(item[3])}</time>
+      <div class="playlist-acoes">
+        <button type="button">✎</button>
+        <button type="button">↓</button>
+        <button type="button">×</button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderizarHistoricosSala() {
+  const encerramento = document.getElementById("salaHistoricoEncerramento");
+  const status = document.getElementById("salaHistoricoStatus");
+
+  if (encerramento) {
+    encerramento.innerHTML = [
+      ["Jhontanas | esquenta.mp4", "02/06/2026"],
+      ["Jhontanas | daiane.", "31/05/2026"]
+    ].map((item, index) => `
+      <div>
+        <strong>${index + 1}.</strong>
+        <span>${escaparHtml(item[0])}</span>
+        <time>${escaparHtml(item[1])}</time>
+      </div>
+    `).join("");
+  }
+
+  if (status) {
+    status.innerHTML = Array.from({ length: 9 }, (_, index) => `
+      <div>
+        <strong>${index + 1}.</strong>
+        <span>Ativo em 07/06/2026, 02:26:49</span>
+        <time>07/06/2026, 02:26:49</time>
+      </div>
+    `).join("");
+  }
 }
 
 function totalTelasPonto(ponto, index) {
