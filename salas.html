@@ -247,7 +247,7 @@
           </div>
 
           <div class="sala-acoes">
-            <button type="button">Editar</button>
+            <button id="btnEditarSala" type="button">Editar</button>
             <button type="button">Biblioteca</button>
             <button type="button" class="btn-upgrade-sala">Adicionar material</button>
           </div>
@@ -278,6 +278,51 @@
 
   </main>
 
+</div>
+
+<div id="modalEditarSala" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card">
+    <div class="modal-editar-topo">
+      <h3>Editar sala</h3>
+      <button id="btnFecharEditarSala" type="button">×</button>
+    </div>
+
+    <div class="modal-editar-grid">
+      <label>
+        <span>Nome da sala</span>
+        <input id="editSalaNome" type="text" placeholder="Nome da sala">
+      </label>
+
+      <label>
+        <span>Cidade / regiao</span>
+        <input id="editSalaCidade" type="text" placeholder="Cidade / regiao">
+      </label>
+
+      <label class="campo-largo">
+        <span>Endereco</span>
+        <input id="editSalaEndereco" type="text" placeholder="Endereco completo">
+      </label>
+
+      <label class="campo-largo">
+        <span>Imagem de capa</span>
+        <input id="editSalaImagem" type="url" placeholder="https://...">
+      </label>
+
+      <label>
+        <span>Telas ativas</span>
+        <input id="editSalaTelas" type="number" min="1" step="1" placeholder="1">
+      </label>
+    </div>
+
+    <div class="modal-editar-preview">
+      <img id="editSalaPreview" src="https://placehold.co/800x450/png" alt="">
+    </div>
+
+    <div class="modal-editar-acoes">
+      <button id="btnCancelarEditarSala" type="button">Cancelar</button>
+      <button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
