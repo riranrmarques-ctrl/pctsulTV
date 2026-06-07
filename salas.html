@@ -7,223 +7,187 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <title>PCTSUL | Salas</title>
-  <link rel="stylesheet" href="salas.css?v=202">
+  <title>PCTSUL | Gerenciador de Pontos</title>
+  <link rel="stylesheet" href="salas.css?v=203">
 </head>
 
 <body>
 
-<div id="conteudoSalas">
-
-  <div class="topo-fixo novo-topo">
-
-    <!-- BOTÃO VOLTAR (SUBSTITUIU MENU) -->
-    <div class="topo-esquerda">
-      <button onclick="window.location.href='centralpainel.html'" class="menu-topo-btn">
-        ← Voltar
-      </button>
-    </div>
-
-    <div class="topo-centro">
-      <h1>Gerenciador de Salas</h1>
-      <p>Gerencie seus Salas e playlists</p>
-    </div>
-
-    <div class="topo-direita">
-      <img src="logo.png?v=2" class="logo-topo-img">
-      <div class="status-topo">Painel Ativo</div>
-    </div>
-
-  </div>
-
-  <div class="painel-shell">
-
-    <!-- LISTA DE Salas -->
-    <div id="listaSalas">
-      <div class="Salas-box"></div>
-
-      <div class="novo-ponto-area">
-        <button id="btnNovoPonto" class="btn-novo-ponto">+ Novo ponto</button>
-      </div>
-
-      <div class="admin-lateral">
-        <div class="admin-icone">👤</div>
-
-        <div class="admin-texto">
-          <span>Olá,</span>
-          <strong>Administrador</strong>
-        </div>
-
-        <button class="admin-seta" type="button">›</button>
-      </div>
-
-      <div class="assinatura-duna">
-        Desenvolvido por <strong>Duna Branding</strong>
-      </div>
-    </div>
-
-    <!-- DETALHE DO PONTO -->
-    <div id="pontoDetalhe" class="playlist-box" style="display:none;">
-
-      <div class="playlist-topbar playlist-topbar-novo">
-        <div class="topbar-esquerda">
-          <button id="btnVoltar" class="btn-secundario">← Voltar</button>
-          <span class="topbar-titulo">Gerencie e organize a sua playlist</span>
-        </div>
-
-        <!-- STATUS ORIGINAL MANTIDO -->
-        <div class="topbar-direita">
-          <div id="statusPonto" class="status-destaque"></div>
-        </div>
-      </div>
-
-      <div class="playlist-header playlist-header-novo">
-        <div class="playlist-topo-flex">
-
-          <div class="playlist-imagem-box">
-            <img id="imagemPonto" src="https://placehold.co/600x320/png">
-          </div>
-
-          <div class="playlist-header-textos">
-
-            <h2 id="tituloPasta"></h2>
-
-            <div class="playlist-info-extra">
-              <div id="cidadePonto" class="playlist-info-item"></div>
-              <div id="enderecoPonto" class="playlist-info-item"></div>
-            </div>
-
-            <div class="playlist-codigo-linha">
-              <button id="btnToggleDisponibilidade" class="toggle-ponto ativo">
-                <span class="toggle-bolinha"></span>
-                <span class="toggle-texto">Disponível</span>
-              </button>
-
-              <span id="codigoAtual"></span>
-            </div>
-
-            <div class="playlist-acoes-topo">
-              <button id="btnEditarInfo" class="btn-secundario">Editar informações</button>
-              <button id="btnUpgradePlaylist" class="btn-upgrade-playlist">upgrade</button>
-              <input id="inputUpgradePlaylist" type="file" hidden>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <div class="playlist-layout-novo">
-
-        <div class="playlist-coluna-ativa">
-          <div class="playlist-secao playlist-secao-ativa">
-            <div class="playlist-secao-topo">
-              <h4>Playlist ativa</h4>
-            </div>
-            <div id="playlistAtiva" class="playlist-lista"></div>
-          </div>
-        </div>
-
-        <div class="playlist-coluna-historico">
-
-          <div class="playlist-secao">
-            <div class="playlist-secao-topo">
-              <h4>Histórico de encerramento</h4>
-            </div>
-            <div id="historicoEncerramento" class="historico-lista"></div>
-          </div>
-
-          <div class="playlist-secao">
-            <div class="playlist-secao-topo">
-              <h4>Histórico de status</h4>
-            </div>
-            <div id="historicoStatus" class="historico-lista"></div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-  
- <!-- MODAL EDITAR -->
-<div id="modalEditar" class="modal-editar" style="display:none;">
-  <div class="modal-conteudo modal-conteudo-amplo">
-
-    <h3>Editar Informações</h3>
-
-    <div class="modal-secao">
-      <h4>Dados do ponto</h4>
-
-      <input type="text" id="editNome" placeholder="Nome do ponto">
-      <input type="text" id="editCidade" placeholder="Cidade / região">
-      <input type="text" id="editEndereco" placeholder="Endereço completo">
-    </div>
-
-    <div class="modal-grid-edicao">
-      <div class="modal-secao modal-secao-contrato">
-        <h4>Período</h4>
-
-        <div class="contrato-periodo">
-          <input type="text" id="editContratoInicio" placeholder="Data inicial" inputmode="numeric" required>
-          <input type="text" id="editContratoFim" placeholder="Data final" inputmode="numeric" required>
-        </div>
-      </div>
-
-      <div class="modal-secao modal-secao-download">
-        <div class="contrato-download-layout">
-          <div class="contrato-parceria">
-            <label class="parceria-titulo">Parceria?</label>
-
-            <div class="parceria-opcoes">
-              <label>
-                <input type="radio" name="contratoParceriaOpcao" id="editContratoParceriaSim" value="sim">
-                <span>Sim</span>
-              </label>
-
-              <label>
-                <input type="radio" name="contratoParceriaOpcao" id="editContratoParceriaNao" value="nao">
-                <span>Não</span>
-              </label>
-            </div>
-
-            <input type="text" id="editValorContrato" placeholder="Valor / custo">
-          </div>
-
-          <button id="btnBaixarContrato" class="btn-baixar-contrato" type="button">
-            Baixar contrato
-          </button>
-        </div>
-      </div>
-
-      <div class="modal-secao modal-secao-responsavel">
-        <h4>Dados do responsável pelo estabelecimento</h4>
-
-        <input type="text" id="editResponsavelNome" placeholder="Nome completo" required>
-        <input type="text" id="editResponsavelCpf" placeholder="CPF / CNPJ" inputmode="numeric" required>
-        <input type="text" id="editResponsavelTelefone" placeholder="Telefone" inputmode="numeric" required>
-        <input type="email" id="editResponsavelEmail" placeholder="E-mail" required>
-      </div>
-
-      <div class="edit-imagem-box modal-secao-imagem">
-        <h4>Imagem do ponto</h4>
-        <img id="previewImagem">
-        <input type="file" id="inputImagem" accept="image/*">
-      </div>
-
-      <div class="edit-botoes">
-        <button id="btnSalvarEdicao" type="button">Salvar</button>
-        <button id="btnDeletarPonto" class="btn-deletar-ponto" type="button">Deletar ponto</button>
-        <button id="btnFecharModal" type="button">Voltar</button>
-      </div>
-    </div>
-
+<div id="loginBox" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">PC<br>SUL</div>
+    <h2>Acesso ao painel</h2>
+    <input id="senhaInput" type="password" placeholder="Digite o codigo de acesso">
+    <button id="btnLogin" type="button">Entrar</button>
+    <div id="loginErro" class="login-erro"></div>
   </div>
 </div>
-  
+
+<div id="conteudoPainel" class="dashboard-shell" style="display:none;">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">PC<br>SUL</div>
+      <div class="brand-texto">
+        Parque Cientifico<br>
+        e Tecnologico<br>
+        do Sul da Bahia
+      </div>
+    </div>
+
+    <nav class="menu-lateral">
+      <a href="#" class="menu-item ativo">
+        <span class="menu-icone">⌖</span>
+        <span>Pontos</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">♫</span>
+        <span>Playlists</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">▥</span>
+        <span>Relatorios</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">♙</span>
+        <span>Usuarios</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">⚙</span>
+        <span>Configuracoes</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+
+    <section class="resumo-card">
+      <h3>Resumo rapido</h3>
+      <div class="resumo-linha">
+        <span>Total de pontos</span>
+        <strong id="totalPontosResumo">0</strong>
+      </div>
+      <div class="resumo-linha positivo">
+        <span>Pontos ativos</span>
+        <strong id="pontosAtivosResumo">0</strong>
+      </div>
+      <div class="resumo-linha negativo">
+        <span>Pontos inativos</span>
+        <strong id="pontosInativosResumo">0</strong>
+      </div>
+      <div class="resumo-linha">
+        <span>Playlists ativas</span>
+        <strong id="playlistsAtivasResumo">0</strong>
+      </div>
+    </section>
+
+    <section class="suporte-card">
+      <div class="suporte-icone">?</div>
+      <h3>Precisa de ajuda?</h3>
+      <p>Acesse nossa central de suporte.</p>
+      <button type="button">
+        Abrir suporte
+        <span>→</span>
+      </button>
+    </section>
+  </aside>
+
+  <main class="conteudo-principal">
+    <header class="cabecalho-painel">
+      <div class="cabecalho-texto">
+        <h1>Gerenciador de Pontos</h1>
+        <p>Gerencie seus pontos e playlists de forma simples e eficiente.</p>
+      </div>
+
+      <div class="cabecalho-acoes">
+        <button class="usuario-topo" type="button">
+          <span class="usuario-icone">♙</span>
+          <strong>Ola, Administrador</strong>
+          <span>⌄</span>
+        </button>
+
+        <button class="tema-botao" type="button" aria-label="Alternar tema">☼</button>
+
+        <div class="sistema-online">
+          <span></span>
+          Sistema Online
+        </div>
+      </div>
+    </header>
+
+    <section class="filtros-pontos">
+      <label class="campo-busca">
+        <span>⌕</span>
+        <input id="buscaPontos" type="search" placeholder="Buscar por nome, endereco ou codigo">
+      </label>
+
+      <label class="campo-select">
+        <span>Status</span>
+        <select id="filtroStatus">
+          <option value="todos">Todos</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+          <option value="desativado">Desativados</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Tipo de ponto</span>
+        <select id="filtroTipo">
+          <option value="todos">Todos</option>
+          <option value="academia">Academia</option>
+          <option value="campus">Campus</option>
+          <option value="loja">Loja</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Ordenar por</span>
+        <select id="ordenarPontos">
+          <option value="recentes">Mais recentes</option>
+          <option value="nome">Nome</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
+      <button id="btnNovoPonto" class="btn-novo-ponto" type="button">
+        <span>+</span>
+        Novo ponto
+      </button>
+    </section>
+
+    <section id="listaPontos" class="pontos-box"></section>
+
+    <footer class="rodape-lista">
+      <label class="por-pagina">
+        <select>
+          <option>8 por pagina</option>
+          <option>12 por pagina</option>
+          <option>24 por pagina</option>
+        </select>
+      </label>
+
+      <div class="paginacao">
+        <button type="button">‹</button>
+        <button type="button" class="ativo">1</button>
+        <button type="button">2</button>
+        <button type="button">3</button>
+        <button type="button">›</button>
+      </div>
+    </footer>
+  </main>
+
+  <button class="painel-ativo-fixo" type="button">
+    <span>▦</span>
+    Painel Ativo
+  </button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="salas.js?v=201"></script>
+<script src="salas.js?v=203"></script>
 
 </body>
 </html>
