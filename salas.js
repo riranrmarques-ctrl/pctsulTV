@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarLogout();
   configurarVoltarSala();
   configurarEdicaoSala();
+  configurarNovoPonto();
 });
 
 function iniciarLoginCentral() {
@@ -76,6 +77,13 @@ function configurarFiltros() {
     elemento.addEventListener("input", atualizarPainelFiltrado);
     elemento.addEventListener("change", atualizarPainelFiltrado);
   });
+}
+
+function configurarNovoPonto() {
+  const btnNovoPonto = document.getElementById("btnNovoPonto");
+  if (!btnNovoPonto) return;
+
+  btnNovoPonto.addEventListener("click", criarNovoPonto);
 }
 
 function configurarLogout() {
@@ -139,6 +147,54 @@ function configurarEdicaoSala() {
       };
       leitor.readAsDataURL(arquivo);
     });
+  }
+}
+
+async function criarNovoPonto() {
+  const btnNovoPonto = document.getElementById("btnNovoPonto");
+  const textoOriginal = btnNovoPonto ? btnNovoPonto.innerHTML : "";
+  const codigo = gerarCodigoPonto();
+
+  const novoPonto = {
+    codigo,
+    nome: "Nova sala",
+    endereco: "Predio nao informado",
+    imagem_url: "",
+    status: "ativo",
+    tipo_ponto: "sala",
+    total_telas: 0,
+    disponivel: true
+  };
+
+  if (btnNovoPonto) {
+    btnNovoPonto.disabled = true;
+    btnNovoPonto.innerHTML = "<span>+</span> Criando...";
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("pontos")
+      .insert(novoPonto)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    const pontoCriado = combinarPontosComStatus([data || novoPonto])[0];
+
+    todosOsPontos = [pontoCriado, ...todosOsPontos];
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    atualizarPainelFiltrado();
+    abrirSala(pontoCriado);
+    abrirModalEditarSala();
+  } catch (erro) {
+    console.error("Erro ao criar ponto:", erro);
+    alert(mensagemErroNovoPonto(erro));
+  } finally {
+    if (btnNovoPonto) {
+      btnNovoPonto.disabled = false;
+      btnNovoPonto.innerHTML = textoOriginal || "<span>+</span> Novo ponto";
+    }
   }
 }
 
@@ -534,6 +590,20 @@ function mensagemErroSala(erro) {
   return "Nao foi possivel salvar as informacoes da sala.";
 }
 
+function mensagemErroNovoPonto(erro) {
+  const texto = String(erro?.message || erro?.details || erro?.hint || "");
+
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("pontos")) {
+    return "A tabela pontos ainda nao existe no banco novo. Rode o SQL de criacao das tabelas no Supabase.";
+  }
+
+  if (texto.toLowerCase().includes("duplicate") || erro?.code === "23505") {
+    return "O codigo gerado ja existe. Tente criar novamente.";
+  }
+
+  return "Nao foi possivel criar o novo ponto.";
+}
+
 function renderizarPlaylistSala(codigoSala) {
   const lista = document.getElementById("salaPlaylistLista");
   if (!lista) return;
@@ -670,6 +740,21 @@ function formatarDataHora(valor) {
 
 function normalizarCodigo(codigo) {
   return String(codigo || "").trim().toUpperCase();
+}
+
+function gerarCodigoPonto() {
+  const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let codigo = "";
+
+  for (let i = 0; i < 7; i += 1) {
+    codigo += caracteres[Math.floor(Math.random() * caracteres.length)];
+  }
+
+  const jaExiste = todosOsPontos.some(ponto => {
+    return normalizarCodigo(ponto.codigo_final || ponto.codigo) === codigo;
+  });
+
+  return jaExiste ? gerarCodigoPonto() : codigo;
 }
 
 function normalizarStatus(status) {
