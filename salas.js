@@ -2,13 +2,14 @@ const SUPABASE_URL = "https://niqyhaiytiusvyspjsld.supabase.co";
 const SUPABASE_KEY = "sb_publishable_O6vm7g-Xiv4COo1mNHCBAw_jgEJbSDI";
 const SENHA_PAINEL = "@helena";
 
-const CACHE_CENTRAL_KEY = "central_painel_cache_v3";
+const CACHE_CENTRAL_KEY = "central_painel_cache_v4";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
 const STORAGE_CAPAS_BUCKET = "capas-salas";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let todosOsPontos = [];
+let todasAsPlaylists = [];
 let playlistsAtivas = 0;
 let salaAtual = null;
 let imagemSalaSelecionada = null;
@@ -173,7 +174,9 @@ async function carregarcentralpainel(opcoes = {}) {
   try {
     const cache = lerCacheCentral();
 
-    if (!opcoes.forcarAtualizacao && cache?.dados) {
+    const cacheComPontosReais = Array.isArray(cache?.dados?.pontos) && cache.dados.pontos.length > 0;
+
+    if (!opcoes.forcarAtualizacao && cache?.dados && cacheComPontosReais) {
       aplicarDadosCentral(cache.dados);
 
       if (cache.fresco) return;
@@ -186,13 +189,11 @@ async function carregarcentralpainel(opcoes = {}) {
 
     if (erroPontos) throw erroPontos;
 
-    const status = await buscarStatusPontos();
-
     let playlists = [];
 
     const respostaPlaylists = await supabaseClient
       .from("playlists")
-      .select("codigo_cliente,data_fim,status,created_at");
+      .select("*");
 
     if (respostaPlaylists.error) {
       console.warn("Playlists nao carregaram:", respostaPlaylists.error);
@@ -202,7 +203,6 @@ async function carregarcentralpainel(opcoes = {}) {
 
     const dados = {
       pontos: pontos || [],
-      status: status || [],
       playlists
     };
 
@@ -210,56 +210,22 @@ async function carregarcentralpainel(opcoes = {}) {
     aplicarDadosCentral(dados);
   } catch (erro) {
     console.error("Erro ao carregar central painel:", erro);
-    aplicarDadosCentral({ pontos: pontosDemo(), status: [], playlists: [] });
+    aplicarDadosCentral({ pontos: [], playlists: [] });
   }
 }
 
 function aplicarDadosCentral(dados) {
   const pontos = dados?.pontos || [];
-  const status = dados?.status || [];
   const playlists = dados?.playlists || [];
 
+  todasAsPlaylists = playlists;
   playlistsAtivas = contarPlaylistsAtivas(playlists);
-  todosOsPontos = combinarPontosComStatus(pontos.length ? pontos : pontosDemo(), status);
+  todosOsPontos = combinarPontosComStatus(pontos);
   atualizarPainelFiltrado();
 }
 
-async function buscarStatusPontos() {
-  const consultas = [
-    { ordem: "ultimo_ping" },
-    { ordem: "data_hora" },
-    { ordem: "created_at" }
-  ];
-
-  for (const consulta of consultas) {
-    const { data, error } = await supabaseClient
-      .from("statuspontos")
-      .select("*")
-      .order(consulta.ordem, { ascending: false });
-
-    if (!error) return data || [];
-
-    console.warn(`Status nao carregou usando ${consulta.ordem}:`, error);
-  }
-
-  return [];
-}
-
-function combinarPontosComStatus(pontos, status) {
+function combinarPontosComStatus(pontos) {
   const statusPorCodigo = {};
-
-  (status || []).forEach(item => {
-    const codigoStatus = normalizarCodigo(
-      item.codigo ||
-      item.codigo_ponto ||
-      item.ponto_codigo ||
-      ""
-    );
-
-    if (!codigoStatus || statusPorCodigo[codigoStatus]) return;
-
-    statusPorCodigo[codigoStatus] = item;
-  });
 
   return pontos.map(ponto => {
     const codigoPonto = normalizarCodigo(ponto.codigo || ponto.codigo_ponto || ponto.ponto_codigo || ponto.codigo_final || "");
@@ -308,7 +274,7 @@ function atualizarResumo(pontos) {
   setTexto("totalPontosResumo", total);
   setTexto("pontosAtivosResumo", ativos);
   setTexto("pontosInativosResumo", inativos);
-  setTexto("playlistsAtivasResumo", playlistsAtivas || 8);
+  setTexto("playlistsAtivasResumo", playlistsAtivas);
 }
 
 function ordenarPontos(pontos, ordenar) {
@@ -397,6 +363,8 @@ function abrirSala(ponto) {
   setTexto("salaEndereco", endereco);
   setTexto("salaCodigo", codigo);
   setTexto("salaStatusTopo", `${status} desde ${agora}`);
+  setTexto("salaTotalMidias", totalMidiasPonto(ponto));
+  setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
   setTexto("salaDiasOnline", totalTelasPonto(ponto, 0));
 
   const salaImagem = document.getElementById("salaImagem");
@@ -405,7 +373,7 @@ function abrirSala(ponto) {
     salaImagem.alt = nome;
   }
 
-  renderizarPlaylistSala();
+  renderizarPlaylistSala(codigo);
   renderizarHistoricosSala();
 
   const salaDetalhe = document.getElementById("salaDetalhe");
@@ -467,10 +435,21 @@ async function salvarEdicaoSala() {
       dadosAtualizados.imagem_url = getValor("editSalaImagem");
     }
 
+    const dadosPersistencia = {
+      codigo,
+      nome: dadosAtualizados.nome,
+      endereco: dadosAtualizados.endereco,
+      imagem_url: dadosAtualizados.imagem_url,
+      cidade: salaAtual.cidade || salaAtual.regiao || salaAtual.bairro || null,
+      status: salaAtual.status || salaAtual.status_final || "ativo",
+      tipo_ponto: salaAtual.tipo_ponto || "sala",
+      total_telas: totalTelasPonto(salaAtual, 0),
+      disponivel: salaAtual.disponivel !== false
+    };
+
     const { error } = await supabaseClient
       .from("pontos")
-      .update(dadosAtualizados)
-      .eq("codigo", codigo);
+      .upsert(dadosPersistencia, { onConflict: "codigo" });
 
     if (error) throw error;
 
@@ -555,29 +534,27 @@ function mensagemErroSala(erro) {
   return "Nao foi possivel salvar as informacoes da sala.";
 }
 
-function renderizarPlaylistSala() {
+function renderizarPlaylistSala(codigoSala) {
   const lista = document.getElementById("salaPlaylistLista");
   if (!lista) return;
 
-  const itens = [
-    ["Netplace Telecom", "provedora de internet", "05/05/2026, 19:52:23", "19/04/2027"],
-    ["Jhontanas", "Charles", "05/05/2026, 19:34:34", "04/07/2026"],
-    ["Jacqueline Pacheco Moreira", "dentistas", "07/05/2026, 11:09:40", "19/09/2026"],
-    ["Dr. Breno Souza Silva", "consultoria premium", "07/05/2026, 11:21:26", "19/06/2026"],
-    ["Jhontanas", "fernanda", "14/05/2026, 13:37:26", "13/06/2026"],
-    ["Jhontanas", "hotel", "23/05/2026, 01:14:26", "19/07/2026"]
-  ];
+  const itens = playlistsDaSala(codigoSala);
+
+  if (!itens.length) {
+    lista.innerHTML = `<div class="playlist-vazia">Nenhuma playlist cadastrada para esta sala.</div>`;
+    return;
+  }
 
   lista.innerHTML = itens.map((item, index) => `
     <article class="sala-playlist-item">
       <span class="playlist-handle">⋮⋮</span>
       <strong>${index + 1}.</strong>
       <div>
-        <h4>${escaparHtml(item[0])}</h4>
-        <p>${escaparHtml(item[1])}</p>
+        <h4>${escaparHtml(item.nome || item.titulo || "Playlist sem nome")}</h4>
+        <p>${escaparHtml(item.descricao || item.status || "")}</p>
       </div>
-      <time>${escaparHtml(item[2])}</time>
-      <time>${escaparHtml(item[3])}</time>
+      <time>${escaparHtml(formatarDataHora(item.created_at))}</time>
+      <time>${escaparHtml(formatarData(item.data_fim))}</time>
       <div class="playlist-acoes">
         <button type="button">✎</button>
         <button type="button">↓</button>
@@ -592,26 +569,11 @@ function renderizarHistoricosSala() {
   const status = document.getElementById("salaHistoricoStatus");
 
   if (encerramento) {
-    encerramento.innerHTML = [
-      ["Jhontanas | esquenta.mp4", "02/06/2026"],
-      ["Jhontanas | daiane.", "31/05/2026"]
-    ].map((item, index) => `
-      <div>
-        <strong>${index + 1}.</strong>
-        <span>${escaparHtml(item[0])}</span>
-        <time>${escaparHtml(item[1])}</time>
-      </div>
-    `).join("");
+    encerramento.innerHTML = `<div><span>Nenhum historico de encerramento.</span></div>`;
   }
 
   if (status) {
-    status.innerHTML = Array.from({ length: 9 }, (_, index) => `
-      <div>
-        <strong>${index + 1}.</strong>
-        <span>Ativo em 07/06/2026, 02:26:49</span>
-        <time>07/06/2026, 02:26:49</time>
-      </div>
-    `).join("");
+    status.innerHTML = `<div><span>Nenhum historico de status.</span></div>`;
   }
 }
 
@@ -624,9 +586,34 @@ function totalTelasPonto(ponto, index) {
     ponto.numero_telas;
 
   const numero = Number(valor);
-  if (Number.isFinite(numero) && numero > 0) return numero;
+  if (Number.isFinite(numero) && numero >= 0) return numero;
 
-  return [3, 2, 4, 1, 2, 5, 3, 6][index % 8];
+  return 0;
+}
+
+function totalMidiasPonto(ponto) {
+  const valor =
+    ponto.total_midias ||
+    ponto.quantidade_midias ||
+    ponto.qtd_midias ||
+    ponto.midias;
+
+  const numero = Number(valor);
+  return Number.isFinite(numero) && numero >= 0 ? numero : 0;
+}
+
+function playlistsDaSala(codigoSala) {
+  const codigoNormalizado = normalizarCodigo(codigoSala);
+
+  return todasAsPlaylists.filter(item => {
+    return normalizarCodigo(
+      item.codigo_cliente ||
+      item.codigo_ponto ||
+      item.ponto_codigo ||
+      item.codigo ||
+      ""
+    ) === codigoNormalizado;
+  });
 }
 
 function contarPlaylistsAtivas(playlists) {
@@ -660,7 +647,25 @@ function imagemPonto(ponto) {
     ponto.foto_url ||
     ponto.imagem ||
     ponto.banner_url ||
-    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80";
+    "https://placehold.co/900x520/111111/ffffff?text=Sem+imagem";
+}
+
+function formatarData(valor) {
+  if (!valor) return "";
+
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return String(valor);
+
+  return data.toLocaleDateString("pt-BR");
+}
+
+function formatarDataHora(valor) {
+  if (!valor) return "";
+
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return String(valor);
+
+  return data.toLocaleString("pt-BR");
 }
 
 function normalizarCodigo(codigo) {
@@ -727,73 +732,4 @@ function escaparHtml(valor) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function pontosDemo() {
-  return [
-    {
-      nome: "Smart Fit Ilheus",
-      cidade: "Zona Sul",
-      endereco: "Av. Tancredo Neves, 2495 - Jardim Atlantico, Ilheus",
-      codigo: "A4M4G1W",
-      status: "ativo",
-      imagem_url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Aeroshake / Avenida",
-      cidade: "Ilheus",
-      endereco: "Avenida Soares Lopes",
-      codigo: "V2M6E5Y",
-      status: "ativo",
-      imagem_url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Aeroshake / Missael Tavares",
-      cidade: "Ilheus",
-      endereco: "Praca Missael Tavares, Cidade Nova",
-      codigo: "G4A0K4A",
-      status: "ativo",
-      imagem_url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Smart Fit Conlar",
-      cidade: "Itabuna",
-      endereco: "Avenida Juracy Magalhaes, 782 - Nossa Senhora de Fatima",
-      codigo: "H6M9G7J",
-      status: "inativo",
-      imagem_url: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Smart Fit Shopping",
-      cidade: "Itabuna",
-      endereco: "Av. Aziz Maron, s/n - Goes Calmon",
-      codigo: "O8L2K6R",
-      status: "inativo",
-      imagem_url: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Academia Smart Fit",
-      cidade: "Porto Seguro",
-      endereco: "Av. dos Trabalhadores, 2008 - Olhos D'agua",
-      codigo: "P9M8Z4R",
-      status: "inativo",
-      imagem_url: "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "Jacques Janine",
-      cidade: "Ilheus",
-      endereco: "Praia dos Milionarios - R. Acana, 11 - Nossa Sra. da Vitoria",
-      codigo: "T4D8A5N",
-      status: "inativo",
-      imagem_url: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80"
-    },
-    {
-      nome: "UESC",
-      cidade: "Ilheus x Itabuna",
-      endereco: "Campus Soane Nazare de Andrade",
-      codigo: "L7O9K4M",
-      status: "ativo",
-      imagem_url: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80"
-    }
-  ];
 }
