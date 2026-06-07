@@ -293,25 +293,17 @@
         <input id="editSalaNome" type="text" placeholder="Nome da sala">
       </label>
 
-      <label>
-        <span>Cidade / regiao</span>
-        <input id="editSalaCidade" type="text" placeholder="Cidade / regiao">
+      <label class="campo-largo">
+        <span>Predio</span>
+        <input id="editSalaEndereco" type="text" placeholder="Predio">
       </label>
 
-      <label class="campo-largo">
-        <span>Endereco</span>
-        <input id="editSalaEndereco" type="text" placeholder="Endereco completo">
-      </label>
-
-      <label class="campo-largo">
+      <div class="campo-largo campo-imagem-capa">
         <span>Imagem de capa</span>
-        <input id="editSalaImagem" type="url" placeholder="https://...">
-      </label>
-
-      <label>
-        <span>Telas ativas</span>
-        <input id="editSalaTelas" type="number" min="1" step="1" placeholder="1">
-      </label>
+        <button id="btnAlterarImagemSala" type="button">Alterar imagem</button>
+        <input id="editSalaImagem" type="hidden">
+        <input id="inputImagemSala" type="file" accept="image/*" hidden>
+      </div>
     </div>
 
     <div class="modal-editar-preview">
