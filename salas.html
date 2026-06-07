@@ -37,32 +37,68 @@
 
     <nav class="menu-lateral">
       <a href="#" class="menu-item ativo">
-        <span class="menu-icone">⌖</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v4"></path>
+            <path d="M12 18v4"></path>
+            <path d="M2 12h4"></path>
+            <path d="M18 12h4"></path>
+            <circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </span>
         <span>Pontos</span>
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">▥</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V5"></path>
+            <path d="M9 19V9"></path>
+            <path d="M14 19V3"></path>
+            <path d="M19 19v-7"></path>
+          </svg>
+        </span>
         <span>Relatorios</span>
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">♙</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M5 21a7 7 0 0 1 14 0"></path>
+          </svg>
+        </span>
         <span>Usuarios</span>
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">▣</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path>
+            <path d="M8 7h8"></path>
+            <path d="M8 12h8"></path>
+            <path d="M8 17h5"></path>
+          </svg>
+        </span>
         <span>Biblioteca</span>
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">⚡</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
+          </svg>
+        </span>
         <span>Ativador</span>
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">◉</span>
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
         <span>RadioTv</span>
       </a>
     </nav>
@@ -90,16 +126,27 @@
     </section>
 
     <section class="usuario-card">
-      <div class="usuario-avatar">♙</div>
+      <div class="usuario-card-topo">
+        <div class="usuario-avatar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M5 21a7 7 0 0 1 14 0"></path>
+          </svg>
+        </div>
 
-      <div class="usuario-card-texto">
-        <span>Usuario logado</span>
-        <strong>Administrador</strong>
-        <small>Painel principal</small>
+        <div class="usuario-card-texto">
+          <span>Sessao ativa</span>
+          <strong>Administrador</strong>
+        </div>
       </div>
 
-      <button type="button">
-        Sair
+      <div class="usuario-status">
+        <span></span>
+        Acesso liberado
+      </div>
+
+      <button id="btnLogout" type="button">
+        Encerrar sessao
         <span>→</span>
       </button>
     </section>
@@ -166,10 +213,6 @@
 
   </main>
 
-  <button class="painel-ativo-fixo" type="button">
-    <span>▦</span>
-    Painel Ativo
-  </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
