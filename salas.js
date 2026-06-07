@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarVoltarSala();
   configurarEdicaoSala();
   configurarNovoPonto();
+  configurarAdicionarMaterial();
 });
 
 function iniciarLoginCentral() {
@@ -84,6 +85,13 @@ function configurarNovoPonto() {
   if (!btnNovoPonto) return;
 
   btnNovoPonto.addEventListener("click", criarNovoPonto);
+}
+
+function configurarAdicionarMaterial() {
+  const btnAdicionarMaterial = document.getElementById("btnAdicionarMaterial");
+  if (!btnAdicionarMaterial) return;
+
+  btnAdicionarMaterial.addEventListener("click", adicionarMaterialSala);
 }
 
 function configurarLogout() {
@@ -194,6 +202,65 @@ async function criarNovoPonto() {
     if (btnNovoPonto) {
       btnNovoPonto.disabled = false;
       btnNovoPonto.innerHTML = textoOriginal || "<span>+</span> Novo ponto";
+    }
+  }
+}
+
+async function adicionarMaterialSala() {
+  if (!salaAtual) {
+    alert("Abra uma sala antes de adicionar material.");
+    return;
+  }
+
+  const codigo = salaAtual.codigo_final || salaAtual.codigo;
+  if (!codigo) {
+    alert("Codigo da sala nao encontrado.");
+    return;
+  }
+
+  const nome = window.prompt("Nome do material ou playlist:", "Novo material");
+  if (!nome) return;
+
+  const btnAdicionarMaterial = document.getElementById("btnAdicionarMaterial");
+  const textoOriginal = btnAdicionarMaterial ? btnAdicionarMaterial.textContent : "";
+
+  if (btnAdicionarMaterial) {
+    btnAdicionarMaterial.disabled = true;
+    btnAdicionarMaterial.textContent = "Adicionando...";
+  }
+
+  try {
+    const novoMaterial = {
+      codigo_cliente: codigo,
+      nome,
+      descricao: "",
+      status: "ativo",
+      data_inicio: new Date().toISOString().slice(0, 10),
+      data_fim: null
+    };
+
+    const { data, error } = await supabaseClient
+      .from("playlists")
+      .insert(novoMaterial)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    todasAsPlaylists = [data || novoMaterial, ...todasAsPlaylists];
+    playlistsAtivas = contarPlaylistsAtivas(todasAsPlaylists);
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+
+    renderizarPlaylistSala(codigo);
+    setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
+    atualizarResumo(todosOsPontos);
+  } catch (erro) {
+    console.error("Erro ao adicionar material:", erro);
+    alert(mensagemErroMaterial(erro));
+  } finally {
+    if (btnAdicionarMaterial) {
+      btnAdicionarMaterial.disabled = false;
+      btnAdicionarMaterial.textContent = textoOriginal || "Adicionar material";
     }
   }
 }
@@ -602,6 +669,16 @@ function mensagemErroNovoPonto(erro) {
   }
 
   return "Nao foi possivel criar o novo ponto.";
+}
+
+function mensagemErroMaterial(erro) {
+  const texto = String(erro?.message || erro?.details || erro?.hint || "");
+
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("playlists")) {
+    return "A tabela playlists ainda nao existe no banco novo. Crie a tabela playlists no Supabase.";
+  }
+
+  return "Nao foi possivel adicionar o material.";
 }
 
 function renderizarPlaylistSala(codigoSala) {
