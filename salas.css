@@ -1054,3 +1054,184 @@ body {
     min-height: 300px;
   }
 }
+
+/* Tema escuro refinado com cards brancos */
+:root {
+  --bg: #090b0c;
+  --panel: #0d1011;
+  --text: #f8fafc;
+  --muted: #aeb5bd;
+  --line: rgba(255, 255, 255, 0.14);
+  --soft: rgba(255, 255, 255, 0.08);
+  --black: #030303;
+  --green: #16b861;
+  --green-soft: rgba(22, 184, 97, 0.14);
+  --red: #ef3d3d;
+  --red-soft: rgba(239, 61, 61, 0.12);
+}
+
+body,
+.dashboard-shell {
+  color: var(--text);
+  background:
+    radial-gradient(circle at 72% 8%, rgba(255, 255, 255, 0.055), transparent 24%),
+    radial-gradient(circle at 48% 42%, rgba(255, 255, 255, 0.035), transparent 28%),
+    linear-gradient(135deg, #0b0e0f 0%, #050606 52%, #101313 100%);
+}
+
+.sidebar {
+  background: rgba(6, 8, 9, 0.92);
+  border-right-color: rgba(255, 255, 255, 0.14);
+}
+
+.brand-logo,
+.brand-texto {
+  color: #ffffff;
+}
+
+.menu-item {
+  color: #e8edf2;
+}
+
+.menu-item:not(.ativo):hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.menu-item.ativo {
+  background: #ffffff;
+  color: #050505;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+}
+
+.resumo-card,
+.usuario-card {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+}
+
+.resumo-card h3 {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.resumo-linha span,
+.usuario-card-texto span {
+  color: #b7bec7;
+}
+
+.resumo-linha strong,
+.usuario-card-texto strong {
+  color: #ffffff;
+}
+
+.usuario-avatar {
+  background: #ffffff;
+}
+
+.usuario-avatar svg {
+  stroke: #050505;
+}
+
+.usuario-status {
+  background: rgba(22, 184, 97, 0.13);
+}
+
+.usuario-card button,
+.btn-novo-ponto {
+  background: #ffffff;
+  color: #050505;
+}
+
+.cabecalho-painel {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.cabecalho-texto h1 {
+  color: #ffffff;
+  text-shadow: 0 10px 35px rgba(0, 0, 0, 0.28);
+}
+
+.cabecalho-texto p {
+  color: #c5cbd3;
+}
+
+.sistema-online,
+.campo-busca,
+.campo-select {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+}
+
+.campo-busca span,
+.campo-busca input::placeholder,
+.campo-select span {
+  color: #aeb5bd;
+}
+
+.campo-busca input,
+.campo-select select {
+  color: #ffffff;
+}
+
+.campo-select select option {
+  color: #050505;
+  background: #ffffff;
+}
+
+.point-card {
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.86);
+  color: #101214;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.point-card img {
+  filter: saturate(1.04) contrast(1.03);
+}
+
+.btn-mais {
+  color: #101214;
+}
+
+.point-card h3 {
+  color: #050505;
+}
+
+.card-info p {
+  color: #22262b;
+  font-weight: 750;
+}
+
+.codigo-pill {
+  background: #f0f2f5;
+  color: #111827;
+}
+
+.btn-detalhes {
+  background: #050505;
+  border-color: #050505;
+  color: #ffffff;
+}
+
+.btn-detalhes:hover {
+  background: #1d1d1f;
+  border-color: #1d1d1f;
+}
+
+.status-pill.ativo {
+  background: #e8f7ee;
+  color: #0d9749;
+}
+
+.status-pill.inativo,
+.status-pill.desativado {
+  background: #fff0f0;
+  color: #df2626;
+}
+
+.pontos-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
