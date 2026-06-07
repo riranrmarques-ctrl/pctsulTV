@@ -913,6 +913,8 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   align-content: start;
+  align-items: start;
+  grid-auto-rows: max-content;
 }
 
 .pontos-box::-webkit-scrollbar {
@@ -930,7 +932,7 @@ body {
 
 .point-card {
   min-height: 0;
-  height: clamp(245px, calc((100vh - 230px) / 2), 315px);
+  height: auto;
   padding: 9px;
 }
 
@@ -959,7 +961,7 @@ body {
 }
 
 .point-card img {
-  aspect-ratio: 16 / 8.8;
+  aspect-ratio: 16 / 9.2;
 }
 
 .point-card h3 {
@@ -974,7 +976,7 @@ body {
 
 .card-info {
   gap: 7px;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 }
 
 .card-info p {
@@ -996,10 +998,15 @@ body {
   min-height: 34px;
   padding: 0 12px;
   font-size: 12px;
+  justify-content: center;
 }
 
 .btn-detalhes span {
   gap: 7px;
+}
+
+.btn-detalhes strong {
+  margin-left: 8px;
 }
 
 @media (max-width: 1380px) {
@@ -1193,6 +1200,7 @@ body,
   display: grid;
   grid-template-rows: auto auto auto auto auto;
   align-content: start;
+  row-gap: 0;
 }
 
 .point-card img {
@@ -1267,7 +1275,7 @@ body,
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
-  text-align: right;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -1543,4 +1551,85 @@ body.modo-sala .conteudo-principal {
   .playlist-acoes {
     justify-content: flex-start;
   }
+}
+
+/* Subpasta sem tom azul: preto e cinza claro com texto legivel */
+body,
+.dashboard-shell {
+  background: #050505;
+}
+
+.sala-detalhe {
+  background: #101113;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+}
+
+.btn-voltar-sala,
+.sala-acoes button {
+  background: #2b2d31;
+  color: #ffffff;
+}
+
+.sala-topbar > span,
+.sala-info p,
+.sala-codigo-linha strong,
+.sala-playlist-item p,
+.sala-playlist-item time,
+.sala-historico-lista div {
+  color: #d7dbe2;
+}
+
+.sala-topbar > strong,
+.sala-disponivel {
+  background: rgba(22, 184, 97, 0.2);
+  color: #70e08c;
+}
+
+.sala-playlist,
+.sala-historicos section {
+  background: #151619;
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.sala-historicos h3 {
+  color: #ffffff;
+}
+
+.sala-playlist h3 {
+  color: #70e08c;
+}
+
+.sala-playlist-item {
+  background: #24262b;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.playlist-handle,
+.playlist-acoes button {
+  background: #343741;
+  color: #ffffff;
+}
+
+.sala-historico-lista {
+  background: #121316;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.sala-historico-lista div {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+#salaHistoricoEncerramento span,
+#salaHistoricoEncerramento time,
+#salaHistoricoEncerramento strong {
+  color: #ffffff;
+}
+
+#salaHistoricoStatus span {
+  color: #70e08c;
+}
+
+#salaHistoricoStatus span.status-inativo {
+  color: #ff5b5b;
 }
