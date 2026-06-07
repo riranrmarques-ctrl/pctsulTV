@@ -5,6 +5,7 @@ const SENHA_PAINEL = "@helena";
 const CACHE_CENTRAL_KEY = "central_painel_cache_v4";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
 const STORAGE_CAPAS_BUCKET = "capas-salas";
+const STORAGE_MATERIAIS_BUCKET = "materiais-salas";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -89,9 +90,18 @@ function configurarNovoPonto() {
 
 function configurarAdicionarMaterial() {
   const btnAdicionarMaterial = document.getElementById("btnAdicionarMaterial");
-  if (!btnAdicionarMaterial) return;
+  const inputMaterialSala = document.getElementById("inputMaterialSala");
+  if (!btnAdicionarMaterial || !inputMaterialSala) return;
 
-  btnAdicionarMaterial.addEventListener("click", adicionarMaterialSala);
+  btnAdicionarMaterial.addEventListener("click", () => inputMaterialSala.click());
+  inputMaterialSala.addEventListener("change", () => {
+    const arquivo = inputMaterialSala.files?.[0];
+    if (!arquivo) return;
+
+    adicionarMaterialSala(arquivo).finally(() => {
+      inputMaterialSala.value = "";
+    });
+  });
 }
 
 function configurarLogout() {
@@ -206,11 +216,13 @@ async function criarNovoPonto() {
   }
 }
 
-async function adicionarMaterialSala() {
+async function adicionarMaterialSala(arquivo) {
   if (!salaAtual) {
     alert("Abra uma sala antes de adicionar material.");
     return;
   }
+
+  if (!arquivo) return;
 
   const codigo = salaAtual.codigo_final || salaAtual.codigo;
   if (!codigo) {
@@ -218,22 +230,25 @@ async function adicionarMaterialSala() {
     return;
   }
 
-  const nome = window.prompt("Nome do material ou playlist:", "Novo material");
-  if (!nome) return;
-
   const btnAdicionarMaterial = document.getElementById("btnAdicionarMaterial");
   const textoOriginal = btnAdicionarMaterial ? btnAdicionarMaterial.textContent : "";
 
   if (btnAdicionarMaterial) {
     btnAdicionarMaterial.disabled = true;
-    btnAdicionarMaterial.textContent = "Adicionando...";
+    btnAdicionarMaterial.textContent = "Enviando...";
   }
 
   try {
+    const arquivoUrl = await enviarMaterialSala(codigo, arquivo);
+
     const novoMaterial = {
       codigo_cliente: codigo,
-      nome,
-      descricao: "",
+      nome: nomeArquivoSemExtensao(arquivo.name),
+      descricao: arquivo.name,
+      arquivo_url: arquivoUrl,
+      arquivo_nome: arquivo.name,
+      arquivo_tipo: arquivo.type || tipoArquivoPorNome(arquivo.name),
+      arquivo_tamanho: arquivo.size || 0,
       status: "ativo",
       data_inicio: new Date().toISOString().slice(0, 10),
       data_fim: null
@@ -643,6 +658,33 @@ async function enviarCapaSala(codigo, arquivo) {
   return data.publicUrl;
 }
 
+async function enviarMaterialSala(codigo, arquivo) {
+  const nomeSeguro = (arquivo.name || "material")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .replace(/-+/g, "-");
+
+  const caminho = `${normalizarCodigo(codigo).toLowerCase()}/${Date.now()}-${nomeSeguro}`;
+
+  const { error } = await supabaseClient
+    .storage
+    .from(STORAGE_MATERIAIS_BUCKET)
+    .upload(caminho, arquivo, {
+      cacheControl: "3600",
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data } = supabaseClient
+    .storage
+    .from(STORAGE_MATERIAIS_BUCKET)
+    .getPublicUrl(caminho);
+
+  return data.publicUrl;
+}
+
 function mensagemErroSala(erro) {
   const texto = String(erro?.message || erro?.details || erro?.hint || "");
 
@@ -678,6 +720,14 @@ function mensagemErroMaterial(erro) {
     return "A tabela playlists ainda nao existe no banco novo. Crie a tabela playlists no Supabase.";
   }
 
+  if (texto.toLowerCase().includes("bucket") || texto.toLowerCase().includes("storage")) {
+    return "Nao foi possivel enviar o arquivo. Crie o bucket publico materiais-salas no Storage do Supabase.";
+  }
+
+  if (erro?.code === "PGRST204" || texto.includes("arquivo_url")) {
+    return "Faltam colunas de arquivo na tabela playlists. Adicione arquivo_url, arquivo_nome, arquivo_tipo e arquivo_tamanho.";
+  }
+
   return "Nao foi possivel adicionar o material.";
 }
 
@@ -697,8 +747,8 @@ function renderizarPlaylistSala(codigoSala) {
       <span class="playlist-handle">⋮⋮</span>
       <strong>${index + 1}.</strong>
       <div>
-        <h4>${escaparHtml(item.nome || item.titulo || "Playlist sem nome")}</h4>
-        <p>${escaparHtml(item.descricao || item.status || "")}</p>
+        <h4>${escaparHtml(item.nome || item.titulo || item.arquivo_nome || "Material sem nome")}</h4>
+        <p>${escaparHtml(item.arquivo_nome || item.descricao || item.status || "")}</p>
       </div>
       <time>${escaparHtml(formatarDataHora(item.created_at))}</time>
       <time>${escaparHtml(formatarData(item.data_fim))}</time>
@@ -813,6 +863,21 @@ function formatarDataHora(valor) {
   if (Number.isNaN(data.getTime())) return String(valor);
 
   return data.toLocaleString("pt-BR");
+}
+
+function nomeArquivoSemExtensao(nome) {
+  const texto = String(nome || "Novo material").trim();
+  return texto.replace(/\.[^/.]+$/, "") || "Novo material";
+}
+
+function tipoArquivoPorNome(nome) {
+  const extensao = String(nome || "").split(".").pop().toLowerCase();
+
+  if (["jpg", "jpeg", "png", "gif", "webp"].includes(extensao)) return `image/${extensao === "jpg" ? "jpeg" : extensao}`;
+  if (["mp4", "webm", "mov", "m4v"].includes(extensao)) return `video/${extensao}`;
+  if (extensao === "txt") return "text/plain";
+
+  return "application/octet-stream";
 }
 
 function normalizarCodigo(codigo) {
