@@ -167,9 +167,20 @@ button {
 
 .menu-icone {
   width: 22px;
-  text-align: center;
-  font-size: 20px;
-  line-height: 1;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.menu-icone svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .sidebar-spacer {
@@ -222,52 +233,83 @@ button {
 
 .usuario-card {
   margin-top: 28px;
-  padding: 18px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
 }
 
+.usuario-card-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
 .usuario-avatar {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
-  margin-bottom: 14px;
   border-radius: 999px;
-  background: var(--soft);
+  background: #000000;
   color: #000000;
-  font-size: 22px;
-  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.usuario-avatar svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .usuario-card-texto {
   display: grid;
-  gap: 3px;
-  margin-bottom: 16px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .usuario-card-texto span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
 .usuario-card-texto strong {
   color: #000000;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 900;
+  line-height: 1.1;
 }
 
-.usuario-card-texto small {
-  color: var(--muted);
+.usuario-status {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--green-soft);
+  color: var(--green);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 850;
+}
+
+.usuario-status span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .usuario-card button {
   width: 100%;
-  height: 42px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -276,7 +318,7 @@ button {
   border-radius: 8px;
   background: #000000;
   color: #ffffff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -559,24 +601,6 @@ button {
   font-weight: 700;
 }
 
-.painel-ativo-fixo {
-  position: fixed;
-  right: 28px;
-  bottom: 28px;
-  min-height: 58px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-  border: none;
-  border-radius: 8px;
-  background: #000000;
-  color: #ffffff;
-  font-weight: 900;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2);
-  z-index: 20;
-}
-
 @media (max-width: 1380px) {
   .pontos-box {
     grid-template-columns: repeat(3, minmax(230px, 1fr));
@@ -678,10 +702,6 @@ button {
     justify-self: start;
   }
 
-  .painel-ativo-fixo {
-    right: 16px;
-    bottom: 16px;
-  }
 }
 
 /* Ajuste compacto: tudo dentro de uma tela, com rolagem interna nos pontos */
@@ -732,7 +752,12 @@ body {
 
 .menu-icone {
   width: 18px;
-  font-size: 16px;
+  height: 18px;
+}
+
+.menu-icone svg {
+  width: 18px;
+  height: 18px;
 }
 
 .sidebar-spacer {
@@ -764,27 +789,32 @@ body {
 
 .usuario-card {
   margin-top: 16px;
-  padding: 14px;
+  padding: 12px;
 }
 
 .usuario-avatar {
-  width: 34px;
-  height: 34px;
-  margin-bottom: 10px;
-  font-size: 17px;
+  width: 32px;
+  height: 32px;
 }
 
-.usuario-card-texto {
-  margin-bottom: 10px;
+.usuario-avatar svg {
+  width: 16px;
+  height: 16px;
 }
 
 .usuario-card-texto strong {
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.usuario-status {
+  height: 28px;
+  margin-bottom: 10px;
+  font-size: 11px;
 }
 
 .usuario-card button {
-  height: 34px;
-  font-size: 12px;
+  height: 32px;
+  font-size: 11px;
 }
 
 .conteudo-principal {
@@ -969,14 +999,6 @@ body {
 
 .btn-detalhes span {
   gap: 7px;
-}
-
-.painel-ativo-fixo {
-  right: 18px;
-  bottom: 18px;
-  min-height: 42px;
-  padding: 0 14px;
-  font-size: 13px;
 }
 
 @media (max-width: 1380px) {
