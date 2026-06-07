@@ -47,18 +47,6 @@
       <a href="#" class="menu-item">
         <span class="menu-icone">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 19V5"></path>
-            <path d="M9 19V9"></path>
-            <path d="M14 19V3"></path>
-            <path d="M19 19v-7"></path>
-          </svg>
-        </span>
-        <span>Relatorios</span>
-      </a>
-
-      <a href="#" class="menu-item">
-        <span class="menu-icone">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="8" r="4"></circle>
             <path d="M5 21a7 7 0 0 1 14 0"></path>
           </svg>
@@ -115,7 +103,7 @@
         <strong id="pontosInativosResumo">0</strong>
       </div>
       <div class="resumo-linha">
-        <span>Playlists ativas</span>
+        <span>Telas conectadas</span>
         <strong id="playlistsAtivasResumo">0</strong>
       </div>
     </section>
@@ -210,7 +198,7 @@
       <div class="sala-topbar">
         <button id="btnVoltarSalas" class="btn-voltar-sala" type="button">← Voltar</button>
         <span>Gerencie e organize a sua playlist</span>
-        <strong id="salaStatusTopo">Ativo desde 07/06/2026, 02:26:49</strong>
+        <strong id="salaStatusTopo">Inativo - sem conexao</strong>
       </div>
 
       <div class="sala-hero">
@@ -257,8 +245,8 @@
 
       <div class="sala-historicos">
         <section>
-          <h3>Historico de encerramento</h3>
-          <div id="salaHistoricoEncerramento" class="sala-historico-lista"></div>
+          <h3>RadioTV</h3>
+          <div id="salaRadioTvLista" class="sala-historico-lista radio-tv-lista"></div>
         </section>
 
         <section>
@@ -309,6 +297,37 @@
     <div class="modal-editar-acoes">
       <button id="btnCancelarEditarSala" type="button">Cancelar</button>
       <button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalAdicionarMaterial" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card modal-material-card">
+    <div class="modal-editar-topo">
+      <h3>Adicionar material</h3>
+      <button id="btnFecharAdicionarMaterial" type="button">×</button>
+    </div>
+
+    <div class="material-selecionado">
+      <span>Arquivo selecionado</span>
+      <strong id="materialSelecionadoNome">Nenhum arquivo selecionado</strong>
+    </div>
+
+    <div class="modal-editar-grid">
+      <label>
+        <span>Postagem</span>
+        <input id="materialDataPostagem" type="datetime-local">
+      </label>
+
+      <label>
+        <span>Encerramento</span>
+        <input id="materialDataEncerramento" type="datetime-local">
+      </label>
+    </div>
+
+    <div class="modal-editar-acoes">
+      <button id="btnCancelarAdicionarMaterial" type="button">Cancelar</button>
+      <button id="btnConfirmarAdicionarMaterial" type="button">Enviar material</button>
     </div>
   </div>
 </div>
