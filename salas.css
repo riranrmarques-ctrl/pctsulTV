@@ -1733,6 +1733,24 @@ body,
   font-weight: 850;
 }
 
+.campo-imagem-capa {
+  display: grid;
+  gap: 8px;
+}
+
+.campo-imagem-capa button {
+  width: fit-content;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  padding: 0 18px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .modal-editar-grid input {
   width: 100%;
   height: 46px;
