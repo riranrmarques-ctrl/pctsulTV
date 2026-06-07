@@ -7,248 +7,212 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <title>PCTSUL | salas</title>
-  <link rel="stylesheet" href="salas.css?v=212">
+  <title>PCTSUL | Salas</title>
+  <link rel="stylesheet" href="centralSalas.css?v=202">
 </head>
 
 <body>
-  <aside class="sidebar-app">
-    <div class="sidebar-logo">
-      <img src="logo.png" alt="Loop Player">
+
+<div id="conteudoSalas">
+
+  <div class="topo-fixo novo-topo">
+
+    <!-- BOTÃO VOLTAR (SUBSTITUIU MENU) -->
+    <div class="topo-esquerda">
+      <button onclick="window.location.href='centralpainel.html'" class="menu-topo-btn">
+        ← Voltar
+      </button>
     </div>
 
-    <div class="sidebar-label">Navegação</div>
-
-    <nav class="sidebar-nav">
-      <a href="/geral.html">
-        <i data-lucide="layout-dashboard"></i>
-        Geral
-      </a>
-
-      <a href="/salas.html" class="ativo">
-        <i data-lucide="monitor"></i>
-        salas
-      </a>
-
-      <a href="/central-cliente.html">
-        <i data-lucide="users"></i>
-        Anunciantes
-      </a>
-
-      <a href="/empresa.html">
-        <i data-lucide="building-2"></i>
-        Empresas
-      </a>
-
-      <a href="/contratos.html">
-        <i data-lucide="file-text"></i>
-        Contratos
-      </a>
-
-      <a href="/biblioteca.html">
-        <i data-lucide="folder-open"></i>
-        Biblioteca
-      </a>
-    </nav>
-
-    <div class="sidebar-spacer"></div>
-
-    <div class="sidebar-ajuda">
-      <div class="whatsapp-icon">
-        <i data-lucide="message-circle"></i>
-      </div>
-
-      <strong>Precisa de ajuda?</strong>
-      <p>Fale com o suporte pelo WhatsApp.</p>
-
-      <a href="https://wa.me/5531000000000" target="_blank" rel="noopener">
-        Abrir WhatsApp
-        <i data-lucide="external-link"></i>
-      </a>
+    <div class="topo-centro">
+      <h1>Gerenciador de Salas</h1>
+      <p>Gerencie seus Salas e playlists</p>
     </div>
 
-    <div class="sidebar-user">
-      <div class="avatar-user">V</div>
-
-      <div>
-        <strong>Vitor</strong>
-        <span>Administrador</span>
-      </div>
-
-      <i data-lucide="chevron-down"></i>
+    <div class="topo-direita">
+      <img src="logo.png?v=2" class="logo-topo-img">
+      <div class="status-topo">Painel Ativo</div>
     </div>
-  </aside>
 
-  <main id="conteudosalas">
-    <header class="topo-fixo novo-topo">
-      <div class="topo-centro">
-        <h1>Gerenciador de salas</h1>
-        <p>Gerencie seus salas e playlists</p>
-      </div>
-
-      <div class="topo-status">
-        <div>
-          <span>Atualizado agora</span>
-          <strong>12 de Mai, 10:24</strong>
-        </div>
-
-        <button id="btnAtualizarsalas" class="btn-icon" type="button" aria-label="Atualizar salas">
-          <i data-lucide="refresh-cw"></i>
-        </button>
-      </div>
-    </header>
-
-    <section class="painel-shell">
-      <div id="listasalas">
-        <div class="salas-box">
-          <div class="estado-carregando">Carregando salas do banco...</div>
-        </div>
-
-        <div class="novo-sala-area">
-          <button id="btnNovosala" class="btn-novo-sala" type="button">+ Novo sala</button>
-        </div>
-
-        <div class="assinatura-duna">
-          Desenvolvido por <strong>Duna Branding</strong>
-        </div>
-      </div>
-
-      <div id="salaDetalhe" class="playlist-box" style="display:none;">
-        <div class="playlist-topbar playlist-topbar-novo">
-          <div class="topbar-esquerda">
-            <button id="btnVoltar" class="btn-secundario" type="button">← Voltar</button>
-            <span class="topbar-titulo">Gerencie e organize a sua playlist</span>
-          </div>
-
-          <div class="topbar-direita">
-            <div id="statussala" class="status-destaque"></div>
-          </div>
-        </div>
-
-        <div class="playlist-header playlist-header-novo">
-          <div class="playlist-topo-flex">
-            <div class="playlist-imagem-box">
-              <img id="imagemsala" src="" alt="Imagem do sala">
-            </div>
-
-            <div class="playlist-header-textos">
-              <h2 id="tituloPasta"></h2>
-
-              <div class="playlist-info-extra">
-                <div id="cidadesala" class="playlist-info-item"></div>
-                <div id="enderecosala" class="playlist-info-item"></div>
-              </div>
-
-              <div class="playlist-codigo-linha">
-                <button id="btnToggleDisponibilidade" class="toggle-sala ativo" type="button">
-                  <span class="toggle-bolinha"></span>
-                  <span class="toggle-texto">Disponível</span>
-                </button>
-
-                <span id="codigoAtual"></span>
-              </div>
-
-              <div class="playlist-acoes-topo">
-                <button id="btnEditarInfo" class="btn-secundario" type="button">Editar informações</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="playlist-layout-novo">
-          <div class="playlist-coluna-ativa">
-            <div class="playlist-secao playlist-secao-ativa">
-              <div class="playlist-secao-topo">
-                <h4>Playlist ativa</h4>
-
-                <div class="playlist-botoes-topo">
-                  <button id="btnUpgradePlaylist" class="btn-playlist-topo btn-adicionar-material" type="button">
-                    Adicionar material
-                  </button>
-
-                  <button id="btnBiblioteca" class="btn-playlist-topo btn-biblioteca" type="button">
-                    Biblioteca
-                  </button>
-
-                  <button id="btnCopiarPlaylist" class="btn-playlist-topo btn-copiar-playlist" type="button">
-                    Copiar playlist
-                  </button>
-                </div>
-
-                <input id="inputUpgradePlaylist" type="file" hidden>
-              </div>
-
-              <div id="playlistAtiva" class="playlist-lista"></div>
-            </div>
-          </div>
-
-          <div class="playlist-coluna-historico">
-            <div class="playlist-secao">
-              <div class="playlist-secao-topo">
-                <h4>Histórico de encerramento</h4>
-              </div>
-              <div id="historicoEncerramento" class="historico-lista"></div>
-            </div>
-
-            <div class="playlist-secao">
-              <div class="playlist-secao-topo">
-                <h4>Histórico de status</h4>
-              </div>
-              <div id="historicoStatus" class="historico-lista"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div id="modalEditar" class="modal-editar" style="display:none;">
-    <div class="modal-conteudo modal-conteudo-amplo">
-      <h3>Editar Informações</h3>
-
-      <div class="modal-secao">
-        <h4>Dados do sala</h4>
-
-        <input type="text" id="editNome" placeholder="Nome do sala">
-        <input type="text" id="editCidade" placeholder="Cidade / região">
-        <input type="text" id="editEndereco" placeholder="Endereço completo">
-      </div>
-
-      <div class="modal-grid-edicao">
-        <div class="edit-imagem-box modal-secao-imagem">
-          <h4>Imagem do sala</h4>
-          <img id="previewImagem">
-          <input type="file" id="inputImagem" accept="image/*">
-        </div>
-
-        <div class="edit-botoes">
-          <button id="btnSalvarEdicao" type="button">Salvar</button>
-          <button id="btnDeletarsala" class="btn-deletar-sala" type="button">Deletar sala</button>
-          <button id="btnFecharModal" type="button">Voltar</button>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <div id="modalCopiarPlaylist" class="modal-editar" style="display:none;">
-    <div class="modal-conteudo">
-      <h3>Copiar playlist</h3>
+  <div class="painel-shell">
 
-      <div class="modal-secao">
-        <h4>Pasta de origem</h4>
-        <select id="playlistOrigemSelect"></select>
-        <p class="modal-ajuda">Os materiais da pasta escolhida serão copiados para o sala aberto.</p>
+    <!-- LISTA DE Salas -->
+    <div id="listaSalas">
+      <div class="Salas-box"></div>
+
+      <div class="novo-ponto-area">
+        <button id="btnNovoPonto" class="btn-novo-ponto">+ Novo ponto</button>
+      </div>
+
+      <div class="assinatura-duna">
+        Desenvolvido por <strong>Duna Branding</strong>
+      </div>
+    </div>
+
+    <!-- DETALHE DO PONTO -->
+    <div id="pontoDetalhe" class="playlist-box" style="display:none;">
+
+      <div class="playlist-topbar playlist-topbar-novo">
+        <div class="topbar-esquerda">
+          <button id="btnVoltar" class="btn-secundario">← Voltar</button>
+          <span class="topbar-titulo">Gerencie e organize a sua playlist</span>
+        </div>
+
+        <!-- STATUS ORIGINAL MANTIDO -->
+        <div class="topbar-direita">
+          <div id="statusPonto" class="status-destaque"></div>
+        </div>
+      </div>
+
+      <div class="playlist-header playlist-header-novo">
+        <div class="playlist-topo-flex">
+
+          <div class="playlist-imagem-box">
+            <img id="imagemPonto" src="https://placehold.co/600x320/png">
+          </div>
+
+          <div class="playlist-header-textos">
+
+            <h2 id="tituloPasta"></h2>
+
+            <div class="playlist-info-extra">
+              <div id="cidadePonto" class="playlist-info-item"></div>
+              <div id="enderecoPonto" class="playlist-info-item"></div>
+            </div>
+
+            <div class="playlist-codigo-linha">
+              <button id="btnToggleDisponibilidade" class="toggle-ponto ativo">
+                <span class="toggle-bolinha"></span>
+                <span class="toggle-texto">Disponível</span>
+              </button>
+
+              <span id="codigoAtual"></span>
+            </div>
+
+            <div class="playlist-acoes-topo">
+              <button id="btnEditarInfo" class="btn-secundario">Editar informações</button>
+              <button id="btnUpgradePlaylist" class="btn-upgrade-playlist">upgrade</button>
+              <input id="inputUpgradePlaylist" type="file" hidden>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="playlist-layout-novo">
+
+        <div class="playlist-coluna-ativa">
+          <div class="playlist-secao playlist-secao-ativa">
+            <div class="playlist-secao-topo">
+              <h4>Playlist ativa</h4>
+            </div>
+            <div id="playlistAtiva" class="playlist-lista"></div>
+          </div>
+        </div>
+
+        <div class="playlist-coluna-historico">
+
+          <div class="playlist-secao">
+            <div class="playlist-secao-topo">
+              <h4>Histórico de encerramento</h4>
+            </div>
+            <div id="historicoEncerramento" class="historico-lista"></div>
+          </div>
+
+          <div class="playlist-secao">
+            <div class="playlist-secao-topo">
+              <h4>Histórico de status</h4>
+            </div>
+            <div id="historicoStatus" class="historico-lista"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  
+ <!-- MODAL EDITAR -->
+<div id="modalEditar" class="modal-editar" style="display:none;">
+  <div class="modal-conteudo modal-conteudo-amplo">
+
+    <h3>Editar Informações</h3>
+
+    <div class="modal-secao">
+      <h4>Dados do ponto</h4>
+
+      <input type="text" id="editNome" placeholder="Nome do ponto">
+      <input type="text" id="editCidade" placeholder="Cidade / região">
+      <input type="text" id="editEndereco" placeholder="Endereço completo">
+    </div>
+
+    <div class="modal-grid-edicao">
+      <div class="modal-secao modal-secao-contrato">
+        <h4>Período</h4>
+
+        <div class="contrato-periodo">
+          <input type="text" id="editContratoInicio" placeholder="Data inicial" inputmode="numeric" required>
+          <input type="text" id="editContratoFim" placeholder="Data final" inputmode="numeric" required>
+        </div>
+      </div>
+
+      <div class="modal-secao modal-secao-download">
+        <div class="contrato-download-layout">
+          <div class="contrato-parceria">
+            <label class="parceria-titulo">Parceria?</label>
+
+            <div class="parceria-opcoes">
+              <label>
+                <input type="radio" name="contratoParceriaOpcao" id="editContratoParceriaSim" value="sim">
+                <span>Sim</span>
+              </label>
+
+              <label>
+                <input type="radio" name="contratoParceriaOpcao" id="editContratoParceriaNao" value="nao">
+                <span>Não</span>
+              </label>
+            </div>
+
+            <input type="text" id="editValorContrato" placeholder="Valor / custo">
+          </div>
+
+          <button id="btnBaixarContrato" class="btn-baixar-contrato" type="button">
+            Baixar contrato
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-secao modal-secao-responsavel">
+        <h4>Dados do responsável pelo estabelecimento</h4>
+
+        <input type="text" id="editResponsavelNome" placeholder="Nome completo" required>
+        <input type="text" id="editResponsavelCpf" placeholder="CPF / CNPJ" inputmode="numeric" required>
+        <input type="text" id="editResponsavelTelefone" placeholder="Telefone" inputmode="numeric" required>
+        <input type="email" id="editResponsavelEmail" placeholder="E-mail" required>
+      </div>
+
+      <div class="edit-imagem-box modal-secao-imagem">
+        <h4>Imagem do ponto</h4>
+        <img id="previewImagem">
+        <input type="file" id="inputImagem" accept="image/*">
       </div>
 
       <div class="edit-botoes">
-        <button id="btnConfirmarCopiaPlaylist" type="button">Copiar playlist inteira</button>
-        <button id="btnFecharCopiaPlaylist" type="button">Voltar</button>
+        <button id="btnSalvarEdicao" type="button">Salvar</button>
+        <button id="btnDeletarPonto" class="btn-deletar-ponto" type="button">Deletar ponto</button>
+        <button id="btnFecharModal" type="button">Voltar</button>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="salas.js?v=211"></script>
+  </div>
+</div>
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="centralSalas.js?v=201"></script>
+
 </body>
 </html>
