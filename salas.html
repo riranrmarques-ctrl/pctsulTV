@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <title>PCTSUL | Gerenciador de Pontos</title>
+  <title>PCTSUL | Gerenciador de TVs</title>
   <link rel="stylesheet" href="salas.css?v=203">
 </head>
 
@@ -42,11 +42,6 @@
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">♫</span>
-        <span>Playlists</span>
-      </a>
-
-      <a href="#" class="menu-item">
         <span class="menu-icone">▥</span>
         <span>Relatorios</span>
       </a>
@@ -57,8 +52,18 @@
       </a>
 
       <a href="#" class="menu-item">
-        <span class="menu-icone">⚙</span>
-        <span>Configuracoes</span>
+        <span class="menu-icone">▣</span>
+        <span>Biblioteca</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">⚡</span>
+        <span>Ativador</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">◉</span>
+        <span>RadioTv</span>
       </a>
     </nav>
 
@@ -84,33 +89,31 @@
       </div>
     </section>
 
-    <section class="suporte-card">
-      <div class="suporte-icone">?</div>
-      <h3>Precisa de ajuda?</h3>
-      <p>Acesse nossa central de suporte.</p>
+    <section class="usuario-card">
+      <div class="usuario-avatar">♙</div>
+
+      <div class="usuario-card-texto">
+        <span>Usuario logado</span>
+        <strong>Administrador</strong>
+        <small>Painel principal</small>
+      </div>
+
       <button type="button">
-        Abrir suporte
+        Sair
         <span>→</span>
       </button>
     </section>
+
   </aside>
 
   <main class="conteudo-principal">
     <header class="cabecalho-painel">
       <div class="cabecalho-texto">
-        <h1>Gerenciador de Pontos</h1>
-        <p>Gerencie seus pontos e playlists de forma simples e eficiente.</p>
+        <h1>Gerenciador de TVs</h1>
+        <p>Gerencie os conteudos das tvs e salas forma simples e eficiente.</p>
       </div>
 
       <div class="cabecalho-acoes">
-        <button class="usuario-topo" type="button">
-          <span class="usuario-icone">♙</span>
-          <strong>Ola, Administrador</strong>
-          <span>⌄</span>
-        </button>
-
-        <button class="tema-botao" type="button" aria-label="Alternar tema">☼</button>
-
         <div class="sistema-online">
           <span></span>
           Sistema Online
@@ -161,23 +164,6 @@
 
     <section id="listaPontos" class="pontos-box"></section>
 
-    <footer class="rodape-lista">
-      <label class="por-pagina">
-        <select>
-          <option>8 por pagina</option>
-          <option>12 por pagina</option>
-          <option>24 por pagina</option>
-        </select>
-      </label>
-
-      <div class="paginacao">
-        <button type="button">‹</button>
-        <button type="button" class="ativo">1</button>
-        <button type="button">2</button>
-        <button type="button">3</button>
-        <button type="button">›</button>
-      </div>
-    </footer>
   </main>
 
   <button class="painel-ativo-fixo" type="button">
