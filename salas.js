@@ -295,16 +295,12 @@ function renderizarPontos(pontos) {
       <article class="point-card" data-codigo="${escaparHtml(codigo)}">
         <div class="card-topo">
           <span class="status-pill ${classeStatusVisual(status)}">${textoStatus(status)}</span>
-          <button class="btn-mais" type="button" aria-label="Mais opcoes">...</button>
+          <span class="telas-topo">${totalTelas} ${totalTelas === 1 ? "tela" : "telas"}</span>
         </div>
 
         <img src="${escaparHtml(imagem)}" alt="${escaparHtml(nome)}" loading="lazy">
 
         <h3>${escaparHtml(nome)}</h3>
-
-        <div class="card-meta">
-          <span>${totalTelas} ${totalTelas === 1 ? "tela" : "telas"}</span>
-        </div>
 
         <div class="card-info">
           <p>${escaparHtml(endereco)}</p>
@@ -312,7 +308,7 @@ function renderizarPontos(pontos) {
         </div>
 
         <button class="btn-detalhes" type="button">
-          <span>⚙ Ver detalhes</span>
+          <span>Entrar na sala</span>
           <strong>→</strong>
         </button>
       </article>
