@@ -272,7 +272,7 @@ function renderizarPontos(pontos) {
     return;
   }
 
-  pontos.slice(0, 8).forEach(ponto => {
+  pontos.forEach(ponto => {
     const nome = nomePonto(ponto);
     const status = ponto.status_final;
     const imagem = imagemPonto(ponto);
