@@ -211,6 +211,50 @@
 
     <section id="listaPontos" class="pontos-box"></section>
 
+    <section id="salaDetalhe" class="sala-detalhe" hidden>
+      <div class="sala-topbar">
+        <button id="btnVoltarSalas" class="btn-voltar-sala" type="button">← Voltar</button>
+        <span>Gerencie e organize a sua playlist</span>
+        <strong id="salaStatusTopo">Ativo desde 07/06/2026, 02:26:49</strong>
+      </div>
+
+      <div class="sala-hero">
+        <img id="salaImagem" src="https://placehold.co/800x450/png" alt="">
+
+        <div class="sala-info">
+          <h2 id="salaTitulo">Sala</h2>
+          <p id="salaEndereco"></p>
+
+          <div class="sala-codigo-linha">
+            <span class="sala-disponivel">Disponivel</span>
+            <strong id="salaCodigo"></strong>
+          </div>
+
+          <div class="sala-acoes">
+            <button type="button">Editar informacoes</button>
+            <button type="button" class="btn-upgrade-sala">upgrade</button>
+          </div>
+        </div>
+      </div>
+
+      <section class="sala-playlist">
+        <h3>Playlist ativa</h3>
+        <div id="salaPlaylistLista" class="sala-lista"></div>
+      </section>
+
+      <div class="sala-historicos">
+        <section>
+          <h3>Historico de encerramento</h3>
+          <div id="salaHistoricoEncerramento" class="sala-historico-lista"></div>
+        </section>
+
+        <section>
+          <h3>Historico de status</h3>
+          <div id="salaHistoricoStatus" class="sala-historico-lista"></div>
+        </section>
+      </div>
+    </section>
+
     <div class="assinatura-final">
       Desenvolvido por <strong>DUNA BRANDING</strong>
     </div>
