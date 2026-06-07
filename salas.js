@@ -9,12 +9,14 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let todosOsPontos = [];
 let playlistsAtivas = 0;
+let salaAtual = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
   configurarFiltros();
   configurarLogout();
   configurarVoltarSala();
+  configurarEdicaoSala();
 });
 
 function iniciarLoginCentral() {
@@ -92,6 +94,26 @@ function configurarVoltarSala() {
     const salaDetalhe = document.getElementById("salaDetalhe");
     if (salaDetalhe) salaDetalhe.hidden = true;
   });
+}
+
+function configurarEdicaoSala() {
+  const btnEditar = document.getElementById("btnEditarSala");
+  const btnFechar = document.getElementById("btnFecharEditarSala");
+  const btnCancelar = document.getElementById("btnCancelarEditarSala");
+  const btnSalvar = document.getElementById("btnSalvarEditarSala");
+  const inputImagem = document.getElementById("editSalaImagem");
+
+  if (btnEditar) btnEditar.addEventListener("click", abrirModalEditarSala);
+  if (btnFechar) btnFechar.addEventListener("click", fecharModalEditarSala);
+  if (btnCancelar) btnCancelar.addEventListener("click", fecharModalEditarSala);
+  if (btnSalvar) btnSalvar.addEventListener("click", salvarEdicaoSala);
+
+  if (inputImagem) {
+    inputImagem.addEventListener("input", () => {
+      const preview = document.getElementById("editSalaPreview");
+      if (preview) preview.src = inputImagem.value.trim() || "https://placehold.co/800x450/png";
+    });
+  }
 }
 
 function lerCacheCentral() {
@@ -337,6 +359,8 @@ function renderizarPontos(pontos) {
 }
 
 function abrirSala(ponto) {
+  salaAtual = ponto;
+
   const nome = nomePonto(ponto);
   const endereco = enderecoPonto(ponto);
   const imagem = imagemPonto(ponto);
@@ -348,6 +372,7 @@ function abrirSala(ponto) {
   setTexto("salaEndereco", endereco);
   setTexto("salaCodigo", codigo);
   setTexto("salaStatusTopo", `${status} desde ${agora}`);
+  setTexto("salaDiasOnline", totalTelasPonto(ponto, 0));
 
   const salaImagem = document.getElementById("salaImagem");
   if (salaImagem) {
@@ -362,6 +387,111 @@ function abrirSala(ponto) {
   if (salaDetalhe) salaDetalhe.hidden = false;
 
   document.body.classList.add("modo-sala");
+}
+
+function abrirModalEditarSala() {
+  if (!salaAtual) return;
+
+  setValor("editSalaNome", nomePonto(salaAtual));
+  setValor("editSalaCidade", salaAtual.cidade || salaAtual.regiao || salaAtual.bairro || "");
+  setValor("editSalaEndereco", salaAtual.endereco || salaAtual.endereco_completo || salaAtual.localizacao || "");
+  setValor("editSalaImagem", imagemPonto(salaAtual));
+  setValor("editSalaTelas", totalTelasPonto(salaAtual, 0));
+
+  const preview = document.getElementById("editSalaPreview");
+  if (preview) preview.src = imagemPonto(salaAtual);
+
+  const modal = document.getElementById("modalEditarSala");
+  if (modal) modal.hidden = false;
+}
+
+function fecharModalEditarSala() {
+  const modal = document.getElementById("modalEditarSala");
+  if (modal) modal.hidden = true;
+}
+
+async function salvarEdicaoSala() {
+  if (!salaAtual) return;
+
+  const codigo = salaAtual.codigo_final || salaAtual.codigo;
+  if (!codigo) {
+    alert("Codigo da sala nao encontrado.");
+    return;
+  }
+
+  const nome = getValor("editSalaNome");
+  const cidade = getValor("editSalaCidade");
+  const endereco = getValor("editSalaEndereco");
+  const imagemUrl = getValor("editSalaImagem");
+  const totalTelas = Number(getValor("editSalaTelas") || 1);
+
+  const dadosAtualizados = {
+    nome,
+    cidade,
+    endereco,
+    imagem_url: imagemUrl,
+    total_telas: Number.isFinite(totalTelas) && totalTelas > 0 ? totalTelas : 1
+  };
+
+  const btnSalvar = document.getElementById("btnSalvarEditarSala");
+  const textoOriginal = btnSalvar ? btnSalvar.textContent : "";
+
+  if (btnSalvar) {
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = "Salvando...";
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("pontos")
+      .update(dadosAtualizados)
+      .eq("codigo", codigo);
+
+    if (error) throw error;
+
+    Object.assign(salaAtual, dadosAtualizados, {
+      nome_ponto: dadosAtualizados.nome,
+      endereco_completo: dadosAtualizados.endereco
+    });
+
+    todosOsPontos = todosOsPontos.map(ponto => {
+      if (normalizarCodigo(ponto.codigo_final || ponto.codigo) !== normalizarCodigo(codigo)) return ponto;
+      return {
+        ...ponto,
+        ...dadosAtualizados,
+        nome_ponto: dadosAtualizados.nome,
+        endereco_completo: dadosAtualizados.endereco
+      };
+    });
+
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    atualizarSalaAberta();
+    atualizarPainelFiltrado();
+    fecharModalEditarSala();
+  } catch (erro) {
+    console.error("Erro ao salvar sala:", erro);
+    alert("Nao foi possivel salvar as informacoes da sala.");
+  } finally {
+    if (btnSalvar) {
+      btnSalvar.disabled = false;
+      btnSalvar.textContent = textoOriginal || "Salvar alteracoes";
+    }
+  }
+}
+
+function atualizarSalaAberta() {
+  if (!salaAtual) return;
+
+  setTexto("salaTitulo", nomePonto(salaAtual));
+  setTexto("salaEndereco", enderecoPonto(salaAtual));
+  setTexto("salaCodigo", salaAtual.codigo_final || salaAtual.codigo || "------");
+  setTexto("salaDiasOnline", totalTelasPonto(salaAtual, 0));
+
+  const salaImagem = document.getElementById("salaImagem");
+  if (salaImagem) {
+    salaImagem.src = imagemPonto(salaAtual);
+    salaImagem.alt = nomePonto(salaAtual);
+  }
 }
 
 function renderizarPlaylistSala() {
@@ -517,6 +647,16 @@ function normalizarBusca(valor) {
 function setTexto(id, texto) {
   const el = document.getElementById(id);
   if (el) el.textContent = texto;
+}
+
+function setValor(id, valor) {
+  const el = document.getElementById(id);
+  if (el) el.value = valor || "";
+}
+
+function getValor(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
 }
 
 function escaparHtml(valor) {
