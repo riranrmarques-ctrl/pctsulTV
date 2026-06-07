@@ -4,12 +4,14 @@ const SENHA_PAINEL = "@helena";
 
 const CACHE_CENTRAL_KEY = "central_painel_cache_v3";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
+const STORAGE_CAPAS_BUCKET = "capas-salas";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let todosOsPontos = [];
 let playlistsAtivas = 0;
 let salaAtual = null;
+let imagemSalaSelecionada = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
@@ -125,10 +127,11 @@ function configurarEdicaoSala() {
       const arquivo = inputArquivoImagem.files?.[0];
       if (!arquivo) return;
 
+      imagemSalaSelecionada = arquivo;
+
       const leitor = new FileReader();
       leitor.onload = () => {
         const imagemBase64 = String(leitor.result || "");
-        inputImagem.value = imagemBase64;
 
         const preview = document.getElementById("editSalaPreview");
         if (preview) preview.src = imagemBase64;
@@ -414,6 +417,8 @@ function abrirSala(ponto) {
 function abrirModalEditarSala() {
   if (!salaAtual) return;
 
+  imagemSalaSelecionada = null;
+
   setValor("editSalaNome", nomePonto(salaAtual));
   setValor("editSalaEndereco", salaAtual.endereco || salaAtual.endereco_completo || salaAtual.localizacao || "");
   setValor("editSalaImagem", imagemPonto(salaAtual));
@@ -441,12 +446,10 @@ async function salvarEdicaoSala() {
 
   const nome = getValor("editSalaNome");
   const endereco = getValor("editSalaEndereco");
-  const imagemUrl = getValor("editSalaImagem");
 
   const dadosAtualizados = {
     nome,
-    endereco,
-    imagem_url: imagemUrl
+    endereco
   };
 
   const btnSalvar = document.getElementById("btnSalvarEditarSala");
@@ -458,6 +461,12 @@ async function salvarEdicaoSala() {
   }
 
   try {
+    if (imagemSalaSelecionada) {
+      dadosAtualizados.imagem_url = await enviarCapaSala(codigo, imagemSalaSelecionada);
+    } else {
+      dadosAtualizados.imagem_url = getValor("editSalaImagem");
+    }
+
     const { error } = await supabaseClient
       .from("pontos")
       .update(dadosAtualizados)
@@ -486,7 +495,7 @@ async function salvarEdicaoSala() {
     fecharModalEditarSala();
   } catch (erro) {
     console.error("Erro ao salvar sala:", erro);
-    alert("Nao foi possivel salvar as informacoes da sala.");
+    alert(mensagemErroSala(erro));
   } finally {
     if (btnSalvar) {
       btnSalvar.disabled = false;
@@ -508,6 +517,42 @@ function atualizarSalaAberta() {
     salaImagem.src = imagemPonto(salaAtual);
     salaImagem.alt = nomePonto(salaAtual);
   }
+}
+
+async function enviarCapaSala(codigo, arquivo) {
+  const extensao = (arquivo.name || "jpg").split(".").pop() || "jpg";
+  const caminho = `${normalizarCodigo(codigo).toLowerCase()}/capa-${Date.now()}.${extensao}`;
+
+  const { error } = await supabaseClient
+    .storage
+    .from(STORAGE_CAPAS_BUCKET)
+    .upload(caminho, arquivo, {
+      cacheControl: "3600",
+      upsert: true
+    });
+
+  if (error) throw error;
+
+  const { data } = supabaseClient
+    .storage
+    .from(STORAGE_CAPAS_BUCKET)
+    .getPublicUrl(caminho);
+
+  return data.publicUrl;
+}
+
+function mensagemErroSala(erro) {
+  const texto = String(erro?.message || erro?.details || erro?.hint || "");
+
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("pontos")) {
+    return "A tabela pontos ainda nao existe no banco novo. Rode o SQL de criacao das tabelas no Supabase.";
+  }
+
+  if (texto.toLowerCase().includes("bucket") || texto.toLowerCase().includes("storage")) {
+    return "Nao foi possivel salvar a imagem. Crie o bucket publico capas-salas no Storage do Supabase.";
+  }
+
+  return "Nao foi possivel salvar as informacoes da sala.";
 }
 
 function renderizarPlaylistSala() {
