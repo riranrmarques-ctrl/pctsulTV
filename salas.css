@@ -34,6 +34,20 @@ select {
 
 button {
   cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.16s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active,
+button.botao-clicado {
+  background: #ffffff !important;
+  color: #050505 !important;
+  border-color: #ffffff !important;
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.14);
 }
 
 .login-screen {
@@ -1567,6 +1581,26 @@ body.modo-sala .conteudo-principal {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.09);
   color: #dce5f7;
+}
+
+.playlist-acoes button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.playlist-acoes .btn-renomear-material.botao-clicado {
+  background: #60a5fa !important;
+  color: #050505 !important;
+}
+
+.playlist-acoes .btn-download-material.botao-clicado {
+  background: #70e08c !important;
+  color: #050505 !important;
+}
+
+.playlist-acoes .btn-deletar-material.botao-clicado {
+  background: #ff5b5b !important;
+  color: #ffffff !important;
 }
 
 .playlist-handle {
