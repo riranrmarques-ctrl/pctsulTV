@@ -702,8 +702,8 @@ async function enviarMaterialSala(codigo, arquivo) {
 function mensagemErroSala(erro) {
   const texto = String(erro?.message || erro?.details || erro?.hint || "");
 
-  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("pontos")) {
-    return "A tabela pontos ainda nao existe no banco novo. Rode o SQL de criacao das tabelas no Supabase.";
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("salas")) {
+    return "A tabela salas ainda nao existe no banco novo. Crie a tabela salas no Supabase.";
   }
 
   if (texto.toLowerCase().includes("bucket") || texto.toLowerCase().includes("storage")) {
@@ -716,8 +716,8 @@ function mensagemErroSala(erro) {
 function mensagemErroNovoPonto(erro) {
   const texto = String(erro?.message || erro?.details || erro?.hint || "");
 
-  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("pontos")) {
-    return "A tabela pontos ainda nao existe no banco novo. Rode o SQL de criacao das tabelas no Supabase.";
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("salas")) {
+    return "A tabela salas ainda nao existe no banco novo. Crie a tabela salas no Supabase.";
   }
 
   if (texto.toLowerCase().includes("duplicate") || erro?.code === "23505") {
@@ -730,8 +730,8 @@ function mensagemErroNovoPonto(erro) {
 function mensagemErroMaterial(erro) {
   const texto = String(erro?.message || erro?.details || erro?.hint || "");
 
-  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("playlists")) {
-    return "A tabela playlists ainda nao existe no banco novo. Crie a tabela playlists no Supabase.";
+  if (erro?.code === "PGRST205" || erro?.status === 404 || texto.includes("materiais_salas")) {
+    return "A tabela materiais_salas ainda nao existe no banco novo. Crie a tabela materiais_salas no Supabase.";
   }
 
   if (texto.toLowerCase().includes("bucket") || texto.toLowerCase().includes("storage")) {
@@ -739,7 +739,7 @@ function mensagemErroMaterial(erro) {
   }
 
   if (erro?.code === "PGRST204" || texto.includes("arquivo_url")) {
-    return "Faltam colunas de arquivo na tabela playlists. Adicione arquivo_url, arquivo_nome, arquivo_tipo e arquivo_tamanho.";
+    return "Faltam colunas de arquivo na tabela materiais_salas. Adicione arquivo_url, arquivo_nome, arquivo_tipo e arquivo_tamanho.";
   }
 
   return "Nao foi possivel adicionar o material.";
