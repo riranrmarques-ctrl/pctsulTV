@@ -1564,7 +1564,7 @@ body.modo-sala .conteudo-principal {
 .sala-playlist-item {
   min-height: 70px;
   display: grid;
-  grid-template-columns: 42px 34px minmax(220px, 1fr) 170px 132px;
+  grid-template-columns: 42px 34px minmax(220px, 1fr) 250px 132px;
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -1619,6 +1619,28 @@ body.modo-sala .conteudo-principal {
   color: #b9c3d7;
   font-size: 13px;
   font-weight: 750;
+}
+
+.playlist-datas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.playlist-datas time {
+  display: grid;
+  gap: 3px;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.playlist-datas time span {
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .playlist-acoes {
