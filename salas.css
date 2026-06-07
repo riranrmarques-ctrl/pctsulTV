@@ -1191,7 +1191,8 @@ body,
 
 .point-card {
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto auto;
+  align-content: start;
 }
 
 .point-card img {
@@ -1221,6 +1222,7 @@ body,
   background: #050505;
   border-color: #050505;
   color: #ffffff;
+  margin-top: 0;
 }
 
 .telas-topo {
@@ -1272,4 +1274,273 @@ body,
 .assinatura-final strong {
   color: rgba(255, 255, 255, 0.68);
   font-weight: 900;
+}
+
+body.modo-sala .cabecalho-painel,
+body.modo-sala .filtros-pontos,
+body.modo-sala .pontos-box,
+body.modo-sala .assinatura-final {
+  display: none;
+}
+
+body.modo-sala .conteudo-principal {
+  grid-template-rows: minmax(0, 1fr);
+  padding: 24px 28px;
+}
+
+.sala-detalhe[hidden] {
+  display: none;
+}
+
+.sala-detalhe {
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  background: rgba(12, 17, 29, 0.9);
+  color: #f8fafc;
+}
+
+.sala-detalhe::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sala-detalhe::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
+.sala-topbar {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.btn-voltar-sala {
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.sala-topbar > span {
+  color: #c4ccda;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.sala-topbar > strong {
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: rgba(22, 184, 97, 0.16);
+  color: #78e391;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.sala-hero {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(300px, 1.05fr);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.sala-hero img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.sala-info {
+  padding-top: 8px;
+}
+
+.sala-info h2 {
+  margin-bottom: 6px;
+  color: #ffffff;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1;
+}
+
+.sala-info p {
+  max-width: 620px;
+  color: #c9d0df;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 750;
+}
+
+.sala-codigo-linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 14px;
+}
+
+.sala-disponivel {
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: #47ad59;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.sala-codigo-linha strong {
+  color: #bdc6d7;
+  letter-spacing: 0.08em;
+}
+
+.sala-acoes {
+  display: flex;
+  gap: 12px;
+}
+
+.sala-acoes button {
+  height: 46px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.sala-acoes .btn-upgrade-sala {
+  background: #ffffff;
+  color: #111827;
+}
+
+.sala-playlist,
+.sala-historicos section {
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.sala-playlist h3,
+.sala-historicos h3 {
+  margin-bottom: 14px;
+  color: #8df0a9;
+  font-size: 18px;
+}
+
+.sala-lista {
+  display: grid;
+  gap: 12px;
+}
+
+.sala-playlist-item {
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 42px 34px minmax(220px, 1fr) 170px 120px 132px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(31, 45, 82, 0.94), rgba(23, 34, 64, 0.94));
+}
+
+.playlist-handle,
+.playlist-acoes button {
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #dce5f7;
+}
+
+.playlist-handle {
+  width: 34px;
+  height: 44px;
+  font-weight: 900;
+}
+
+.sala-playlist-item h4 {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.sala-playlist-item p,
+.sala-playlist-item time {
+  color: #b9c3d7;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.playlist-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.playlist-acoes button {
+  width: 34px;
+  height: 34px;
+}
+
+.sala-historicos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.sala-historico-lista {
+  display: grid;
+  gap: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.sala-historico-lista div {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #b9c3d7;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.sala-historico-lista div:last-child {
+  border-bottom: none;
+}
+
+.sala-historico-lista span {
+  color: #78e391;
+}
+
+@media (max-width: 1100px) {
+  .sala-topbar,
+  .sala-hero,
+  .sala-historicos,
+  .sala-playlist-item {
+    grid-template-columns: 1fr;
+  }
+
+  .sala-topbar > strong {
+    justify-self: start;
+  }
+
+  .playlist-acoes {
+    justify-content: flex-start;
+  }
 }
