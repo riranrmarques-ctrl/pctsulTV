@@ -1658,3 +1658,144 @@ body,
 #salaHistoricoStatus span.status-inativo {
   color: #ff5b5b;
 }
+
+.modal-editar-sala[hidden] {
+  display: none;
+}
+
+.modal-editar-sala {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal-editar-card {
+  width: min(100%, 760px);
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: #141518;
+  color: #ffffff;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.58);
+}
+
+.modal-editar-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.modal-editar-topo h3 {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.modal-editar-topo button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #2b2d31;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.modal-editar-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.modal-editar-grid label {
+  display: grid;
+  gap: 8px;
+}
+
+.modal-editar-grid .campo-largo {
+  grid-column: 1 / -1;
+}
+
+.modal-editar-grid span {
+  color: #d7dbe2;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.modal-editar-grid input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: #202226;
+  color: #ffffff;
+  padding: 0 14px;
+  outline: none;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.modal-editar-grid input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.modal-editar-preview {
+  margin-top: 16px;
+}
+
+.modal-editar-preview img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+  background: #202226;
+}
+
+.modal-editar-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.modal-editar-acoes button {
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+#btnCancelarEditarSala {
+  background: #2b2d31;
+  color: #ffffff;
+}
+
+#btnSalvarEditarSala {
+  background: #ffffff;
+  color: #111827;
+}
+
+@media (max-width: 680px) {
+  .modal-editar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-editar-acoes {
+    flex-direction: column;
+  }
+}
