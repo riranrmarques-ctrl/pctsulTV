@@ -58,11 +58,10 @@ button {
 
 .login-logo {
   margin: 0 auto 22px;
-  color: #000000;
-  font-size: 42px;
-  line-height: 0.72;
-  font-weight: 950;
-  letter-spacing: 0;
+  width: 112px;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .login-card h2 {
@@ -125,11 +124,10 @@ button {
 }
 
 .brand-logo {
-  color: #000000;
-  font-size: 44px;
-  line-height: 0.72;
-  font-weight: 950;
-  letter-spacing: 0;
+  width: 96px;
+  height: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .brand-texto {
@@ -730,7 +728,7 @@ body {
 }
 
 .brand-logo {
-  font-size: 34px;
+  width: 76px;
 }
 
 .brand-texto {
@@ -1092,7 +1090,10 @@ body,
   border-right-color: rgba(255, 255, 255, 0.14);
 }
 
-.brand-logo,
+.brand-logo {
+  filter: brightness(0) invert(1);
+}
+
 .brand-texto {
   color: #ffffff;
 }
@@ -1270,7 +1271,13 @@ body,
 }
 
 .assinatura-final {
-  padding-top: 10px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 40;
+  width: 100%;
+  pointer-events: none;
   color: rgba(255, 255, 255, 0.42);
   font-size: 10px;
   font-weight: 700;
@@ -1286,8 +1293,7 @@ body,
 
 body.modo-sala .cabecalho-painel,
 body.modo-sala .filtros-pontos,
-body.modo-sala .pontos-box,
-body.modo-sala .assinatura-final {
+body.modo-sala .pontos-box {
   display: none;
 }
 
