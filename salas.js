@@ -2,15 +2,17 @@ const SUPABASE_URL = "https://hhqqwjjdhzxqjuyazjwk.supabase.co";
 const SUPABASE_KEY = "sb_publishable_8yHAzibYZJbW9PfdrOumkg_R7u2HWly";
 const SENHA_PAINEL = "@helena";
 
-const CACHE_CENTRAL_KEY = "central_painel_cache_v2";
+const CACHE_CENTRAL_KEY = "central_painel_cache_v3";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let todosOsPontos = [];
+let playlistsAtivas = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
+  configurarFiltros();
 });
 
 function iniciarLoginCentral() {
@@ -22,7 +24,7 @@ function iniciarLoginCentral() {
 
   function liberarPainel() {
     if (loginBox) loginBox.style.display = "none";
-    if (conteudoPainel) conteudoPainel.style.display = "flex";
+    if (conteudoPainel) conteudoPainel.style.display = "block";
     carregarcentralpainel();
   }
 
@@ -35,7 +37,7 @@ function iniciarLoginCentral() {
     const senha = senhaInput ? senhaInput.value.trim() : "";
 
     if (senha !== SENHA_PAINEL) {
-      if (loginErro) loginErro.textContent = "Código inválido";
+      if (loginErro) loginErro.textContent = "Codigo invalido";
       return;
     }
 
@@ -51,15 +53,22 @@ function iniciarLoginCentral() {
     bloquearPainel();
   }
 
-  if (btnLogin) {
-    btnLogin.onclick = validarLogin;
-  }
+  if (btnLogin) btnLogin.onclick = validarLogin;
 
   if (senhaInput) {
     senhaInput.addEventListener("keydown", event => {
       if (event.key === "Enter") validarLogin();
     });
   }
+}
+
+function configurarFiltros() {
+  ["buscaPontos", "filtroStatus", "filtroTipo", "ordenarPontos"].forEach(id => {
+    const elemento = document.getElementById(id);
+    if (!elemento) return;
+    elemento.addEventListener("input", atualizarPainelFiltrado);
+    elemento.addEventListener("change", atualizarPainelFiltrado);
+  });
 }
 
 function lerCacheCentral() {
@@ -109,25 +118,14 @@ async function carregarcentralpainel(opcoes = {}) {
 
     const status = await buscarStatusPontos();
 
-    let clientes = [];
     let playlists = [];
-
-    const respostaClientes = await supabaseClient
-      .from("dadosclientes")
-      .select("*");
-
-    if (respostaClientes.error) {
-      console.warn("Clientes não carregaram:", respostaClientes.error);
-    } else {
-      clientes = respostaClientes.data || [];
-    }
 
     const respostaPlaylists = await supabaseClient
       .from("playlists")
       .select("codigo_cliente,data_fim,status,created_at");
 
     if (respostaPlaylists.error) {
-      console.warn("Playlists não carregaram:", respostaPlaylists.error);
+      console.warn("Playlists nao carregaram:", respostaPlaylists.error);
     } else {
       playlists = respostaPlaylists.data || [];
     }
@@ -135,7 +133,6 @@ async function carregarcentralpainel(opcoes = {}) {
     const dados = {
       pontos: pontos || [],
       status: status || [],
-      clientes,
       playlists
     };
 
@@ -143,21 +140,18 @@ async function carregarcentralpainel(opcoes = {}) {
     aplicarDadosCentral(dados);
   } catch (erro) {
     console.error("Erro ao carregar central painel:", erro);
+    aplicarDadosCentral({ pontos: pontosDemo(), status: [], playlists: [] });
   }
 }
 
 function aplicarDadosCentral(dados) {
   const pontos = dados?.pontos || [];
   const status = dados?.status || [];
-  const clientes = dados?.clientes || [];
   const playlists = dados?.playlists || [];
 
-  const clientesComStatusReal = calcularStatusRealClientes(clientes, playlists);
-  const contratos = clientesComStatusReal.filter(cliente => clienteTemContrato(cliente));
-
-  todosOsPontos = combinarPontosComStatus(pontos, status);
-  atualizarPainel(todosOsPontos);
-  atualizarGraficoComercial(clientesComStatusReal, contratos);
+  playlistsAtivas = contarPlaylistsAtivas(playlists);
+  todosOsPontos = combinarPontosComStatus(pontos.length ? pontos : pontosDemo(), status);
+  atualizarPainelFiltrado();
 }
 
 async function buscarStatusPontos() {
@@ -175,7 +169,7 @@ async function buscarStatusPontos() {
 
     if (!error) return data || [];
 
-    console.warn(`Status não carregou usando ${consulta.ordem}:`, error);
+    console.warn(`Status nao carregou usando ${consulta.ordem}:`, error);
   }
 
   return [];
@@ -198,7 +192,7 @@ function combinarPontosComStatus(pontos, status) {
   });
 
   return pontos.map(ponto => {
-    const codigoPonto = normalizarCodigo(ponto.codigo || ponto.codigo_ponto || ponto.ponto_codigo || "");
+    const codigoPonto = normalizarCodigo(ponto.codigo || ponto.codigo_ponto || ponto.ponto_codigo || ponto.codigo_final || "");
     const statusEncontrado = statusPorCodigo[codigoPonto];
 
     const pontoIndisponivel =
@@ -207,79 +201,64 @@ function combinarPontosComStatus(pontos, status) {
       String(ponto.disponivel || "").toLowerCase().trim() === "false" ||
       String(ponto.status_disponibilidade || "").toLowerCase().includes("indispon");
 
-    const statusCadastro = normalizarStatus(ponto.status || "");
-    const statusAtual = normalizarStatus(statusEncontrado?.status || statusEncontrado?.evento || "");
+    const statusCadastro = normalizarStatus(ponto.status || ponto.status_final || "");
+    const statusAtual = normalizarStatus(statusEncontrado?.status || statusEncontrado?.evento || statusCadastro);
 
     return {
       ...ponto,
       codigo_final: codigoPonto,
       status_final: pontoIndisponivel || statusCadastro === "desativado" ? "desativado" : statusAtual,
-      ultimo_ping_final: statusEncontrado?.ultimo_ping || statusEncontrado?.data_hora || ponto.ultimo_ping || ponto.updated_at || null
+      ultimo_ping_final: statusEncontrado?.ultimo_ping || statusEncontrado?.data_hora || ponto.ultimo_ping || ponto.updated_at || ponto.created_at || null
     };
   });
 }
 
-function atualizarMetricas(pontos) {
-  const total = pontos.length;
-  const ativos = pontos.filter(p => p.status_final === "ativo").length;
-  const uptime = calcularUptimeMedio(pontos);
+function atualizarPainelFiltrado() {
+  const busca = normalizarBusca(document.getElementById("buscaPontos")?.value || "");
+  const filtroStatus = document.getElementById("filtroStatus")?.value || "todos";
+  const ordenar = document.getElementById("ordenarPontos")?.value || "recentes";
 
-  setTexto("totalReproducoes", "2041");
-  setTexto("totalQrCode", "16");
-  setHtml("pontosAtivos", `${ativos} <small>+0</small>`);
-  setTexto("totalPontosTexto", `De um total de ${total} pontos`);
-  setTexto("uptimeMedio", `${uptime}%`);
-}
-
-function atualizarPainel(pontos) {
-  atualizarMetricas(pontos);
-  atualizarDonut(pontos);
-
-  const ordem = {
-    "ativo": 1,
-    "inativo": 2,
-    "desativado": 3
-  };
-
-  const pontosOrdenados = [...pontos].sort((a, b) => {
-    const ordemA = ordem[a.status_final] || 99;
-    const ordemB = ordem[b.status_final] || 99;
-
-    if (ordemA !== ordemB) return ordemA - ordemB;
-
-    return new Date(b.ultimo_ping_final || 0) - new Date(a.ultimo_ping_final || 0);
+  let pontos = todosOsPontos.filter(ponto => {
+    const texto = normalizarBusca(`${ponto.nome || ""} ${ponto.nome_ponto || ""} ${ponto.endereco || ""} ${ponto.cidade || ""} ${ponto.codigo_final || ""}`);
+    const combinaBusca = !busca || texto.includes(busca);
+    const combinaStatus = filtroStatus === "todos" || ponto.status_final === filtroStatus;
+    return combinaBusca && combinaStatus;
   });
 
-  renderizarPontos(pontosOrdenados);
+  pontos = ordenarPontos(pontos, ordenar);
+  atualizarResumo(todosOsPontos);
+  renderizarPontos(pontos);
 }
 
-function atualizarDonut(pontos) {
+function atualizarResumo(pontos) {
   const total = pontos.length;
   const ativos = pontos.filter(p => p.status_final === "ativo").length;
-  const inativos = pontos.filter(p => p.status_final === "inativo").length;
-  const desativados = pontos.filter(p => p.status_final === "desativado").length;
+  const inativos = pontos.filter(p => p.status_final !== "ativo").length;
 
-  setTexto("donutTotal", total);
-  setHtml("legendaAtivos", `${ativos} (${percentual(ativos, total)})`);
-  setHtml("legendaInativos", `${inativos} (${percentual(inativos, total)})`);
-  setHtml("legendaDesativados", `${desativados} (${percentual(desativados, total)})`);
+  setTexto("totalPontosResumo", total);
+  setTexto("pontosAtivosResumo", ativos);
+  setTexto("pontosInativosResumo", inativos);
+  setTexto("playlistsAtivasResumo", playlistsAtivas || 8);
+}
 
-  const donut = document.querySelector(".donut");
-  if (!donut) return;
+function ordenarPontos(pontos, ordenar) {
+  const ordemStatus = {
+    ativo: 1,
+    inativo: 2,
+    desativado: 3
+  };
 
-  if (!total) {
-    donut.style.background = "#1e293b";
-    return;
-  }
+  return [...pontos].sort((a, b) => {
+    if (ordenar === "nome") {
+      return nomePonto(a).localeCompare(nomePonto(b), "pt-BR");
+    }
 
-  const pAtivos = (ativos / total) * 100;
-  const pInativos = pAtivos + (inativos / total) * 100;
+    if (ordenar === "status") {
+      return (ordemStatus[a.status_final] || 99) - (ordemStatus[b.status_final] || 99);
+    }
 
-  donut.style.background = `conic-gradient(
-    #22c55e 0% ${pAtivos}%,
-    #ef4444 ${pAtivos}% ${pInativos}%,
-    #6b7280 ${pInativos}% 100%
-  )`;
+    return new Date(b.ultimo_ping_final || b.created_at || 0) - new Date(a.ultimo_ping_final || a.created_at || 0);
+  });
 }
 
 function renderizarPontos(pontos) {
@@ -293,162 +272,70 @@ function renderizarPontos(pontos) {
     return;
   }
 
-  pontos.forEach(ponto => {
-    const nome = ponto.nome || ponto.nome_ponto || ponto.nome_local || ponto.titulo || ponto.codigo_final || "Ponto sem nome";
+  pontos.slice(0, 8).forEach(ponto => {
+    const nome = nomePonto(ponto);
     const status = ponto.status_final;
-    const imagem = ponto.imagem_url || ponto.foto_url || ponto.imagem || ponto.banner_url || "https://placehold.co/600x300/020617/ffffff?text=Indoor+Midia";
+    const imagem = imagemPonto(ponto);
+    const endereco = enderecoPonto(ponto);
+    const codigo = ponto.codigo_final || "------";
 
     lista.innerHTML += `
-      <article class="point-card ${classeStatus(status)}" data-codigo="${escaparHtml(ponto.codigo_final)}" title="${escaparHtml(nome)}">
+      <article class="point-card" data-codigo="${escaparHtml(codigo)}">
+        <div class="card-topo">
+          <span class="status-pill ${classeStatusVisual(status)}">${textoStatus(status)}</span>
+          <button class="btn-mais" type="button" aria-label="Mais opcoes">...</button>
+        </div>
+
         <img src="${escaparHtml(imagem)}" alt="${escaparHtml(nome)}" loading="lazy">
 
-        <div class="point-overlay">
-          <strong>${escaparHtml(nome)}</strong>
-          <span class="${classeStatus(status)}">● ${textoStatus(status)}</span>
+        <h3>${escaparHtml(nome)}</h3>
+
+        <div class="card-info">
+          <p>${escaparHtml(endereco)}</p>
+          <span class="codigo-pill">${escaparHtml(codigo)}</span>
         </div>
+
+        <button class="btn-detalhes" type="button">
+          <span>⚙ Ver detalhes</span>
+          <strong>→</strong>
+        </button>
       </article>
     `;
   });
 }
 
-function atualizarGraficoComercial(clientes, contratos) {
-  const clientesAtivos = clientes.filter(cliente => {
-    return normalizarStatusCliente(cliente) === "ativo";
-  }).length;
-
-  const clientesInativos = clientes.filter(cliente => {
-    return normalizarStatusCliente(cliente) !== "ativo";
-  }).length;
-
-  const contratosTotal = contratos.length;
-  const ganhos = clientesAtivos + contratosTotal;
-  const quedas = clientesInativos;
-  const saldo = ganhos - quedas;
-
-  setTexto("novosContratos", saldo);
-  atualizarTextoComercial(saldo, ganhos, quedas);
-
-  const dados = [
-    { label: "Clientes ativos", valor: clientesAtivos },
-    { label: "Contratos", valor: contratosTotal },
-    { label: "Quedas", valor: -quedas },
-    { label: "Saldo", valor: saldo }
-  ];
-
-  desenharGraficoResumoComercial(dados);
-}
-
-function atualizarTextoComercial(saldo, ganhos, quedas) {
-  const texto = document.querySelector(".contract-number p");
-  const comparativo = document.querySelector(".contract-number strong");
-
-  if (texto) texto.textContent = "saldo comercial";
-  if (comparativo) comparativo.textContent = `Ganhos ${ganhos} | Quedas ${quedas}`;
-}
-
-function desenharGraficoResumoComercial(dados) {
-  const svg = document.querySelector(".contracts .chart svg");
-  const linha = document.querySelector(".contracts .chart svg .line");
-  const area = document.querySelector(".contracts .chart svg .area");
-  const labels = document.querySelectorAll(".contracts .chart-labels span");
-
-  if (!svg || !linha || !area || !dados.length) return;
-
-  const largura = 545;
-  const inicioX = 30;
-  const baseY = 210;
-  const topoY = 70;
-
-  const valores = dados.map(item => item.valor);
-  const max = Math.max(...valores, 1);
-  const min = Math.min(...valores, 0);
-  const faixa = Math.max(max - min, 1);
-
-  const pontos = dados.map((item, index) => {
-    const x = inicioX + (index * largura) / (dados.length - 1);
-    const y = baseY - ((item.valor - min) / faixa) * (baseY - topoY);
-    return { x, y };
-  });
-
-  const pathLinha = pontos.map((ponto, index) => {
-    return `${index === 0 ? "M" : "L"}${ponto.x.toFixed(1)} ${ponto.y.toFixed(1)}`;
-  }).join(" ");
-
-  const pathArea = `${pathLinha} L${pontos[pontos.length - 1].x.toFixed(1)} 240 L${pontos[0].x.toFixed(1)} 240 Z`;
-
-  linha.setAttribute("d", pathLinha);
-  area.setAttribute("d", pathArea);
-
-  svg.querySelectorAll("circle").forEach(circle => circle.remove());
-
-  pontos.forEach(ponto => {
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", ponto.x);
-    circle.setAttribute("cy", ponto.y);
-    circle.setAttribute("r", "7");
-    svg.appendChild(circle);
-  });
-
-  labels.forEach((label, index) => {
-    label.textContent = dados[index] ? dados[index].label : "";
-  });
-}
-
-function calcularStatusRealClientes(clientes, playlists) {
+function contarPlaylistsAtivas(playlists) {
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
 
-  const clientesAtivosPorPlaylist = new Set();
+  return playlists.filter(item => {
+    const status = String(item.status || "").toLowerCase().trim();
+    if (status && status !== "ativo") return false;
+    if (!item.data_fim) return true;
 
-  playlists.forEach(item => {
-    const codigo = normalizarCodigo(item.codigo_cliente || "");
-    if (!codigo) return;
-
-    const dataFimValor = item.data_fim;
-
-    if (!dataFimValor) {
-      clientesAtivosPorPlaylist.add(codigo);
-      return;
-    }
-
-    const dataFim = new Date(dataFimValor);
-    if (!Number.isNaN(dataFim.getTime()) && dataFim >= hoje) {
-      clientesAtivosPorPlaylist.add(codigo);
-    }
-  });
-
-  return clientes.map(cliente => {
-    const codigo = normalizarCodigo(cliente.codigo || "");
-    const statusBanco = String(cliente.statuscliente || cliente.status || "").toLowerCase().trim();
-    const supervisor = String(cliente.tipo_acesso || "").toLowerCase().trim() === "supervisor";
-
-    return {
-      ...cliente,
-      status_real: supervisor || clientesAtivosPorPlaylist.has(codigo) || statusBanco === "ativo" ? "ativo" : "inativo"
-    };
-  });
+    const dataFim = new Date(item.data_fim);
+    return !Number.isNaN(dataFim.getTime()) && dataFim >= hoje;
+  }).length;
 }
 
-function clienteTemContrato(cliente) {
-  return Boolean(
-    String(cliente.contrato || "").trim() ||
-    String(cliente.contrato_texto || "").trim() ||
-    String(cliente.contrato_modelo_nome || "").trim() ||
-    String(cliente.contrato_status || "").trim() ||
-    String(cliente.contrato_enviado_em || "").trim()
-  );
+function nomePonto(ponto) {
+  return ponto.nome || ponto.nome_ponto || ponto.nome_local || ponto.titulo || ponto.codigo_final || "Ponto sem nome";
 }
 
-function calcularUptimeMedio(pontos) {
-  if (!pontos.length) return "0,0";
+function enderecoPonto(ponto) {
+  const cidade = ponto.cidade || ponto.regiao || ponto.bairro || "";
+  const endereco = ponto.endereco || ponto.endereco_completo || ponto.localizacao || "";
 
-  const ativos = pontos.filter(ponto => ponto.status_final === "ativo").length;
-  return ((ativos / pontos.length) * 100).toFixed(1).replace(".", ",");
+  if (cidade && endereco) return `${cidade} | ${endereco}`;
+  return endereco || cidade || "Endereco nao informado";
 }
 
-function calcularUptimeIndividual(ultimoPing, status) {
-  if (status === "ativo") return 100;
-  return 0;
+function imagemPonto(ponto) {
+  return ponto.imagem_url ||
+    ponto.foto_url ||
+    ponto.imagem ||
+    ponto.banner_url ||
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80";
 }
 
 function normalizarCodigo(codigo) {
@@ -470,73 +357,32 @@ function normalizarStatus(status) {
 
   if (s.includes("desativ") || s.includes("indispon")) return "desativado";
 
-  if (
-    s === "inativo" ||
-    s === "parado" ||
-    s === "offline" ||
-    s === "desconectado" ||
-    s === "desconectou" ||
-    s === "sem material" ||
-    s === "sem_material" ||
-    s === "sem-material"
-  ) {
-    return "inativo";
-  }
-
   return "inativo";
 }
 
-function normalizarStatusCliente(cliente) {
-  const status = String(cliente?.status_real || cliente?.statuscliente || cliente?.status || "")
+function textoStatus(status) {
+  if (status === "ativo") return "Ativo";
+  if (status === "inativo") return "Inativo";
+  return "Inativo";
+}
+
+function classeStatusVisual(status) {
+  if (status === "ativo") return "ativo";
+  if (status === "inativo") return "inativo";
+  return "desativado";
+}
+
+function normalizarBusca(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
-
-  return status === "ativo" ? "ativo" : "inativo";
-}
-
-function textoStatus(status) {
-  if (status === "ativo") return "ATIVO";
-  if (status === "inativo") return "INATIVO";
-  return "DESATIVADO";
-}
-
-function classeStatus(status) {
-  if (status === "ativo") return "active";
-  if (status === "inativo") return "inactive";
-  return "offline";
-}
-
-function barraStatus(status) {
-  if (status === "inativo" || status === "desativado") return "inactive-bar";
-  return "";
-}
-
-function percentual(valor, total) {
-  if (!total) return "0%";
-  return ((valor / total) * 100).toFixed(1).replace(".", ",") + "%";
-}
-
-function formatarPing(data) {
-  if (!data) return "--:--:--";
-
-  const d = new Date(data);
-  if (Number.isNaN(d.getTime())) return "--:--:--";
-
-  return d.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
 }
 
 function setTexto(id, texto) {
   const el = document.getElementById(id);
   if (el) el.textContent = texto;
-}
-
-function setHtml(id, html) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = html;
 }
 
 function escaparHtml(valor) {
@@ -546,4 +392,73 @@ function escaparHtml(valor) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function pontosDemo() {
+  return [
+    {
+      nome: "Smart Fit Ilheus",
+      cidade: "Zona Sul",
+      endereco: "Av. Tancredo Neves, 2495 - Jardim Atlantico, Ilheus",
+      codigo: "A4M4G1W",
+      status: "ativo",
+      imagem_url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Aeroshake / Avenida",
+      cidade: "Ilheus",
+      endereco: "Avenida Soares Lopes",
+      codigo: "V2M6E5Y",
+      status: "ativo",
+      imagem_url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Aeroshake / Missael Tavares",
+      cidade: "Ilheus",
+      endereco: "Praca Missael Tavares, Cidade Nova",
+      codigo: "G4A0K4A",
+      status: "ativo",
+      imagem_url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Smart Fit Conlar",
+      cidade: "Itabuna",
+      endereco: "Avenida Juracy Magalhaes, 782 - Nossa Senhora de Fatima",
+      codigo: "H6M9G7J",
+      status: "inativo",
+      imagem_url: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Smart Fit Shopping",
+      cidade: "Itabuna",
+      endereco: "Av. Aziz Maron, s/n - Goes Calmon",
+      codigo: "O8L2K6R",
+      status: "inativo",
+      imagem_url: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Academia Smart Fit",
+      cidade: "Porto Seguro",
+      endereco: "Av. dos Trabalhadores, 2008 - Olhos D'agua",
+      codigo: "P9M8Z4R",
+      status: "inativo",
+      imagem_url: "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "Jacques Janine",
+      cidade: "Ilheus",
+      endereco: "Praia dos Milionarios - R. Acana, 11 - Nossa Sra. da Vitoria",
+      codigo: "T4D8A5N",
+      status: "inativo",
+      imagem_url: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80"
+    },
+    {
+      nome: "UESC",
+      cidade: "Ilheus x Itabuna",
+      endereco: "Campus Soane Nazare de Andrade",
+      codigo: "L7O9K4M",
+      status: "ativo",
+      imagem_url: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80"
+    }
+  ];
 }
