@@ -617,7 +617,7 @@ function abrirSala(ponto) {
   setTexto("salaCodigo", codigo);
   setTexto("salaStatusTopo", textoStatusSala(ponto));
   aplicarClasseStatusSala(ponto.status_final);
-  setTexto("salaTotalMidias", totalMidiasPonto(ponto));
+  setTexto("salaTotalMidias", materiaisDaSala(codigo).length);
   setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
   setTexto("salaDiasOnline", totalTelasPonto(ponto, 0));
 
@@ -871,7 +871,10 @@ function renderizarPlaylistSala(codigoSala) {
       <div>
         <h4>${escaparHtml(item.nome || item.arquivo_nome || "Material sem nome")}</h4>
       </div>
-      <time>${escaparHtml(formatarDataHora(item.created_at))}</time>
+      <div class="playlist-datas">
+        <time><span>Postagem</span>${escaparHtml(formatarData(item.data_postagem || item.created_at))}</time>
+        <time><span>Vencimento</span>${escaparHtml(formatarData(item.data_encerramento || item.data_fim || ""))}</time>
+      </div>
       <div class="playlist-acoes">
         <button type="button" class="btn-renomear-material" data-id="${escaparHtml(item.id)}">✎</button>
         <button type="button" class="btn-download-material" data-id="${escaparHtml(item.id)}">↓</button>
