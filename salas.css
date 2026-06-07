@@ -118,13 +118,17 @@ button {
 .brand {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 9px;
-  padding-left: 28px;
+  width: 100%;
+  padding: 0;
+  text-align: center;
 }
 
 .brand-logo {
-  width: 96px;
+  width: 132px;
+  max-width: 82%;
   height: auto;
   display: block;
   object-fit: contain;
@@ -142,7 +146,7 @@ button {
 .menu-lateral {
   display: grid;
   gap: 14px;
-  margin-top: 46px;
+  margin-top: 38px;
 }
 
 .menu-item {
@@ -724,11 +728,15 @@ body {
 
 .brand {
   gap: 7px;
-  padding-left: 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  text-align: center;
 }
 
 .brand-logo {
-  width: 76px;
+  width: 116px;
+  max-width: 86%;
 }
 
 .brand-texto {
@@ -1352,10 +1360,21 @@ body.modo-sala .conteudo-principal {
 .sala-topbar > strong {
   padding: 11px 18px;
   border-radius: 999px;
-  background: rgba(22, 184, 97, 0.16);
-  color: #78e391;
+  background: rgba(239, 68, 68, 0.16);
+  color: #ff5b5b;
   font-size: 13px;
   white-space: nowrap;
+}
+
+.sala-topbar > strong.ativo {
+  background: rgba(22, 184, 97, 0.16);
+  color: #78e391;
+}
+
+.sala-topbar > strong.inativo,
+.sala-topbar > strong.desativado {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ff5b5b;
 }
 
 .sala-hero {
@@ -1401,8 +1420,57 @@ body.modo-sala .conteudo-principal {
 }
 
 .sala-codigo-linha strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
   color: #bdc6d7;
   letter-spacing: 0.08em;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sala-codigo-linha strong:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.status-flutuante {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 99999;
+  min-width: 190px;
+  max-width: min(360px, calc(100vw - 40px));
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: #111316;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.status-flutuante.ativo {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.status-flutuante.ok {
+  border-color: rgba(34, 197, 94, 0.32);
+}
+
+.status-flutuante.erro {
+  border-color: rgba(239, 68, 68, 0.42);
+  background: #1c1111;
 }
 
 .sala-metricas {
@@ -1482,7 +1550,7 @@ body.modo-sala .conteudo-principal {
 .sala-playlist-item {
   min-height: 70px;
   display: grid;
-  grid-template-columns: 42px 34px minmax(220px, 1fr) 170px 120px 132px;
+  grid-template-columns: 42px 34px minmax(220px, 1fr) 170px 132px;
   align-items: center;
   gap: 12px;
   padding: 12px;
@@ -1548,15 +1616,15 @@ body.modo-sala .conteudo-principal {
 
 .sala-historico-lista div {
   display: grid;
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
-  min-height: 42px;
-  padding: 0 12px;
+  min-height: 52px;
+  padding: 10px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  color: #b9c3d7;
-  font-size: 13px;
-  font-weight: 750;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 850;
 }
 
 .sala-historico-lista div:last-child {
@@ -1564,7 +1632,20 @@ body.modo-sala .conteudo-principal {
 }
 
 .sala-historico-lista span {
-  color: #78e391;
+  min-width: 0;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.sala-historico-lista strong {
+  color: #ffffff;
+}
+
+.sala-historico-lista time {
+  color: #d7dbe2;
+  text-align: right;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 @media (max-width: 1100px) {
@@ -1612,9 +1693,15 @@ body,
   color: #d7dbe2;
 }
 
-.sala-topbar > strong {
+.sala-topbar > strong.ativo {
   background: rgba(22, 184, 97, 0.2);
   color: #70e08c;
+}
+
+.sala-topbar > strong.inativo,
+.sala-topbar > strong.desativado {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ff5b5b;
 }
 
 .sala-playlist,
@@ -1651,13 +1738,13 @@ body,
   border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
-#salaHistoricoEncerramento span,
-#salaHistoricoEncerramento time,
-#salaHistoricoEncerramento strong {
+#salaRadioTvLista span,
+#salaRadioTvLista time,
+#salaRadioTvLista strong {
   color: #ffffff;
 }
 
-#salaHistoricoStatus span {
+#salaHistoricoStatus span.status-ativo {
   color: #70e08c;
 }
 
@@ -1774,6 +1861,33 @@ body,
   color: rgba(255, 255, 255, 0.38);
 }
 
+.modal-material-card {
+  width: min(100%, 560px);
+}
+
+.material-selecionado {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: #202226;
+}
+
+.material-selecionado span {
+  color: #d7dbe2;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.material-selecionado strong {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  word-break: break-word;
+}
+
 .modal-editar-preview {
   margin-top: 16px;
 }
@@ -1809,7 +1923,13 @@ body,
   color: #ffffff;
 }
 
-#btnSalvarEditarSala {
+#btnCancelarAdicionarMaterial {
+  background: #2b2d31;
+  color: #ffffff;
+}
+
+#btnSalvarEditarSala,
+#btnConfirmarAdicionarMaterial {
   background: #ffffff;
   color: #111827;
 }
