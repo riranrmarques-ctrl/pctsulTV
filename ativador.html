@@ -50,20 +50,55 @@
     }
 
     .back-link {
-      width: min(260px, 100%);
-      min-height: 54px;
-      margin: 22px auto 0;
-      padding: 0 22px;
+      position: relative;
+      width: min(270px, 100%);
+      min-height: 56px;
+      margin: 24px auto 0;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #fff;
       text-decoration: none;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
+      letter-spacing: 0.01em;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .back-link::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.2) 42%, transparent 68%);
+      transform: translateX(-120%);
+      animation: buttonSheen 3.2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .back-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.11));
+    }
+
+    .back-link:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+     buttonSheen {
+      0%, 45% {
+        transform: translateX(-120%);
+      }
+
+      75%, 100% {
+        transform: translateX(120%);
+      }
     }
 
     .logo {
@@ -202,7 +237,7 @@
     <section id="scanCard" class="card scan-card">
       <h1>Escaneie o código da tela para login</h1>
       <p class="sub">Abra esta página pelo QR Code exibido na TV.</p>
-      <a class="back-link" href="sala.html">Voltar para salas</a>
+      <a class="back-link" href="salas.html">Voltar para salas</a>
     </section>
 
     <section id="activationCard" class="card">
@@ -220,7 +255,7 @@
       </div>
 
       <p id="msg" class="msg"></p>
-      <a class="back-link" href="sala.html">Voltar para salas</a>
+      <a class="back-link" href="salas.html">Voltar para salas</a>
     </section>
 
     <div class="signature">desenvolvimento pela DUNA BRANDING</div>
@@ -232,7 +267,7 @@
     <section class="card">
       <h1>Entre pelo mobile</h1>
       <p class="sub">Use o celular para fazer a ativação da tela.</p>
-      <a class="back-link" href="sala.html">Voltar para salas</a>
+      <a class="back-link" href="salas.html">Voltar para salas</a>
     </section>
 
     <div class="signature">desenvolvimento pela DUNA BRANDING</div>
@@ -253,7 +288,8 @@
       const params = new URLSearchParams(window.location.search);
       const forcarMobile = params.get("mobile") === "1" || params.get("modo") === "mobile";
       const forcarDesktop = params.get("desktop") === "1" || params.get("modo") === "desktop";
-      const pareceMobile = window.innerWidth <= 820 || screen.width <= 820 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      const modoPreviewMobileNoPc = true;
+      const pareceMobile = modoPreviewMobileNoPc || window.innerWidth <= 820 || screen.width <= 820 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
       document.body.classList.remove("mobile-mode", "desktop-mode");
       document.body.classList.add(forcarDesktop ? "desktop-mode" : (forcarMobile || pareceMobile ? "mobile-mode" : "desktop-mode"));
