@@ -140,7 +140,7 @@
     </div>
 
     <nav class="menu-lateral">
-      <a href="#pontos" class="menu-item ativo" data-view="pontos">
+      <a href="salas.html" class="menu-item ativo">
         <span class="menu-icone">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><circle cx="12" cy="12" r="5"></circle>
@@ -156,7 +156,7 @@
         <span>Usuarios</span>
       </a>
 
-      <a href="#biblioteca" class="menu-item" data-view="biblioteca">
+      <a href="biblioteca.html" class="menu-item">
         <span class="menu-icone">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h8"></path><path d="M8 12h8"></path><path d="M8 17h5"></path></svg>
         </span>
@@ -213,50 +213,6 @@
 
     <section id="listaPontos" class="pontos-box"></section>
 
-
-    <section id="bibliotecaPainel" class="biblioteca-painel" hidden>
-      <div class="biblioteca-card">
-        <header class="biblioteca-topo">
-          <button class="btn-voltar-biblioteca" type="button" data-view="pontos">← Voltar</button>
-          <div>
-            <h2>Biblioteca</h2>
-            <p>Seus arquivos disponíveis para adicionar às playlists das salas</p>
-          </div>
-          <button class="btn-adicionar-material" type="button"><span>+</span>Adicionar material</button>
-        </header>
-
-        <section class="biblioteca-filtros">
-          <label class="biblioteca-busca">
-            <input type="search" placeholder="Buscar na biblioteca...">
-            <span>⌕</span>
-          </label>
-          <button class="biblioteca-select" type="button">Filtrar por tipo <span>⌄</span></button>
-        </section>
-
-        <section class="biblioteca-lista">
-          <div class="biblioteca-head">
-            <span>Nome do arquivo</span>
-            <span>Ações</span>
-          </div>
-
-          <article class="biblioteca-linha"><strong>www.gov.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.inovacao.gov.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.sebrae.com.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.fapesb.ba.gov.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.bahia.ba.gov.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.cnpq.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.finep.gov.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-          <article class="biblioteca-linha"><strong>www.ibict.br</strong><div class="biblioteca-acoes"><button type="button">✎</button><button type="button">↓</button><button class="danger" type="button">⌫</button></div></article>
-        </section>
-
-        <footer class="biblioteca-rodape">
-          <span>Mostrando 1 a 8 de 8 arquivos</span>
-          <div class="biblioteca-paginas"><button type="button">‹</button><strong>1</strong><button type="button">›</button></div>
-          <div class="biblioteca-por-pagina"><span>Itens por página:</span><button type="button">10 <span>⌄</span></button></div>
-        </footer>
-      </div>
-    </section>
-
     <section id="salaDetalhe" class="sala-detalhe" hidden>
       <div class="sala-topbar">
         <button id="btnVoltarSalas" class="btn-voltar-sala" type="button">← Voltar</button>
@@ -278,7 +234,7 @@
           </div>
           <div class="sala-acoes">
             <button id="btnEditarSala" type="button">Editar</button>
-            <button type="button" class="button-link" data-view="biblioteca">Biblioteca</button>
+            <a href="biblioteca.html" class="button-link">Biblioteca</a>
             <button id="btnAdicionarMaterial" type="button" class="btn-upgrade-sala">Adicionar material</button>
             <input id="inputMaterialSala" type="file" accept="video/*,image/*,.txt,text/plain" hidden>
           </div>
