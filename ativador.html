@@ -14,8 +14,9 @@
     body {
       margin: 0;
       width: 100%;
-      min-height: 100vh;
-      background: #030505;
+      height: 100%;
+      overflow: hidden;
+      background: #030404;
       color: #fff;
       font-family: Arial, Helvetica, sans-serif;
     }
@@ -24,10 +25,10 @@
       visibility: hidden;
       display: grid;
       place-items: center;
-      padding: 22px 22px 72px;
+      padding: 18px 18px 54px;
       background:
-        radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.045), transparent 32%),
-        linear-gradient(180deg, #050606 0%, #020303 100%);
+        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.065), transparent 30%),
+        linear-gradient(180deg, #060707 0%, #020303 100%);
     }
 
     input,
@@ -42,7 +43,7 @@
     .page,
     .desktop {
       display: none;
-      width: min(430px, 100%);
+      width: min(360px, 100%);
     }
 
     body.mobile-mode .page,
@@ -51,37 +52,37 @@
     }
 
     .logo {
-      width: min(300px, 72vw);
-      height: 190px;
+      width: min(215px, 62vw);
+      height: 104px;
       object-fit: contain;
       display: block;
-      margin: 0 auto 20px;
-      filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.22));
+      margin: 0 auto 14px;
+      filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.18));
     }
 
     .card {
       width: 100%;
-      padding: 42px 26px 34px;
-      border: 2px solid rgba(255, 255, 255, 0.86);
-      border-radius: 32px;
-      background: rgba(0, 0, 0, 0.14);
-      box-shadow: 0 26px 86px rgba(0, 0, 0, 0.5), inset 0 0 32px rgba(255, 255, 255, 0.025);
+      padding: 24px 22px 22px;
+      border: 1.5px solid rgba(255, 255, 255, 0.86);
+      border-radius: 24px;
+      background: rgba(0, 0, 0, 0.16);
+      box-shadow: 0 22px 58px rgba(0, 0, 0, 0.48), inset 0 0 22px rgba(255, 255, 255, 0.025);
       text-align: center;
     }
 
     h1 {
       margin: 0 0 10px;
-      font-size: 30px;
-      line-height: 1.08;
+      font-size: 24px;
+      line-height: 1.1;
       text-align: center;
     }
 
     .sub {
-      margin: 0 auto 28px;
-      max-width: 330px;
+      margin: 0 auto 20px;
+      max-width: 285px;
       color: #fff;
-      font-size: clamp(1.72rem, 7.8vw, 2.08rem);
-      line-height: 1.22;
+      font-size: 1.18rem;
+      line-height: 1.28;
       text-align: center;
     }
 
@@ -92,9 +93,9 @@
     .token {
       display: grid;
       gap: 5px;
-      margin-bottom: 18px;
-      padding: 13px 14px;
-      border-radius: 14px;
+      margin-bottom: 14px;
+      padding: 11px 12px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.16);
       text-align: center;
@@ -102,31 +103,31 @@
 
     .token span {
       color: rgb(180, 196, 210);
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
     .token strong {
-      font-size: 22px;
+      font-size: 20px;
       letter-spacing: 0.08em;
     }
 
     .form {
       display: grid;
-      gap: 14px;
+      gap: 12px;
     }
 
     input {
       width: 100%;
-      height: 60px;
-      padding: 0 15px;
+      height: 52px;
+      padding: 0 14px;
       border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 14px;
+      border-radius: 12px;
       outline: none;
       background: rgba(255, 255, 255, 0.08);
       color: #fff;
-      font-size: 20px;
+      font-size: 18px;
       text-align: center;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -134,12 +135,12 @@
 
     button {
       width: 100%;
-      min-height: 62px;
+      min-height: 52px;
       border: 0;
-      border-radius: 18px;
+      border-radius: 14px;
       background: #fff;
       color: #050505;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 900;
     }
 
@@ -148,36 +149,35 @@
     }
 
     .msg {
-      min-height: 24px;
-      margin: 16px 0 0;
+      min-height: 20px;
+      margin: 12px 0 0;
       color: rgb(125, 210, 150);
-      font-size: 15px;
-      line-height: 1.35;
+      font-size: 13px;
+      line-height: 1.32;
       text-align: center;
     }
 
     #scanMsg:not(:empty) {
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .scan-card {
       display: none;
-      width: min(360px, 100%);
       margin: 0 auto;
-      transform: scale(0.86);
-      transform-origin: top center;
     }
 
     .scan-target {
       position: relative;
-      width: 188px;
-      height: 188px;
-      margin: 0 auto 34px;
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 18px;
       display: grid;
       place-items: center;
+      border-radius: 28px;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025) 64%, transparent 65%);
     }
 
     .scan-target::before,
@@ -186,8 +186,8 @@
     .corner-layer::after {
       content: "";
       position: absolute;
-      width: 32px;
-      height: 32px;
+      width: 22px;
+      height: 22px;
       border-color: #fff;
       border-style: solid;
       pointer-events: none;
@@ -196,80 +196,38 @@
     .scan-target::before {
       top: 0;
       left: 0;
-      border-width: 5px 0 0 5px;
+      border-width: 3px 0 0 3px;
       border-radius: 12px 0 0 0;
     }
 
     .scan-target::after {
       top: 0;
       right: 0;
-      border-width: 5px 5px 0 0;
+      border-width: 3px 3px 0 0;
       border-radius: 0 12px 0 0;
     }
 
     .corner-layer::before {
       bottom: 0;
       left: 0;
-      border-width: 0 0 5px 5px;
+      border-width: 0 0 3px 3px;
       border-radius: 0 0 0 12px;
     }
 
     .corner-layer::after {
       right: 0;
       bottom: 0;
-      border-width: 0 5px 5px 0;
+      border-width: 0 3px 3px 0;
       border-radius: 0 0 12px 0;
     }
 
-    .camera-orb {
-      width: 118px;
-      height: 118px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.22);
-    }
-
-    .camera-icon {
-      position: relative;
-      width: 54px;
-      height: 38px;
-      border: 5px solid #050505;
-      border-radius: 10px;
-    }
-
-    .camera-icon::before {
-      content: "";
-      position: absolute;
-      left: 9px;
-      top: -14px;
-      width: 20px;
-      height: 10px;
-      border: 5px solid #050505;
-      border-bottom: 0;
-      border-radius: 8px 8px 0 0;
-    }
-
-    .camera-icon::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18px;
-      height: 18px;
-      border: 5px solid #050505;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-
     .scan-copy {
-      margin-bottom: 34px;
+      margin-bottom: 20px;
     }
 
     .scan-actions {
       display: grid;
-      gap: 12px
+      gap: 12px;
       margin-top: 0;
     }
 
@@ -277,16 +235,16 @@
     .back-link {
       position: relative;
       width: 100%;
-      min-height: 58px
-      padding: 0 22px;
+      min-height: 52px;
+      padding: 0 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px
+      gap: 12px;
       overflow: hidden;
-      border-radius: 18px;
+      border-radius: 14px;
       text-decoration: none;
-      font-size: clamp(1.18rem, 5.3vw, 1.48rem);
+      font-size: 1rem;
       font-weight: 900;
       letter-spacing: 0.01em;
       transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
@@ -295,12 +253,12 @@
     .scan-button {
       background: #fff;
       color: #050505;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
     }
 
     .back-link {
       background: transparent;
-      border: 2px solid rgba(255, 255, 255, 0.92);
+      border: 1.5px solid rgba(255, 255, 255, 0.92);
       color: #fff;
     }
 
@@ -312,26 +270,26 @@
     .btn-icon {
       position: relative;
       flex: 0 0 auto;
-      width: 34px;
-      height: 28px;
+      width: 26px;
+      height: 22px;
       display: inline-block;
     }
 
     .btn-camera {
-      border: 4px solid currentColor;
-      border-radius: 7px;
+      border: 3px solid currentColor;
+      border-radius: 6px;
     }
 
     .btn-camera::before {
       content: "";
       position: absolute;
-      left: 7px;
-      top: -12px;
-      width: 14px;
-      height: 8px;
-      border: 4px solid currentColor;
+      left: 5px;
+      top: -9px;
+      width: 11px;
+      height: 6px;
+      border: 3px solid currentColor;
       border-bottom: 0;
-      border-radius: 7px 7px 0 0;
+      border-radius: 6px 6px 0 0;
     }
 
     .btn-camera::after {
@@ -339,33 +297,33 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 10px;
-      height: 10px;
-      border: 4px solid currentColor;
+      width: 8px;
+      height: 8px;
+      border: 3px solid currentColor;
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
 
     .btn-exit {
-      width: 30px;
-      height: 34px;
-      border: 4px solid currentColor;
+      width: 24px;
+      height: 28px;
+      border: 3px solid currentColor;
       border-radius: 4px;
     }
 
     .btn-exit::before {
       content: "→";
       position: absolute;
-      left: -20px;
+      left: -16px;
       top: 50%;
-      font-size: 32px;
+      font-size: 26px;
       line-height: 1;
       transform: translateY(-52%);
     }
 
     .scan-card.scanning .scan-actions {
       grid-template-columns: 1fr;
-      margin-top: 18px;
+      margin-top: 12px;
     }
 
     .scan-card.scanning .scan-button {
@@ -374,18 +332,18 @@
 
     .activation-card .back-link,
     .desktop .back-link {
-      min-height: 64px;
-      margin: 22px auto 0;
-      font-size: 17px;
+      min-height: 52px;
+      margin: 14px auto 0;
+      font-size: 15px;
     }
 
     .scanner {
       position: relative;
       width: 100%;
-      aspect-ratio: 1 / 1;
-      margin-top: 20px;
+      height: min(210px, 36vh);
+      margin-top: 14px;
       overflow: hidden;
-      border-radius: 18px;
+      border-radius: 16px;
       background: #000;
       border: 1px solid rgba(255, 255, 255, 0.16);
     }
@@ -405,23 +363,19 @@
       position: absolute;
       inset: 12%;
       border: 3px solid rgba(255, 255, 255, 0.92);
-      border-radius: 18px;
+      border-radius: 16px;
       box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.28);
       pointer-events: none;
     }
 
     .desktop {
       display: none;
-      width: min(520px, 100%);
+      width: min(380px, 100%);
       text-align: center;
     }
 
-    .desktop .card {
-      padding: 34px 28px;
-    }
-
     .desktop .sub {
-      font-size: 18px;
+      font-size: 16px;
       color: rgb(190, 202, 216);
     }
 
@@ -429,10 +383,10 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 26px;
+      bottom: 14px;
       margin-top: 0;
       color: #fff;
-      font-size: 1rem;
+      font-size: 0.76rem;
       text-align: center;
       letter-spacing: 0.01em;
       text-shadow: 0 0 12px rgba(255, 255, 255, 0.16);
@@ -442,30 +396,38 @@
       font-weight: 900;
     }
 
-    @media (max-width: 380px) {
+    @media (max-height: 720px) {
       body {
-        padding: 24px 16px 76px;
+        padding-top: 12px;
+        padding-bottom: 42px;
       }
 
       .logo {
-        height: 150px;
-        margin-bottom: 18px;
+        height: 78px;
+        margin-bottom: 8px;
       }
 
       .card {
-        padding: 30px 20px 26px;
-        border-radius: 26px;
+        padding: 18px 18px 16px;
       }
 
       .scan-target {
-        width: 112px;
-        height: 150px;
-        margin-bottom: 26px;
+        width: 82px;
+        height: 82px;
+        margin-bottom: 12px;
       }
 
-      .camera-orb {
-        width: 96px;
-        height: 96px;
+
+      .sub {
+        font-size: 1rem;
+        margin-bottom: 14px;
+      }
+
+      .scan-button,
+      .back-link,
+      button,
+      input {
+        min-height: 46px;
       }
     }
   </style>
@@ -478,10 +440,10 @@
     <section id="scanCard" class="card scan-card">
       <div class="scan-target" aria-hidden="true">
         <span class="corner-layer"></span>
-        <span class="camera-orb"><span class="camera-icon"></span></span>
+        <span class="empty-target"></span>
       </div>
 
-      <p class="sub scan-copy">Aponte a câmera do celular para o <strong>código</strong> exibido na tela.</p>
+      <p class="sub scan-copy">Aponte a câmera do celular para o <strong>código</strong> exibido na tela de ativação.</p>
 
       <div class="scan-actions">
         <button id="scanBtn" class="scan-button" type="button">
