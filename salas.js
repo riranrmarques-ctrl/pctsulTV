@@ -261,33 +261,36 @@ async function adicionarMaterialSala(arquivo) {
 
   try {
     const arquivoUrl = await enviarMaterialSala(codigo, arquivo);
+    const codigosDestino = codigosDestinoMaterial(codigo);
+    const nomeMaterial = nomeArquivoSemExtensao(arquivo.name);
 
-    const novoMaterial = {
-      codigo_ponto: codigo,
-      nome: nomeArquivoSemExtensao(arquivo.name),
+    const registros = codigosDestino.map(codigoDestino => ({
+      codigo_ponto: codigoDestino,
+      nome: nomeMaterial,
       arquivo_url: arquivoUrl,
       arquivo_nome: arquivo.name,
       arquivo_tipo: arquivo.type || tipoArquivoPorNome(arquivo.name),
       arquivo_tamanho: arquivo.size || 0,
       data_postagem: dataPostagem || null,
       data_encerramento: dataEncerramento || null,
-      status: "ativo"
-    };
+      status: "ativo",
+      ordem: materiaisDaSala(codigoDestino).length + 1
+    }));
 
     const { data, error } = await supabaseClient
       .from("materiais_salas")
-      .insert(novoMaterial)
-      .select("*")
-      .single();
+      .insert(registros)
+      .select("*");
 
     if (error) throw error;
 
-    todosOsMateriais = [data || novoMaterial, ...todosOsMateriais];
+    todosOsMateriais = [...(data || registros), ...todosOsMateriais];
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
 
     renderizarPlaylistSala(codigo);
     setTexto("salaTotalMidias", materiaisDaSala(codigo).length);
     setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
+    setTexto("salaTotalRadioTv", radioTvDaSala(codigo).length);
     atualizarResumo(todosOsPontos);
     fecharModalAdicionarMaterial();
   } catch (erro) {
@@ -312,6 +315,7 @@ function abrirModalAdicionarMaterial(arquivo) {
   setTexto("materialSelecionadoNome", arquivo.name || "Material selecionado");
   setValor("materialDataPostagem", dataInputLocal(new Date()));
   setValor("materialDataEncerramento", dataInputLocal(somarDias(new Date(), 30)));
+  renderizarDestinosMaterial();
 
   const modal = document.getElementById("modalAdicionarMaterial");
   if (modal) modal.hidden = false;
@@ -326,6 +330,45 @@ function fecharModalAdicionarMaterial() {
   setTexto("materialSelecionadoNome", "Nenhum arquivo selecionado");
   setValor("materialDataPostagem", "");
   setValor("materialDataEncerramento", "");
+  const destinos = document.getElementById("materialSalasExtras");
+  if (destinos) destinos.innerHTML = "";
+}
+
+function renderizarDestinosMaterial() {
+  const container = document.getElementById("materialSalasExtras");
+  if (!container || !salaAtual) return;
+
+  const codigoAtual = normalizarCodigo(salaAtual.codigo_final || salaAtual.codigo || "");
+  const salasExtras = todosOsPontos.filter(ponto => {
+    return normalizarCodigo(ponto.codigo_final || ponto.codigo || "") !== codigoAtual;
+  });
+
+  if (!salasExtras.length) {
+    container.innerHTML = `<div class="material-salas-vazia">Nenhuma outra sala cadastrada.</div>`;
+    return;
+  }
+
+  container.innerHTML = salasExtras.map(ponto => {
+    const codigo = ponto.codigo_final || ponto.codigo || "";
+    return `
+      <label>
+        <input type="checkbox" value="${escaparHtml(codigo)}">
+        <strong>${escaparHtml(nomePonto(ponto))}</strong>
+        <small>${escaparHtml(codigo)}</small>
+      </label>
+    `;
+  }).join("");
+}
+
+function codigosDestinoMaterial(codigoAtual) {
+  const codigos = new Set([normalizarCodigo(codigoAtual)]);
+
+  document.querySelectorAll("#materialSalasExtras input:checked").forEach(input => {
+    const codigo = normalizarCodigo(input.value);
+    if (codigo) codigos.add(codigo);
+  });
+
+  return Array.from(codigos);
 }
 
 async function confirmarAdicionarMaterial() {
@@ -620,6 +663,7 @@ function abrirSala(ponto) {
   setTexto("salaTotalMidias", materiaisDaSala(codigo).length);
   setTexto("salaTotalPlaylists", playlistsDaSala(codigo).length);
   setTexto("salaDiasOnline", totalTelasPonto(ponto, 0));
+  setTexto("salaTotalRadioTv", radioTvDaSala(codigo).length);
 
   const salaImagem = document.getElementById("salaImagem");
   if (salaImagem) {
@@ -845,7 +889,8 @@ function mensagemErroMaterial(erro) {
     erro?.status === 400 ||
     texto.includes("arquivo_url") ||
     texto.includes("data_postagem") ||
-    texto.includes("data_encerramento")
+    texto.includes("data_encerramento") ||
+    texto.includes("ordem")
   ) {
     return "Faltam colunas na tabela materiais_salas. Execute o SQL atualizado e rode notify pgrst, 'reload schema'; no Supabase.";
   }
@@ -865,7 +910,7 @@ function renderizarPlaylistSala(codigoSala) {
   }
 
   lista.innerHTML = itens.map((item, index) => `
-    <article class="sala-playlist-item" data-id="${escaparHtml(item.id)}">
+    <article class="sala-playlist-item" data-id="${escaparHtml(item.id)}" draggable="true">
       <span class="playlist-handle">⋮⋮</span>
       <strong>${index + 1}.</strong>
       <div>
@@ -884,6 +929,87 @@ function renderizarPlaylistSala(codigoSala) {
   `).join("");
 
   configurarAcoesMateriais();
+  configurarOrdenacaoMateriais(codigoSala);
+}
+
+function configurarOrdenacaoMateriais(codigoSala) {
+  const itens = document.querySelectorAll("#salaPlaylistLista .sala-playlist-item");
+  let idArrastado = "";
+
+  itens.forEach(item => {
+    item.addEventListener("dragstart", event => {
+      idArrastado = item.dataset.id || "";
+      item.classList.add("arrastando");
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", idArrastado);
+    });
+
+    item.addEventListener("dragend", () => {
+      item.classList.remove("arrastando");
+      itens.forEach(outroItem => outroItem.classList.remove("drag-over"));
+    });
+
+    item.addEventListener("dragover", event => {
+      event.preventDefault();
+      item.classList.add("drag-over");
+      event.dataTransfer.dropEffect = "move";
+    });
+
+    item.addEventListener("dragleave", () => {
+      item.classList.remove("drag-over");
+    });
+
+    item.addEventListener("drop", event => {
+      event.preventDefault();
+      item.classList.remove("drag-over");
+
+      const idOrigem = event.dataTransfer.getData("text/plain") || idArrastado;
+      const idDestino = item.dataset.id || "";
+      reordenarMaterial(idOrigem, idDestino, codigoSala);
+    });
+  });
+}
+
+async function reordenarMaterial(idOrigem, idDestino, codigoSala) {
+  if (!idOrigem || !idDestino || String(idOrigem) === String(idDestino)) return;
+
+  const itens = materiaisDaSala(codigoSala);
+  const origemIndex = itens.findIndex(item => String(item.id) === String(idOrigem));
+  const destinoIndex = itens.findIndex(item => String(item.id) === String(idDestino));
+
+  if (origemIndex < 0 || destinoIndex < 0) return;
+
+  const [movido] = itens.splice(origemIndex, 1);
+  itens.splice(destinoIndex, 0, movido);
+
+  itens.forEach((item, index) => {
+    item.ordem = index + 1;
+  });
+
+  todosOsMateriais = todosOsMateriais.map(material => {
+    const atualizado = itens.find(item => String(item.id) === String(material.id));
+    return atualizado ? { ...material, ordem: atualizado.ordem } : material;
+  });
+
+  renderizarPlaylistSala(codigoSala);
+
+  try {
+    const respostas = await Promise.all(itens.map(item => {
+      return supabaseClient
+        .from("materiais_salas")
+        .update({ ordem: item.ordem })
+        .eq("id", item.id);
+    }));
+
+    const erro = respostas.find(resposta => resposta.error)?.error;
+    if (erro) throw erro;
+
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    mostrarStatusFlutuante("Ordem atualizada");
+  } catch (erro) {
+    console.error("Erro ao salvar ordem:", erro);
+    mostrarStatusFlutuante("Nao foi possivel salvar a ordem", "erro");
+  }
 }
 
 function configurarAcoesMateriais() {
@@ -1105,15 +1231,28 @@ function playlistsDaSala(codigoSala) {
 function materiaisDaSala(codigoSala) {
   const codigoNormalizado = normalizarCodigo(codigoSala);
 
-  return todosOsMateriais.filter(item => {
-    return normalizarCodigo(
-      item.codigo_ponto ||
-      item.codigo_cliente ||
-      item.ponto_codigo ||
-      item.codigo ||
-      ""
-    ) === codigoNormalizado;
-  });
+  return todosOsMateriais
+    .filter(item => {
+      return normalizarCodigo(
+        item.codigo_ponto ||
+        item.codigo_cliente ||
+        item.ponto_codigo ||
+        item.codigo ||
+        ""
+      ) === codigoNormalizado;
+    })
+    .sort((a, b) => {
+      const ordemA = Number(a.ordem || 0);
+      const ordemB = Number(b.ordem || 0);
+
+      if (ordemA !== ordemB) return ordemA - ordemB;
+
+      return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+    });
+}
+
+function radioTvDaSala(codigoSala) {
+  return [];
 }
 
 function contarPlaylistsAtivas(playlists) {
