@@ -50,21 +50,20 @@
     }
 
     .back-link {
-      position: fixed;
-      top: 18px;
-      left: 18px;
-      min-height: 42px;
-      padding: 0 14px;
-      display: inline-flex;
+      width: min(260px, 100%);
+      min-height: 54px;
+      margin: 22px auto 0;
+      padding: 0 22px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: #fff;
       text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 17px;
+      font-weight: 800;
     }
 
     .logo {
@@ -193,31 +192,17 @@
       letter-spacing: 0.04em;
     }
 
-    @media (min-width: 821px) {
-      body {
-        padding: 32px;
-      }
-
-      .page {
-        display: none;
-      }
-
-      .desktop {
-        display: block;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <a class="back-link" href="sala.html">Voltar</a>
-
   <main class="page">
     <img src="logo.png" class="logo" alt="PCTSUL TV">
 
     <section id="scanCard" class="card scan-card">
       <h1>Escaneie o código da tela para login</h1>
       <p class="sub">Abra esta página pelo QR Code exibido na TV.</p>
+      <a class="back-link" href="sala.html">Voltar para salas</a>
     </section>
 
     <section id="activationCard" class="card">
@@ -235,6 +220,7 @@
       </div>
 
       <p id="msg" class="msg"></p>
+      <a class="back-link" href="sala.html">Voltar para salas</a>
     </section>
 
     <div class="signature">desenvolvimento pela DUNA BRANDING</div>
@@ -246,6 +232,7 @@
     <section class="card">
       <h1>Entre pelo mobile</h1>
       <p class="sub">Use o celular para fazer a ativação da tela.</p>
+      <a class="back-link" href="sala.html">Voltar para salas</a>
     </section>
 
     <div class="signature">desenvolvimento pela DUNA BRANDING</div>
