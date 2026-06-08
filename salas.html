@@ -3,166 +3,334 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salas | PCTSUL TV</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      width: 100%;
-      min-height: 100vh;
-      background: rgb(5, 12, 18);
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      display: grid;
-      place-items: center;
-      padding: 28px 22px 72px;
-    }
-
-    .page {
-      width: min(460px, 100%);
-    }
-
-    .logo {
-      width: min(310px, 78vw);
-      height: 120px;
-      display: block;
-      object-fit: contain;
-      margin: 0 auto 18px;
-    }
-
-    .card {
-      width: 100%;
-      padding: 26px 22px 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.045);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      line-height: 1.05;
-      text-align: center;
-    }
-
-    .sub {
-      margin: 0 auto 22px;
-      max-width: 330px;
-      color: rgb(180, 196, 210);
-      font-size: 16px;
-      line-height: 1.35;
-      text-align: center;
-    }
-
-    .menu {
-      display: grid;
-      gap: 13px;
-    }
-
-    .menu-link {
-      position: relative;
-      min-height: 62px;
-      padding: 0 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      overflow: hidden;
-      border-radius: 14px;
-      background: #fff;
-      color: #050505;
-      text-decoration: none;
-      font-size: 17px;
-      font-weight: 800;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-    }
-
-    .menu-link::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(110deg, transparent 0%, rgba(0, 0, 0, 0.08) 42%, transparent 68%);
-      transform: translateX(-120%);
-      animation: buttonSheen 3.4s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    .menu-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
-    }
-
-    .menu-link:active {
-      transform: translateY(1px) scale(0.99);
-    }
-
-    .menu-link span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .menu-link strong {
-      position: relative;
-      z-index: 1;
-      font-size: 24px;
-      line-height: 1;
-    }
-
-    .signature {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 22px;
-      color: rgb(130, 145, 160);
-      font-size: 12px;
-      text-align: center;
-      letter-spacing: 0.04em;
-    }
-
-    @keyframes buttonSheen {
-      0%, 45% {
-        transform: translateX(-120%);
-      }
-
-      75%, 100% {
-        transform: translateX(120%);
-      }
-    }
-  </style>
+  <title>PCTSUL | Gerenciador de TVs</title>
+  <link rel="stylesheet" href="salas.css?v=203">
 </head>
 
 <body>
-  <main class="page">
-    <img src="logo.png" class="logo" alt="PCTSUL TV">
 
-    <section class="card">
-      <h1>Salas</h1>
-      <p class="sub">Escolha uma opção para continuar.</p>
+<div id="loginBox" class="login-screen">
+  <div class="login-card">
+    <img src="logo.png" class="login-logo" alt="PC SUL">
+    <h2>Acesso ao painel</h2>
+    <input id="senhaInput" type="password" placeholder="Digite o codigo de acesso">
+    <button id="btnLogin" type="button">Entrar</button>
+    <div id="loginErro" class="login-erro"></div>
+  </div>
+</div>
 
-      <nav class="menu" aria-label="Menu de salas">
-        <a class="menu-link" href="ativador.html">
-          <span>Ativador</span>
-          <strong>›</strong>
-        </a>
+<div id="conteudoPainel" class="dashboard-shell" style="display:none;">
 
-        <a class="menu-link" href="player-teste-pctsul.html">
-          <span>Player</span>
-          <strong>›</strong>
-        </a>
-      </nav>
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="logo.png" class="brand-logo" alt="PC SUL">
+    </div>
+
+    <nav class="menu-lateral">
+      <a href="#" class="menu-item ativo">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v4"></path>
+            <path d="M12 18v4"></path>
+            <path d="M2 12h4"></path>
+            <path d="M18 12h4"></path>
+            <circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </span>
+        <span>Pontos</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M5 21a7 7 0 0 1 14 0"></path>
+          </svg>
+        </span>
+        <span>Usuarios</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path>
+            <path d="M8 7h8"></path>
+            <path d="M8 12h8"></path>
+            <path d="M8 17h5"></path>
+          </svg>
+        </span>
+        <span>Biblioteca</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
+          </svg>
+        </span>
+        <span>Ativador</span>
+      </a>
+
+      <a href="#" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+        <span>RadioTv</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+
+    <section class="resumo-card">
+      <h3>Resumo rapido</h3>
+      <div class="resumo-linha">
+        <span>Total de pontos</span>
+        <strong id="totalPontosResumo">0</strong>
+      </div>
+      <div class="resumo-linha positivo">
+        <span>Pontos ativos</span>
+        <strong id="pontosAtivosResumo">0</strong>
+      </div>
+      <div class="resumo-linha negativo">
+        <span>Pontos inativos</span>
+        <strong id="pontosInativosResumo">0</strong>
+      </div>
+      <div class="resumo-linha">
+        <span>Telas conectadas</span>
+        <strong id="playlistsAtivasResumo">0</strong>
+      </div>
     </section>
+
+    <section class="usuario-card">
+      <div class="usuario-card-topo">
+        <div class="usuario-card-texto">
+          <span>Sessao ativa</span>
+          <strong>Administrador</strong>
+        </div>
+      </div>
+
+      <div class="usuario-status">
+        <span></span>
+        Acesso liberado
+      </div>
+
+      <button id="btnLogout" type="button">
+        Encerrar sessao
+        <span>→</span>
+      </button>
+    </section>
+
+  </aside>
+
+  <main class="conteudo-principal">
+    <header class="cabecalho-painel">
+      <div class="cabecalho-texto">
+        <h1>Gerenciador de TVs</h1>
+        <p>Gerencie os conteudos das tvs e salas forma simples e eficiente.</p>
+      </div>
+
+    </header>
+
+    <section class="filtros-pontos">
+      <label class="campo-busca">
+        <span>⌕</span>
+        <input id="buscaPontos" type="search" placeholder="Buscar por nome, endereco ou codigo">
+      </label>
+
+      <label class="campo-select">
+        <span>Status</span>
+        <select id="filtroStatus">
+          <option value="todos">Todos</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+          <option value="desativado">Desativados</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Tipo de ponto</span>
+        <select id="filtroTipo">
+          <option value="todos">Todos</option>
+          <option value="academia">Academia</option>
+          <option value="campus">Campus</option>
+          <option value="loja">Loja</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Ordenar por</span>
+        <select id="ordenarPontos">
+          <option value="recentes">Mais recentes</option>
+          <option value="nome">Nome</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
+      <button id="btnNovoPonto" class="btn-novo-ponto" type="button">
+        <span>+</span>
+        Novo ponto
+      </button>
+    </section>
+
+    <section id="listaPontos" class="pontos-box"></section>
+
+    <section id="salaDetalhe" class="sala-detalhe" hidden>
+      <div class="sala-topbar">
+        <button id="btnVoltarSalas" class="btn-voltar-sala" type="button">← Voltar</button>
+        <span>Gerencie e organize a sua playlist</span>
+        <strong id="salaStatusTopo">Inativo - sem conexao</strong>
+      </div>
+
+      <div class="sala-hero">
+        <img id="salaImagem" src="https://placehold.co/800x450/png" alt="">
+
+        <div class="sala-info">
+          <h2 id="salaTitulo">Sala</h2>
+          <p id="salaEndereco"></p>
+
+          <div class="sala-codigo-linha">
+            <strong id="salaCodigo"></strong>
+          </div>
+
+          <div class="sala-metricas">
+            <div class="sala-metrica">
+              <strong id="salaTotalMidias">125</strong>
+              <span>Midias</span>
+            </div>
+
+            <div class="sala-metrica">
+              <strong id="salaTotalPlaylists">8</strong>
+              <span>Biblioteca</span>
+            </div>
+
+            <div class="sala-metrica">
+              <strong id="salaDiasOnline">32</strong>
+              <span>Telas ativas</span>
+            </div>
+
+            <div class="sala-metrica">
+              <strong id="salaTotalRadioTv">0</strong>
+              <span>RadioTV</span>
+            </div>
+          </div>
+
+          <div class="sala-acoes">
+            <button id="btnEditarSala" type="button">Editar</button>
+            <button type="button">Biblioteca</button>
+            <button id="btnAdicionarMaterial" type="button" class="btn-upgrade-sala">Adicionar material</button>
+            <input id="inputMaterialSala" type="file" accept="video/*,image/*,.txt,text/plain" hidden>
+          </div>
+        </div>
+      </div>
+
+      <section class="sala-playlist">
+        <h3>Playlist da Sala</h3>
+        <div id="salaPlaylistLista" class="sala-lista"></div>
+      </section>
+
+      <div class="sala-historicos">
+        <section>
+          <h3>RadioTV</h3>
+          <div id="salaRadioTvLista" class="sala-historico-lista radio-tv-lista"></div>
+        </section>
+
+        <section>
+          <h3>Historico de status</h3>
+          <div id="salaHistoricoStatus" class="sala-historico-lista"></div>
+        </section>
+      </div>
+    </section>
+
+    <div class="assinatura-final">
+      Desenvolvido por <strong>DUNA BRANDING</strong>
+    </div>
+
   </main>
 
-  <div class="signature">desenvolvimento pela DUNA BRANDING</div>
+</div>
+
+<div id="modalEditarSala" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card">
+    <div class="modal-editar-topo">
+      <h3>Editar sala</h3>
+      <button id="btnFecharEditarSala" type="button">×</button>
+    </div>
+
+    <div class="modal-editar-grid">
+      <label>
+        <span>Nome da sala</span>
+        <input id="editSalaNome" type="text" placeholder="Nome da sala">
+      </label>
+
+      <label class="campo-largo">
+        <span>Predio</span>
+        <input id="editSalaEndereco" type="text" placeholder="Predio">
+      </label>
+
+      <div class="campo-largo campo-imagem-capa">
+        <span>Imagem de capa</span>
+        <button id="btnAlterarImagemSala" type="button">Alterar imagem</button>
+        <input id="editSalaImagem" type="hidden">
+        <input id="inputImagemSala" type="file" accept="image/*" hidden>
+      </div>
+    </div>
+
+    <div class="modal-editar-preview">
+      <img id="editSalaPreview" src="https://placehold.co/800x450/png" alt="">
+    </div>
+
+    <div class="modal-editar-acoes">
+      <button id="btnCancelarEditarSala" type="button">Cancelar</button>
+      <button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalAdicionarMaterial" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card modal-material-card">
+    <div class="modal-editar-topo">
+      <h3>Adicionar material</h3>
+      <button id="btnFecharAdicionarMaterial" type="button">×</button>
+    </div>
+
+    <div class="material-selecionado">
+      <span>Arquivo selecionado</span>
+      <strong id="materialSelecionadoNome">Nenhum arquivo selecionado</strong>
+    </div>
+
+    <div class="modal-editar-grid">
+      <label>
+        <span>Postagem</span>
+        <input id="materialDataPostagem" type="datetime-local">
+      </label>
+
+      <label>
+        <span>Encerramento</span>
+        <input id="materialDataEncerramento" type="datetime-local">
+      </label>
+    </div>
+
+    <div class="material-destinos">
+      <span>Enviar tambem para</span>
+      <div id="materialSalasExtras" class="material-salas-extras"></div>
+    </div>
+
+    <div class="modal-editar-acoes">
+      <button id="btnCancelarAdicionarMaterial" type="button">Cancelar</button>
+      <button id="btnConfirmarAdicionarMaterial" type="button">Enviar material</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="salas.js?v=203"></script>
+
 </body>
 </html>
