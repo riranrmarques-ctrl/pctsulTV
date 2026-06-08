@@ -21,6 +21,7 @@
     }
 
     body {
+      visibility: hidden;
       display: grid;
       place-items: center;
       padding: 22px;
@@ -31,8 +32,39 @@
       font: inherit;
     }
 
+    body.ready {
+      visibility: visible;
+    }
+
     .page {
+      display: none;
       width: min(430px, 100%);
+    }
+
+    body.mobile-mode .page {
+      display: block;
+    }
+
+    body.desktop-mode .desktop {
+      display: block;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      min-height: 42px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .logo {
@@ -178,6 +210,8 @@
 </head>
 
 <body>
+  <a class="back-link" href="sala.html">Voltar</a>
+
   <main class="page">
     <img src="logo.png" class="logo" alt="PCTSUL TV">
 
@@ -227,6 +261,17 @@
     const msg = document.getElementById("msg");
     const activationCard = document.getElementById("activationCard");
     const scanCard = document.getElementById("scanCard");
+
+    function definirModoVisual() {
+      const params = new URLSearchParams(window.location.search);
+      const forcarMobile = params.get("mobile") === "1" || params.get("modo") === "mobile";
+      const forcarDesktop = params.get("desktop") === "1" || params.get("modo") === "desktop";
+      const pareceMobile = window.innerWidth <= 820 || screen.width <= 820 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+      document.body.classList.remove("mobile-mode", "desktop-mode");
+      document.body.classList.add(forcarDesktop ? "desktop-mode" : (forcarMobile || pareceMobile ? "mobile-mode" : "desktop-mode"));
+      document.body.classList.add("ready");
+    }
 
     function headers(extra = {}) {
       return {
@@ -343,6 +388,9 @@
     });
 
     ativarBtn.addEventListener("click", ativarTela);
+
+    definirModoVisual();
+    window.addEventListener("resize", definirModoVisual);
 
     const token = obterToken();
 
