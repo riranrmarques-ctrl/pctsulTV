@@ -42,7 +42,7 @@
     .page,
     .desktop {
       display: none;
-      width: min(380px, 100%);
+      width: min(430px, 100%);
     }
 
     body.mobile-mode .page,
@@ -52,18 +52,18 @@
 
     .logo {
       width: min(300px, 72vw);
-      height: 126px;
+      height: 190px;
       object-fit: contain;
       display: block;
-      margin: 0 auto 14px;
+      margin: 0 auto 20px;
       filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.22));
     }
 
     .card {
       width: 100%;
-      padding: 26px 22px 22px;
+      padding: 42px 26px 34px;
       border: 2px solid rgba(255, 255, 255, 0.86);
-      border-radius: 24px;
+      border-radius: 32px;
       background: rgba(0, 0, 0, 0.14);
       box-shadow: 0 26px 86px rgba(0, 0, 0, 0.5), inset 0 0 32px rgba(255, 255, 255, 0.025);
       text-align: center;
@@ -78,9 +78,9 @@
 
     .sub {
       margin: 0 auto 28px;
-      max-width: 285px;
+      max-width: 330px;
       color: #fff;
-      font-size: clamp(1.32rem, 6vw, 1.55rem);
+      font-size: clamp(1.72rem, 7.8vw, 2.08rem);
       line-height: 1.22;
       text-align: center;
     }
@@ -165,13 +165,17 @@
 
     .scan-card {
       display: none;
+      width: min(360px, 100%);
+      margin: 0 auto;
+      transform: scale(0.86);
+      transform-origin: top center;
     }
 
     .scan-target {
       position: relative;
-      width: 126px;
-      height: 126px;
-      margin: 0 auto 18px;
+      width: 188px;
+      height: 188px;
+      margin: 0 auto 34px;
       display: grid;
       place-items: center;
     }
@@ -182,8 +186,8 @@
     .corner-layer::after {
       content: "";
       position: absolute;
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       border-color: #fff;
       border-style: solid;
       pointer-events: none;
@@ -192,14 +196,14 @@
     .scan-target::before {
       top: 0;
       left: 0;
-      border-width: 4px 0 0 5px;
+      border-width: 5px 0 0 5px;
       border-radius: 12px 0 0 0;
     }
 
     .scan-target::after {
       top: 0;
       right: 0;
-      border-width: 4px 5px 0 0;
+      border-width: 5px 5px 0 0;
       border-radius: 0 12px 0 0;
     }
 
@@ -218,8 +222,8 @@
     }
 
     .camera-orb {
-      width: 76px;
-      height: 76px;
+      width: 118px;
+      height: 118px;
       display: grid;
       place-items: center;
       border-radius: 50%;
@@ -229,20 +233,20 @@
 
     .camera-icon {
       position: relative;
-      width: 36px;
-      height: 26px;
-      border: 4px solid #050505;
+      width: 54px;
+      height: 38px;
+      border: 5px solid #050505;
       border-radius: 10px;
     }
 
     .camera-icon::before {
       content: "";
       position: absolute;
-      left: 6px;
-      top: -11px;
-      width: 14px;
-      height: 8px;
-      border: 4px solid #050505;
+      left: 9px;
+      top: -14px;
+      width: 20px;
+      height: 10px;
+      border: 5px solid #050505;
       border-bottom: 0;
       border-radius: 8px 8px 0 0;
     }
@@ -254,13 +258,13 @@
       top: 50%;
       width: 18px;
       height: 18px;
-      border: 4px solid #050505;
+      border: 5px solid #050505;
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
 
     .scan-copy {
-      margin-bottom: 22px;
+      margin-bottom: 34px;
     }
 
     .scan-actions {
@@ -282,7 +286,7 @@
       overflow: hidden;
       border-radius: 18px;
       text-decoration: none;
-      font-size: clamp(1rem, 4.4vw, 1.16rem);
+      font-size: clamp(1.18rem, 5.3vw, 1.48rem);
       font-weight: 900;
       letter-spacing: 0.01em;
       transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
@@ -425,10 +429,10 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 16px;
+      bottom: 26px;
       margin-top: 0;
       color: #fff;
-      font-size: 0.82rem;
+      font-size: 1rem;
       text-align: center;
       letter-spacing: 0.01em;
       text-shadow: 0 0 12px rgba(255, 255, 255, 0.16);
@@ -444,7 +448,7 @@
       }
 
       .logo {
-        height: 112px;
+        height: 150px;
         margin-bottom: 18px;
       }
 
@@ -455,13 +459,13 @@
 
       .scan-target {
         width: 112px;
-        height: 112px;
-        margin-bottom: 16px;
+        height: 150px;
+        margin-bottom: 26px;
       }
 
       .camera-orb {
-        width: 68px;
-        height: 68px;
+        width: 96px;
+        height: 96px;
       }
     }
   </style>
