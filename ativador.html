@@ -24,7 +24,7 @@
       visibility: hidden;
       display: grid;
       place-items: center;
-      padding: 22px;
+      padding: 22px 22px 82px;
     }
 
     input,
@@ -39,6 +39,7 @@
     .page {
       display: none;
       width: min(430px, 100%);
+      padding-bottom: 34px;
     }
 
     body.mobile-mode .page {
@@ -51,9 +52,9 @@
 
     .back-link {
       position: relative;
-      width: min(270px, 100%);
+      width: 100%;
       min-height: 56px;
-      margin: 24px auto 0;
+      margin: 0;
       padding: 0 24px;
       display: flex;
       align-items: center;
@@ -201,6 +202,13 @@
       text-align: center;
     }
 
+    #scanMsg:not(:empty) {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.24);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .scan-card {
       display: none;
     }
@@ -232,19 +240,54 @@
     }
 
     .scan-button {
-      min-height: 58px;
-      margin-top: 4px;
+      min-height: 56px;
+      margin-top: 0;
       border-radius: 14px;
       background: #fff;
       color: #050505;
       box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
     }
 
+    .scan-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .scan-actions .scan-button,
+    .scan-actions .back-link {
+      min-width: 0;
+      padding: 0 12px;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .scan-card .scan-copy {
+      margin-bottom: 0;
+    }
+
+    .scan-card.scanning .scan-actions {
+      grid-template-columns: 1fr;
+      margin-top: 18px;
+    }
+
+    .scan-card.scanning .scan-button {
+      display: none;
+    }
+
+    .activation-card .back-link,
+    .desktop .back-link {
+      width: min(270px, 100%);
+      margin: 24px auto 0;
+    }
+
     .scanner {
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      margin-top: 18px;
+      margin-top: 16px;
       overflow: hidden;
       border-radius: 18px;
       background: #000;
@@ -289,7 +332,7 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 22px;
+      bottom: 14px;
       margin-top: 0;
       color: rgb(130, 145, 160);
       font-size: 12px;
@@ -308,7 +351,10 @@
       <div class="scan-icon"></div>
       <p class="sub scan-copy">Aponte a câmera do celular para o código exibido na tela.</p>
 
-      <button id="scanBtn" class="scan-button" type="button">Abrir câmera</button>
+      <div class="scan-actions">
+        <button id="scanBtn" class="scan-button" type="button">Abrir câmera</button>
+        <a class="back-link" href="salas.html">Voltar para salas</a>
+      </div>
 
       <div id="scanner" class="scanner" hidden>
         <video id="scannerVideo" muted playsinline></video>
@@ -316,10 +362,9 @@
       </div>
 
       <p id="scanMsg" class="msg"></p>
-      <a class="back-link" href="salas.html">Voltar para salas</a>
     </section>
 
-    <section id="activationCard" class="card">
+    <section id="activationCard" class="card activation-card">
       <h1>Ativar tela</h1>
       <p class="sub">Digite o código da sala para parear esta TV.</p>
 
@@ -513,16 +558,17 @@
         });
 
         scanner.hidden = false;
+        scanCard.classList.add("scanning");
         scannerVideo.srcObject = scannerStream;
         await scannerVideo.play();
 
         if (!("BarcodeDetector" in window)) {
-          mostrarMensagemScanner("Câmera aberta. Se não ler automaticamente, use a câmera nativa do celular para abrir o QR da TV.", "#ffcc66");
+          mostrarMensagemScanner("Leia o QR Code de ativação no canto inferior esquerdo da tela.", "#ffcc66");
           return;
         }
 
         const detector = new BarcodeDetector({ formats: ["qr_code"] });
-        mostrarMensagemScanner("Aponte para o QR Code exibido na TV.");
+        mostrarMensagemScanner("Leia o QR Code de ativação no canto inferior esquerdo da tela.");
 
         scannerTimer = setInterval(async () => {
           try {
