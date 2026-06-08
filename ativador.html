@@ -60,14 +60,14 @@
       justify-content: center;
       overflow: hidden;
       border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      color: #fff;
+      background: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      color: #050505;
       text-decoration: none;
       font-size: 16px;
       font-weight: 800;
       letter-spacing: 0.01em;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
       transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
 
@@ -83,15 +83,15 @@
 
     .back-link:hover {
       transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.3);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.11));
+      border-color: rgba(255, 255, 255, 0.9);
+      background: #fff;
     }
 
     .back-link:active {
       transform: translateY(1px) scale(0.99);
     }
 
-     buttonSheen {
+    @keyframes buttonSheen {
       0%, 45% {
         transform: translateX(-120%);
       }
@@ -205,6 +205,72 @@
       display: none;
     }
 
+    .scan-title {
+      margin-bottom: 10px;
+      font-size: 26px;
+      line-height: 1.12;
+    }
+
+    .scan-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .scan-icon::before {
+      content: "";
+      width: 34px;
+      height: 26px;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      box-shadow: 0 -10px 0 -6px #fff;
+    }
+
+    .scan-button {
+      min-height: 58px;
+      margin-top: 4px;
+      border-radius: 14px;
+      background: #fff;
+      color: #050505;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+    }
+
+    .scanner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      margin-top: 18px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .scanner[hidden] {
+      display: none;
+    }
+
+    .scanner video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .scanner-frame {
+      position: absolute;
+      inset: 12%;
+      border: 3px solid rgba(255, 255, 255, 0.92);
+      border-radius: 18px;
+      box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.28);
+      pointer-events: none;
+    }
+
     .desktop {
       display: none;
       width: min(520px, 100%);
@@ -220,7 +286,11 @@
     }
 
     .signature {
-      margin-top: 18px;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 22px;
+      margin-top: 0;
       color: rgb(130, 145, 160);
       font-size: 12px;
       text-align: center;
@@ -235,8 +305,17 @@
     <img src="logo.png" class="logo" alt="PCTSUL TV">
 
     <section id="scanCard" class="card scan-card">
-      <h1>Escaneie o código da tela para login</h1>
-      <p class="sub">Abra esta página pelo QR Code exibido na TV.</p>
+      <div class="scan-icon"></div>
+      <p class="sub scan-copy">Aponte a câmera do celular para o código exibido na tela.</p>
+
+      <button id="scanBtn" class="scan-button" type="button">Abrir câmera</button>
+
+      <div id="scanner" class="scanner" hidden>
+        <video id="scannerVideo" muted playsinline></video>
+        <div class="scanner-frame"></div>
+      </div>
+
+      <p id="scanMsg" class="msg"></p>
       <a class="back-link" href="salas.html">Voltar para salas</a>
     </section>
 
@@ -283,6 +362,13 @@
     const msg = document.getElementById("msg");
     const activationCard = document.getElementById("activationCard");
     const scanCard = document.getElementById("scanCard");
+    const scanBtn = document.getElementById("scanBtn");
+    const scanMsg = document.getElementById("scanMsg");
+    const scanner = document.getElementById("scanner");
+    const scannerVideo = document.getElementById("scannerVideo");
+
+    let scannerStream = null;
+    let scannerTimer = null;
 
     function definirModoVisual() {
       const params = new URLSearchParams(window.location.search);
@@ -369,6 +455,95 @@
       if (!res.ok) throw new Error(await res.text());
     }
 
+    function mostrarMensagemScanner(texto, cor = "rgb(180, 196, 210)") {
+      if (!scanMsg) return;
+      scanMsg.textContent = texto;
+      scanMsg.style.color = cor;
+    }
+
+    function abrirResultadoQr(valor) {
+      const texto = String(valor || "").trim();
+      if (!texto) return false;
+
+      try {
+        const url = new URL(texto, window.location.href);
+        const token = url.searchParams.get("token");
+
+        if (token) {
+          window.location.href = `ativador.html?token=${encodeURIComponent(token)}&mobile=1`;
+          return true;
+        }
+      } catch {
+        return false;
+      }
+
+      if (/^TV-[A-Z0-9]+$/i.test(texto)) {
+        window.location.href = `ativador.html?token=${encodeURIComponent(texto.toUpperCase())}&mobile=1`;
+        return true;
+      }
+
+      return false;
+    }
+
+    function pararScanner() {
+      if (scannerTimer) {
+        clearInterval(scannerTimer);
+        scannerTimer = null;
+      }
+
+      if (scannerStream) {
+        scannerStream.getTracks().forEach((track) => track.stop());
+        scannerStream = null;
+      }
+    }
+
+    async function iniciarScanner() {
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          mostrarMensagemScanner("Este navegador não liberou câmera. Use a câmera do celular para escanear o QR da TV.", "#ffcc66");
+          return;
+        }
+
+        scanBtn.disabled = true;
+        mostrarMensagemScanner("Abrindo câmera...");
+
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false
+        });
+
+        scanner.hidden = false;
+        scannerVideo.srcObject = scannerStream;
+        await scannerVideo.play();
+
+        if (!("BarcodeDetector" in window)) {
+          mostrarMensagemScanner("Câmera aberta. Se não ler automaticamente, use a câmera nativa do celular para abrir o QR da TV.", "#ffcc66");
+          return;
+        }
+
+        const detector = new BarcodeDetector({ formats: ["qr_code"] });
+        mostrarMensagemScanner("Aponte para o QR Code exibido na TV.");
+
+        scannerTimer = setInterval(async () => {
+          try {
+            const codigos = await detector.detect(scannerVideo);
+            const valor = codigos?.[0]?.rawValue || "";
+
+            if (abrirResultadoQr(valor)) {
+              pararScanner();
+            }
+          } catch (error) {
+            console.warn("Leitura do QR falhou:", error);
+          }
+        }, 600);
+      } catch (error) {
+        console.error(error);
+        mostrarMensagemScanner("Não foi possível abrir a câmera. Verifique a permissão do navegador.", "#ff8a8a");
+      } finally {
+        scanBtn.disabled = false;
+      }
+    }
+
     async function ativarTela() {
       const token = obterToken();
       const codigo = normalizarCodigo(codigoInput.value);
@@ -411,6 +586,7 @@
     });
 
     ativarBtn.addEventListener("click", ativarTela);
+    scanBtn.addEventListener("click", iniciarScanner);
 
     definirModoVisual();
     window.addEventListener("resize", definirModoVisual);
