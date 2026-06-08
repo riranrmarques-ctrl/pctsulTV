@@ -110,13 +110,6 @@
 
     <section class="usuario-card">
       <div class="usuario-card-topo">
-        <div class="usuario-avatar">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M5 21a7 7 0 0 1 14 0"></path>
-          </svg>
-        </div>
-
         <div class="usuario-card-texto">
           <span>Sessao ativa</span>
           <strong>Administrador</strong>
@@ -143,12 +136,6 @@
         <p>Gerencie os conteudos das tvs e salas forma simples e eficiente.</p>
       </div>
 
-      <div class="cabecalho-acoes">
-        <div class="sistema-online">
-          <span></span>
-          Sistema Online
-        </div>
-      </div>
     </header>
 
     <section class="filtros-pontos">
@@ -226,6 +213,11 @@
             <div class="sala-metrica">
               <strong id="salaDiasOnline">32</strong>
               <span>Telas ativas</span>
+            </div>
+
+            <div class="sala-metrica">
+              <strong id="salaTotalRadioTv">0</strong>
+              <span>RadioTV</span>
             </div>
           </div>
 
@@ -323,6 +315,11 @@
         <span>Encerramento</span>
         <input id="materialDataEncerramento" type="datetime-local">
       </label>
+    </div>
+
+    <div class="material-destinos">
+      <span>Enviar tambem para</span>
+      <div id="materialSalasExtras" class="material-salas-extras"></div>
     </div>
 
     <div class="modal-editar-acoes">
