@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ativador | PCTSUL TV</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: rgb(5, 12, 18);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 22px;
+    }
+
+    input,
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(430px, 100%);
+    }
+
+    .logo {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 12px;
+    }
+
+    .card {
+      width: 100%;
+      padding: 26px 22px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.05;
+      text-align: center;
+    }
+
+    .sub {
+      margin: 0 auto 22px;
+      max-width: 320px;
+      color: rgb(180, 196, 210);
+      font-size: 16px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .token {
+      display: grid;
+      gap: 5px;
+      margin-bottom: 18px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+
+    .token span {
+      color: rgb(150, 165, 180);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .token strong {
+      font-size: 22px;
+      letter-spacing: 0.08em;
+    }
+
+    .form {
+      display: grid;
+      gap: 14px;
+    }
+
+    input {
+      width: 100%;
+      height: 60px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 2px;
+      outline: none;
+      background: rgb(18, 30, 42);
+      color: #fff;
+      font-size: 20px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    button {
+      width: 100%;
+      height: 62px;
+      border: 0;
+      border-radius: 2px;
+      background: #fff;
+      color: #050505;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+    }
+
+    .msg {
+      min-height: 24px;
+      margin: 15px 0 0;
+      color: rgb(125, 210, 150);
+      font-size: 15px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .desktop {
+      display: none;
+      width: min(520px, 100%);
+      text-align: center;
+    }
+
+    .desktop .card {
+      padding: 34px 28px;
+    }
+
+    .desktop h1 {
+      font-size: 30px;
+    }
+
+    .signature {
+      margin-top: 18px;
+      color: rgb(130, 145, 160);
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+
+    @media (min-width: 821px), (hover: hover) and (pointer: fine) {
+      body {
+        padding: 32px;
+      }
+
+      .page {
+        display: none;
+      }
+
+      .desktop {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <img src="logo-login.png" class="logo" alt="PCTSUL TV">
+
+    <section class="card">
+      <h1>Ativar tela</h1>
+      <p class="sub">Digite o código da sala para parear esta TV.</p>
+
+      <div class="token">
+        <span>Token da TV</span>
+        <strong id="tokenText">TV----</strong>
+      </div>
+
+      <div class="form">
+        <input id="codigoInput" placeholder="CODIGO DA SALA" autocomplete="off">
+        <button id="ativarBtn" type="button">Ativar tela</button>
+      </div>
+
+      <p id="msg" class="msg"></p>
+    </section>
+
+    <div class="signature">desenvolvimento pela DUNA BRANDING</div>
+  </main>
+
+  <main class="desktop">
+    <img src="logo-login.png" class="logo" alt="PCTSUL TV">
+
+    <section class="card">
+      <h1>Entre pelo mobile</h1>
+      <p class="sub">Use o celular para fazer a ativação da tela.</p>
+    </section>
+
+    <div class="signature">desenvolvimento pela DUNA BRANDING</div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://niqyhaiytiusvyspjsld.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_O6vm7g-Xiv4COo1mNHCBAw_jgEJbSDI";
+
+    const tokenText = document.getElementById("tokenText");
+    const codigoInput = document.getElementById("codigoInput");
+    const ativarBtn = document.getElementById("ativarBtn");
+    const msg = document.getElementById("msg");
+
+    function headers(extra = {}) {
+      return {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        ...extra
+      };
+    }
+
+    function normalizarCodigo(valor) {
+      return String(valor || "").trim().toUpperCase();
+    }
+
+    function obterToken() {
+      const params = new URLSearchParams(window.location.search);
+      return normalizarCodigo(params.get("token") || "");
+    }
+
+    function mostrarMensagem(texto, cor = "rgb(125, 210, 150)") {
+      msg.textContent = texto;
+      msg.style.color = cor;
+    }
+
+    async function supabaseGet(path) {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        headers: headers({ Accept: "application/json" })
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    }
+
+    async function validarSala(codigo) {
+      const params = new URLSearchParams({
+        codigo: `eq.${codigo}`,
+        select: "*",
+        limit: "1"
+      });
+
+      const data = await supabaseGet(`salas?${params}`);
+      const sala = data[0] || null;
+
+      if (!sala) throw new Error("Código da sala não encontrado.");
+
+      const status = String(sala.status || "").toLowerCase();
+      if (sala.disponivel === false || status === "inativo" || status.includes("desativ") || status.includes("indispon")) {
+        throw new Error("Esta sala está indisponível.");
+      }
+
+      return sala;
+    }
+
+    async function registrarAtivacao(token, codigo) {
+      const agora = new Date().toISOString();
+      const payload = {
+        codigo: token,
+        status: "ativo",
+        evento: `ativar:${codigo}`,
+        ultimo_ping: agora,
+        data_hora: agora
+      };
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/status_salas`, {
+        method: "POST",
+        headers: headers({
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
+        }),
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+    }
+
+    async function ativarTela() {
+      const token = obterToken();
+      const codigo = normalizarCodigo(codigoInput.value);
+
+      if (!token) {
+        mostrarMensagem("Token da TV não encontrado. Escaneie novamente o QR Code.", "#ff8a8a");
+        return;
+      }
+
+      if (!codigo) {
+        mostrarMensagem("Digite o código da sala.", "#ffcc66");
+        codigoInput.focus();
+        return;
+      }
+
+      try {
+        ativarBtn.disabled = true;
+        mostrarMensagem("Validando sala...");
+
+        await validarSala(codigo);
+
+        mostrarMensagem("Ativando TV...");
+        await registrarAtivacao(token, codigo);
+
+        mostrarMensagem("Tela ativada. A TV iniciará a reprodução em instantes.");
+      } catch (error) {
+        console.error(error);
+        mostrarMensagem(error.message || "Não foi possível ativar a tela.", "#ff8a8a");
+      } finally {
+        ativarBtn.disabled = false;
+      }
+    }
+
+    codigoInput.addEventListener("input", () => {
+      codigoInput.value = normalizarCodigo(codigoInput.value);
+    });
+
+    codigoInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") ativarTela();
+    });
+
+    ativarBtn.addEventListener("click", ativarTela);
+
+    const token = obterToken();
+    tokenText.textContent = token || "TV----";
+
+    if (!token) {
+      mostrarMensagem("Escaneie o QR Code da TV para abrir esta página com token.", "#ffcc66");
+    }
+  </script>
+</body>
+</html>
