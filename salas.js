@@ -1,103 +1,281 @@
-const SENHA_PAINEL = "@helena";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
-const loginBox = document.getElementById("loginBox");
-const conteudoPainel = document.getElementById("conteudoPainel");
-const senhaInput = document.getElementById("senhaInput");
-const btnLogin = document.getElementById("btnLogin");
-const loginErro = document.getElementById("loginErro");
-const listaPontos = document.getElementById("listaPontos");
+  <title>PCTSUL | Gerenciador de TVs</title>
+  <link rel="stylesheet" href="salas.css?v=203">
 
-const pontosDemo = [
-  { nome: "Nova sala", endereco: "Predio nao informado", codigo: "UCLCFGG", imagem: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=70" },
-  { nome: "Nova sala", endereco: "Predio nao informado", codigo: "RR3DCPG", imagem: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=900&q=70" },
-  { nome: "Nova sala", endereco: "Prof Julio Cesar", codigo: "J7QUGJM", imagem: "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&w=900&q=70" },
-  { nome: "Sala A", endereco: "Prof Max de Menezes", codigo: "C68X5ZQ", imagem: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=70" }
-];
+  <style>
+    * { box-sizing: border-box; }
 
-function liberarPainel() {
-  if (loginBox) loginBox.style.display = "none";
-  if (conteudoPainel) conteudoPainel.style.display = "grid";
-  renderizarPontos();
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: rgb(5, 12, 18);
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-function bloquearPainel() {
-  if (loginBox) loginBox.style.display = "grid";
-  if (conteudoPainel) conteudoPainel.style.display = "none";
-}
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 22px 74px;
+      background:
+        radial-gradient(circle at 50% 28%, rgba(255,255,255,0.08), transparent 34%),
+        rgb(5, 12, 18);
+    }
 
-function validarLogin() {
-  const senha = senhaInput ? senhaInput.value.trim() : "";
-  if (senha !== SENHA_PAINEL) {
-    if (loginErro) loginErro.textContent = "Código inválido";
-    return;
-  }
-  sessionStorage.setItem("painelLiberado", "1");
-  if (loginErro) loginErro.textContent = "";
-  liberarPainel();
-}
+    .login-card {
+      width: min(440px, 100%);
+      padding: 28px 24px 24px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: rgba(255,255,255,0.045);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.38);
+      text-align: center;
+    }
 
-function renderizarPontos() {
-  if (!listaPontos || listaPontos.dataset.renderizado === "1") return;
-  listaPontos.dataset.renderizado = "1";
-  listaPontos.innerHTML = pontosDemo.map((ponto) => `
-    <article class="point-card">
-      <div class="card-topo"><span class="status-pill">Inativo</span><span class="telas-topo">0 telas</span></div>
-      <img src="${ponto.imagem}" alt="${ponto.nome}" loading="lazy">
-      <h3>${ponto.nome}</h3>
-      <div class="card-info"><p>${ponto.endereco}</p><span class="codigo-pill">${ponto.codigo}</span></div>
-      <button class="btn-detalhes" type="button">Entrar na sala <span>→</span></button>
-    </article>
-  `).join("");
-}
+    .login-logo {
+      width: min(310px, 78vw);
+      height: 130px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 14px;
+    }
 
-function trocarView(view) {
-  document.querySelectorAll(".painel-view").forEach((secao) => {
-    secao.classList.toggle("ativo", secao.id === `view${view[0].toUpperCase()}${view.slice(1)}`);
-  });
+    .login-card h2 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.05;
+    }
 
-  document.querySelectorAll(".menu-item[data-view]").forEach((item) => {
-    item.classList.toggle("ativo", item.dataset.view === view);
-  });
-}
+    .login-card::after {
+      content: "Gerencie telas, salas e ativações em um só lugar.";
+      display: block;
+      max-width: 310px;
+      margin: 0 auto 22px;
+      color: rgb(180, 196, 210);
+      font-size: 15px;
+      line-height: 1.35;
+    }
 
-if (sessionStorage.getItem("painelLiberado") === "1") liberarPainel();
-else bloquearPainel();
+    #senhaInput {
+      width: 100%;
+      height: 60px;
+      padding: 0 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      outline: none;
+      background: rgb(18, 30, 42);
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+    }
 
-if (btnLogin) btnLogin.addEventListener("click", validarLogin);
-if (senhaInput) senhaInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") validarLogin();
-});
+    #senhaInput::placeholder { color: rgb(145, 160, 174); }
 
-document.querySelectorAll(".menu-item[data-view]").forEach((item) => {
-  item.addEventListener("click", () => trocarView(item.dataset.view));
-});
+    #btnLogin {
+      width: 100%;
+      min-height: 60px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 14px;
+      background: #fff;
+      color: #050505;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.24);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
 
-const btnLogout = document.getElementById("btnLogout");
-if (btnLogout) btnLogout.addEventListener("click", () => {
-  sessionStorage.removeItem("painelLiberado");
-  window.location.reload();
-});
+    #btnLogin:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(0,0,0,0.32); }
+    #btnLogin:active { transform: translateY(1px) scale(.99); }
 
-function alternarTelaPainel(view) {
-  const biblioteca = document.getElementById("bibliotecaPainel");
-  const abrirBiblioteca = view === "biblioteca";
+    .login-erro {
+      min-height: 22px;
+      margin-top: 14px;
+      color: #ff8a8a;
+      font-size: 14px;
+      line-height: 1.35;
+    }
 
-  document.body.classList.toggle("modo-biblioteca", abrirBiblioteca);
-  document.body.classList.remove("modo-sala");
+    .login-screen::after {
+      content: "desenvolvimento pela DUNA BRANDING";
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 22px;
+      color: rgb(130, 145, 160);
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: .04em;
+    }
+  </style>
+</head>
 
-  if (biblioteca) biblioteca.hidden = !abrirBiblioteca;
+<body>
 
-  document.querySelectorAll(".menu-item[data-view]").forEach((item) => {
-    item.classList.toggle("ativo", item.dataset.view === view);
-  });
-}
+<div id="loginBox" class="login-screen">
+  <div class="login-card">
+    <img src="logo.png" class="login-logo" alt="PC SUL">
+    <h2>Acesso ao painel</h2>
+    <input id="senhaInput" type="password" placeholder="Digite o código de acesso">
+    <button id="btnLogin" type="button">Entrar</button>
+    <div id="loginErro" class="login-erro"></div>
+  </div>
+</div>
 
-document.querySelectorAll("[data-view]").forEach((item) => {
-  item.addEventListener("click", (event) => {
-    const view = item.dataset.view;
-    if (!view) return;
-    event.preventDefault();
-    alternarTelaPainel(view);
-  });
-});
+<div id="conteudoPainel" class="dashboard-shell" style="display:none;">
 
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="logo.png" class="brand-logo" alt="PC SUL">
+    </div>
+
+    <nav class="menu-lateral">
+      <a href="salas.html" class="menu-item ativo">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </span>
+        <span>Pontos</span>
+      </a>
+
+      <a href="usuarios.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>
+        </span>
+        <span>Usuarios</span>
+      </a>
+
+      <a href="biblioteca.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h8"></path><path d="M8 12h8"></path><path d="M8 17h5"></path></svg>
+        </span>
+        <span>Biblioteca</span>
+      </a>
+
+      <a href="ativador.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"></path></svg>
+        </span>
+        <span>Ativador</span>
+      </a>
+
+      <a href="radiotv.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+        </span>
+        <span>RadioTv</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+
+    <section class="resumo-card">
+      <h3>Resumo rapido</h3>
+      <div class="resumo-linha"><span>Total de pontos</span><strong id="totalPontosResumo">0</strong></div>
+      <div class="resumo-linha positivo"><span>Pontos ativos</span><strong id="pontosAtivosResumo">0</strong></div>
+      <div class="resumo-linha negativo"><span>Pontos inativos</span><strong id="pontosInativosResumo">0</strong></div>
+      <div class="resumo-linha"><span>Telas conectadas</span><strong id="playlistsAtivasResumo">0</strong></div>
+    </section>
+
+    <section class="usuario-card">
+      <div class="usuario-card-topo"><div class="usuario-card-texto"><span>Sessao ativa</span><strong>Administrador</strong></div></div>
+      <div class="usuario-status"><span></span>Acesso liberado</div>
+      <button id="btnLogout" type="button">Encerrar sessao <span>→</span></button>
+    </section>
+  </aside>
+
+  <main class="conteudo-principal">
+    <header class="cabecalho-painel">
+      <div class="cabecalho-texto">
+        <h1>Gerenciador de TVs</h1>
+        <p>Gerencie os conteúdos das TVs e salas de forma simples e eficiente.</p>
+      </div>
+    </header>
+
+    <section class="filtros-pontos">
+      <label class="campo-busca"><span>⌕</span><input id="buscaPontos" type="search" placeholder="Buscar por nome, endereco ou codigo"></label>
+      <label class="campo-select"><span>Status</span><select id="filtroStatus"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option><option value="desativado">Desativados</option></select></label>
+      <label class="campo-select"><span>Tipo de ponto</span><select id="filtroTipo"><option value="todos">Todos</option><option value="academia">Academia</option><option value="campus">Campus</option><option value="loja">Loja</option></select></label>
+      <label class="campo-select"><span>Ordenar por</span><select id="ordenarPontos"><option value="recentes">Mais recentes</option><option value="nome">Nome</option><option value="status">Status</option></select></label>
+      <button id="btnNovoPonto" class="btn-novo-ponto" type="button"><span>+</span>Novo ponto</button>
+    </section>
+
+    <section id="listaPontos" class="pontos-box"></section>
+
+    <section id="salaDetalhe" class="sala-detalhe" hidden>
+      <div class="sala-topbar">
+        <button id="btnVoltarSalas" class="btn-voltar-sala" type="button">← Voltar</button>
+        <span>Gerencie e organize a sua playlist</span>
+        <strong id="salaStatusTopo">Inativo - sem conexao</strong>
+      </div>
+
+      <div class="sala-hero">
+        <img id="salaImagem" src="https://placehold.co/800x450/png" alt="">
+        <div class="sala-info">
+          <h2 id="salaTitulo">Sala</h2>
+          <p id="salaEndereco"></p>
+          <div class="sala-codigo-linha"><strong id="salaCodigo"></strong></div>
+          <div class="sala-metricas">
+            <div class="sala-metrica"><strong id="salaTotalMidias">0</strong><span>Midias</span></div>
+            <div class="sala-metrica"><strong id="salaTotalPlaylists">0</strong><span>Biblioteca</span></div>
+            <div class="sala-metrica"><strong id="salaDiasOnline">0</strong><span>Telas ativas</span></div>
+            <div class="sala-metrica"><strong id="salaTotalRadioTv">0</strong><span>RadioTV</span></div>
+          </div>
+          <div class="sala-acoes">
+            <button id="btnEditarSala" type="button">Editar</button>
+            <a href="biblioteca.html" class="button-link">Biblioteca</a>
+            <button id="btnAdicionarMaterial" type="button" class="btn-upgrade-sala">Adicionar material</button>
+            <input id="inputMaterialSala" type="file" accept="video/*,image/*,.txt,text/plain" hidden>
+          </div>
+        </div>
+      </div>
+
+      <section class="sala-playlist"><h3>Playlist da Sala</h3><div id="salaPlaylistLista" class="sala-lista"></div></section>
+      <div class="sala-historicos">
+        <section><h3>RadioTV</h3><div id="salaRadioTvLista" class="sala-historico-lista radio-tv-lista"></div></section>
+        <section><h3>Historico de status</h3><div id="salaHistoricoStatus" class="sala-historico-lista"></div></section>
+      </div>
+    </section>
+
+    <div class="assinatura-final">Desenvolvido por <strong>DUNA BRANDING</strong></div>
+  </main>
+</div>
+
+<div id="modalEditarSala" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card">
+    <div class="modal-editar-topo"><h3>Editar sala</h3><button id="btnFecharEditarSala" type="button">×</button></div>
+    <div class="modal-editar-grid">
+      <label><span>Nome da sala</span><input id="editSalaNome" type="text" placeholder="Nome da sala"></label>
+      <label class="campo-largo"><span>Predio</span><input id="editSalaEndereco" type="text" placeholder="Predio"></label>
+      <div class="campo-largo campo-imagem-capa"><span>Imagem de capa</span><button id="btnAlterarImagemSala" type="button">Alterar imagem</button><input id="editSalaImagem" type="hidden"><input id="inputImagemSala" type="file" accept="image/*" hidden></div>
+    </div>
+    <div class="modal-editar-preview"><img id="editSalaPreview" src="https://placehold.co/800x450/png" alt=""></div>
+    <div class="modal-editar-acoes"><button id="btnCancelarEditarSala" type="button">Cancelar</button><button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button></div>
+  </div>
+</div>
+
+<div id="modalAdicionarMaterial" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card modal-material-card">
+    <div class="modal-editar-topo"><h3>Adicionar material</h3><button id="btnFecharAdicionarMaterial" type="button">×</button></div>
+    <div class="material-selecionado"><span>Arquivo selecionado</span><strong id="materialSelecionadoNome">Nenhum arquivo selecionado</strong></div>
+    <div class="modal-editar-grid"><label><span>Postagem</span><input id="materialDataPostagem" type="datetime-local"></label><label><span>Encerramento</span><input id="materialDataEncerramento" type="datetime-local"></label></div>
+    <div class="material-destinos"><span>Enviar tambem para</span><div id="materialSalasExtras" class="material-salas-extras"></div></div>
+    <div class="modal-editar-acoes"><button id="btnCancelarAdicionarMaterial" type="button">Cancelar</button><button id="btnConfirmarAdicionarMaterial" type="button">Enviar material</button></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="salas.js?v=203"></script>
+</body>
+</html>
