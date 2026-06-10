@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCTSul Indoor</title>
+<style>
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#07120d;color:#fff;font-family:Arial,Helvetica,sans-serif}
+.tv{position:relative;width:100vw;height:100vh;overflow:hidden;background:linear-gradient(90deg,rgba(4,12,8,.96),rgba(4,12,8,.78) 48%,rgba(4,12,8,.18)),var(--image);background-size:cover;background-position:center}
+.tv::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.36),transparent 44%)}
+.content{position:relative;z-index:1;width:60vw;min-width:680px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:24px;padding:5.4vw}
+.brand{display:flex;align-items:center;gap:18px;color:rgba(255,255,255,.78);font-size:22px;font-weight:700;text-transform:uppercase}
+.mark{width:18px;height:54px;border-radius:999px;background:#70c947}
+.date{width:fit-content;padding:12px 18px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.84);font-size:24px;font-weight:700}
+h1{margin:0;max-width:980px;font-size:clamp(38px,3.9vw,70px);line-height:1.05}
+p{max-width:920px;margin:0;color:rgba(255,255,255,.88);font-size:clamp(25px,2vw,38px);line-height:1.22}
+.source{position:absolute;left:5.4vw;bottom:4.2vw;color:rgba(255,255,255,.66);font-size:22px;font-weight:700}
+.progress{position:absolute;left:0;right:0;bottom:0;z-index:2;height:10px;background:rgba(255,255,255,.18)}
+.progress span{display:block;height:100%;background:#70c947;animation:timer 12s linear infinite}
+@keyframes timer{from{width:0}to{width:100%}}
+</style>
+</head>
+<body>
+<main id="tv" class="tv">
+<section class="content">
+<div class="brand"><span class="mark"></span><span>PCTSul Notícias</span></div>
+<div id="date" class="date"></div>
+<h1 id="title"></h1>
+<p id="summary"></p>
+<div class="source">PCTSul</div>
+</section>
+<div class="progress"><span id="bar"></span></div>
+</main>
+
+<script src="noticias_pctsul.js"></script>
+<script>
+let index=0;
+const tv=document.getElementById("tv");
+const dateEl=document.getElementById("date");
+const titleEl=document.getElementById("title");
+const summaryEl=document.getElementById("summary");
+const bar=document.getElementById("bar");
+
+function show(){
+ if(!window.news || !news.length) return;
+ const item=news[index % news.length];
+ dateEl.textContent=item.date;
+ titleEl.textContent=item.title;
+ summaryEl.textContent=item.summary;
+ tv.style.setProperty("--image",`url("${item.image}")`);
+ bar.style.animation="none";
+ void bar.offsetWidth;
+ bar.style.animation="";
+ index++;
+}
+show();
+setInterval(show,12000);
+</script>
+</body>
+</html>
