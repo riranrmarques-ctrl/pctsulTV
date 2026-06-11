@@ -2062,14 +2062,14 @@ body,
 }
 
 
-/* Atualização: botão Biblioteca preto e duração do material */
+/* Atualização: botão Biblioteca branco e duração do material */
 .sala-acoes .btn-biblioteca {
   height: 46px;
   padding: 0 20px;
   border: none;
   border-radius: 12px;
-  background: #050505;
-  color: #ffffff;
+  background: #ffffff;
+  color: #050505;
   font-weight: 900;
   text-decoration: none;
   display: inline-flex;
@@ -2078,7 +2078,8 @@ body,
 }
 
 .sala-acoes .btn-biblioteca:hover {
-  background: #111111;
+  background: #f1f1f1;
+  color: #050505;
 }
 
 .campo-duracao-material input {
