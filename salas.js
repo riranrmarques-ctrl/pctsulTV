@@ -109,6 +109,13 @@ function configurarAdicionarMaterial() {
   const btnCancelar = document.getElementById("btnCancelarAdicionarMaterial");
   const btnFechar = document.getElementById("btnFecharAdicionarMaterial");
   const btnConfirmar = document.getElementById("btnConfirmarAdicionarMaterial");
+  const inputDuracao = document.getElementById("materialDuracao");
+
+  if (inputDuracao) {
+    inputDuracao.addEventListener("input", () => {
+      inputDuracao.value = mascaraDuracaoMaterial(inputDuracao.value);
+    });
+  }
 
   if (btnCancelar) btnCancelar.addEventListener("click", fecharModalAdicionarMaterial);
   if (btnFechar) btnFechar.addEventListener("click", fecharModalAdicionarMaterial);
@@ -237,6 +244,7 @@ async function criarNovoPonto() {
 async function adicionarMaterialSala(arquivo) {
   const dataPostagem = getValor("materialDataPostagem");
   const dataEncerramento = getValor("materialDataEncerramento");
+  const duracaoMaterial = normalizarDuracaoMaterial(getValor("materialDuracao") || "00:30");
 
   if (!salaAtual) {
     alert("Abra uma sala antes de adicionar material.");
@@ -271,6 +279,7 @@ async function adicionarMaterialSala(arquivo) {
       arquivo_nome: arquivo.name,
       arquivo_tipo: arquivo.type || tipoArquivoPorNome(arquivo.name),
       arquivo_tamanho: arquivo.size || 0,
+      duracao: duracaoMaterial,
       data_postagem: dataPostagem || null,
       data_encerramento: dataEncerramento || null,
       status: "ativo",
@@ -315,6 +324,7 @@ function abrirModalAdicionarMaterial(arquivo) {
   setTexto("materialSelecionadoNome", arquivo.name || "Material selecionado");
   setValor("materialDataPostagem", dataInputLocal(new Date()));
   setValor("materialDataEncerramento", dataInputLocal(somarDias(new Date(), 30)));
+  setValor("materialDuracao", "00:30");
   renderizarDestinosMaterial();
 
   const modal = document.getElementById("modalAdicionarMaterial");
@@ -330,6 +340,7 @@ function fecharModalAdicionarMaterial() {
   setTexto("materialSelecionadoNome", "Nenhum arquivo selecionado");
   setValor("materialDataPostagem", "");
   setValor("materialDataEncerramento", "");
+  setValor("materialDuracao", "");
   const destinos = document.getElementById("materialSalasExtras");
   if (destinos) destinos.innerHTML = "";
 }
@@ -371,6 +382,29 @@ function codigosDestinoMaterial(codigoAtual) {
   return Array.from(codigos);
 }
 
+function mascaraDuracaoMaterial(valor) {
+  const apenasNumeros = String(valor || "").replace(/\D/g, "").slice(0, 4);
+
+  if (apenasNumeros.length <= 2) return apenasNumeros;
+
+  return `${apenasNumeros.slice(0, 2)}:${apenasNumeros.slice(2)}`;
+}
+
+function normalizarDuracaoMaterial(valor) {
+  const texto = String(valor || "").trim();
+  const partes = texto.split(":");
+
+  if (partes.length !== 2) return "";
+
+  const minutos = Number(partes[0]);
+  const segundos = Number(partes[1]);
+
+  if (!Number.isInteger(minutos) || !Number.isInteger(segundos)) return "";
+  if (minutos < 0 || minutos > 99 || segundos < 0 || segundos > 59) return "";
+
+  return `${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
+}
+
 async function confirmarAdicionarMaterial() {
   if (!materialSalaSelecionado) {
     alert("Selecione um arquivo para adicionar.");
@@ -379,6 +413,14 @@ async function confirmarAdicionarMaterial() {
 
   const dataPostagem = getValor("materialDataPostagem");
   const dataEncerramento = getValor("materialDataEncerramento");
+  const duracaoMaterial = normalizarDuracaoMaterial(getValor("materialDuracao"));
+
+  if (!duracaoMaterial) {
+    alert("Informe a duração no formato 00:00. Os segundos precisam ficar entre 00 e 59.");
+    return;
+  }
+
+  setValor("materialDuracao", duracaoMaterial);
 
   if (!dataPostagem || !dataEncerramento) {
     alert("Informe a postagem e o encerramento do material.");
@@ -919,6 +961,7 @@ function renderizarPlaylistSala(codigoSala) {
       <div class="playlist-datas">
         <time><span>Postagem</span>${escaparHtml(formatarData(item.data_postagem || item.created_at))}</time>
         <time><span>Vencimento</span>${escaparHtml(formatarData(item.data_encerramento || item.data_fim || ""))}</time>
+        <time><span>Duração</span>${escaparHtml(normalizarDuracaoMaterial(item.duracao || "00:30") || "00:30")}</time>
       </div>
       <div class="playlist-acoes">
         <button type="button" class="btn-renomear-material" data-id="${escaparHtml(item.id)}">✎</button>
