@@ -267,6 +267,7 @@ function renderizarBiblioteca() {
         </div>
 
         <div class="item-acoes">
+          <button type="button" onclick="renomearArquivoBiblioteca('${escaparHtml(String(item.id))}')">✎</button>
           <button type="button" onclick="baixarArquivoBiblioteca('${escaparHtml(String(item.id))}')">↓</button>
           <button type="button" onclick="deletarArquivoBiblioteca('${escaparHtml(String(item.id))}')">×</button>
         </div>
