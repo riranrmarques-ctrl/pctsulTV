@@ -629,3 +629,23 @@ button:hover {
   text-transform: uppercase;
   pointer-events: none;
 }
+
+.assinatura-final {
+  position: fixed;
+  left: 220px;
+  right: 0;
+  bottom: 14px;
+  z-index: 5;
+  color: rgba(255,255,255,.42);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.assinatura-final strong {
+  color: rgba(255,255,255,.72);
+  font-weight: 950;
+}
