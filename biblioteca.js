@@ -169,8 +169,15 @@ const urlDigitada = urlDetectadaTxt;
     renderizarBiblioteca();
     fecharModal();
   } catch (erro) {
-    console.error("Erro ao salvar biblioteca:", erro);
-    alert(mensagemErroBiblioteca(erro));
+    console.error("ERRO COMPLETO AO SALVAR BIBLIOTECA:", erro);
+
+    alert(
+      erro?.message ||
+      erro?.error_description ||
+      erro?.details ||
+      JSON.stringify(erro, null, 2) ||
+      "Erro desconhecido ao salvar."
+    );
   } finally {
     if (btnSalvar) {
       btnSalvar.disabled = false;
@@ -297,15 +304,10 @@ async function deletarArquivoBiblioteca(id) {
 
     arquivosBiblioteca = arquivosBiblioteca.filter(arquivo => String(arquivo.id) !== String(id));
     renderizarBiblioteca();
- catch (erro) {
-  console.error("ERRO COMPLETO:", erro);
-
-  alert(
-    erro?.message ||
-    erro?.error_description ||
-    JSON.stringify(erro) ||
-    "Erro desconhecido"
-  );
+  } catch (erro) {
+    console.error("Erro ao deletar:", erro);
+    alert("Não foi possível deletar o arquivo.");
+  }
 }
 
 function tipoBibliotecaArquivo(arquivo) {
