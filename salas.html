@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
 
   <title>PCTSUL | Gerenciador de TVs</title>
-  <link rel="stylesheet" href="salas.css?v=601">
+  <link rel="stylesheet" href="salas.css?v=701">
 
   <style>
     * { box-sizing: border-box; }
@@ -274,14 +274,19 @@
 
 <div id="modalEditarSala" class="modal-editar-sala" hidden>
   <div class="modal-editar-card">
-    <div class="modal-editar-topo"><h3>Editar sala</h3><button id="btnFecharEditarSala" type="button">×</button></div>
+    <div class="modal-editar-topo"><h3>Editar ponto</h3><button id="btnFecharEditarSala" type="button">×</button></div>
     <div class="modal-editar-grid">
-      <label><span>Nome da TV</span><input id="editSalaNome" type="text" placeholder="Ex: TV 01"></label>
-      <label class="campo-largo"><span>Prédio</span><input id="editSalaEndereco" type="text" placeholder="Ex: Bloco A"></label>
+      <label class="campo-largo"><span>Nome do ponto / TV</span><input id="editSalaNome" type="text" placeholder="Ex: TV 01"></label>
+      <input id="editSalaEndereco" type="hidden">
       <div class="campo-largo campo-imagem-capa"><span>Imagem de capa</span><button id="btnAlterarImagemSala" type="button">Alterar imagem</button><input id="editSalaImagem" type="hidden"><input id="inputImagemSala" type="file" accept="image/*" hidden></div>
     </div>
     <div class="modal-editar-preview"><img id="editSalaPreview" src="https://placehold.co/800x450/png" alt=""></div>
-    <div class="modal-editar-acoes"><button id="btnCancelarEditarSala" type="button">Cancelar</button><button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button></div>
+    <div class="modal-editar-acoes modal-ponto-acoes">
+      <button id="btnApagarSala" type="button" class="btn-apagar-pasta">Apagar ponto</button>
+      <span></span>
+      <button id="btnCancelarEditarSala" type="button">Cancelar</button>
+      <button id="btnSalvarEditarSala" type="button">Salvar alteracoes</button>
+    </div>
   </div>
 </div>
 
@@ -327,6 +332,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="salas.js?v=601"></script>
+<script src="salas.js?v=701"></script>
 </body>
 </html>

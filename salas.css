@@ -2577,3 +2577,72 @@ a,
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== V5 REGRAS FINAIS DE PASTA/PONTO/RADIOTV ===== */
+
+* {
+  caret-color: transparent;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  caret-color: auto;
+}
+
+button,
+a,
+.point-card,
+.tv-card,
+.grupo-topbar,
+.grupo-topbar-textos {
+  user-select: none;
+}
+
+.btn-delete-tv,
+#btnExcluirPastaGrupo {
+  display: none !important;
+}
+
+.grupo-topbar-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grupo-topbar-acoes button,
+#btnEditarPastaGrupo {
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #050505;
+  font-weight: 900;
+}
+
+.modal-ponto-acoes,
+.modal-pasta-acoes {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-apagar-pasta,
+#btnApagarSala {
+  border: 0 !important;
+  background: #ef3d3d !important;
+  color: #ffffff !important;
+  font-weight: 900;
+}
+
+.radio-tv-lista .radio-tv-item,
+.sala-historico-lista .radio-tv-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}

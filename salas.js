@@ -2,7 +2,7 @@ const SUPABASE_URL = "https://niqyhaiytiusvyspjsld.supabase.co";
 const SUPABASE_KEY = "sb_publishable_O6vm7g-Xiv4COo1mNHCBAw_jgEJbSDI";
 const SENHA_PAINEL = "test1";
 
-const CACHE_CENTRAL_KEY = "central_painel_cache_v5";
+const CACHE_CENTRAL_KEY = "central_painel_cache_v7";
 const CACHE_CENTRAL_TTL = 30 * 60 * 1000;
 const TABELA_SALAS = "salas";
 const STORAGE_CAPAS_BUCKET = "capas-salas";
@@ -23,6 +23,7 @@ let origemBibliotecaSala = "biblioteca";
 let itemBibliotecaSelecionado = null;
 let itensBibliotecaSala = [];
 let itensRadioTvSala = [];
+let todosRadioTvSalas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
@@ -160,6 +161,7 @@ function configurarEdicaoSala() {
   const btnFechar = document.getElementById("btnFecharEditarSala");
   const btnCancelar = document.getElementById("btnCancelarEditarSala");
   const btnSalvar = document.getElementById("btnSalvarEditarSala");
+  const btnApagar = document.getElementById("btnApagarSala");
   const inputImagem = document.getElementById("editSalaImagem");
   const btnAlterarImagem = document.getElementById("btnAlterarImagemSala");
   const inputArquivoImagem = document.getElementById("inputImagemSala");
@@ -168,6 +170,7 @@ function configurarEdicaoSala() {
   if (btnFechar) btnFechar.addEventListener("click", fecharModalEditarSala);
   if (btnCancelar) btnCancelar.addEventListener("click", fecharModalEditarSala);
   if (btnSalvar) btnSalvar.addEventListener("click", salvarEdicaoSala);
+  if (btnApagar) btnApagar.addEventListener("click", apagarSalaAtual);
   if (btnAlterarImagem && inputArquivoImagem) {
     btnAlterarImagem.addEventListener("click", () => inputArquivoImagem.click());
   }
@@ -550,11 +553,24 @@ async function carregarcentralpainel(opcoes = {}) {
       materiais = respostaMateriais.data || [];
     }
 
+    let radiotvSalas = [];
+
+    const respostaRadioTvSalas = await supabaseClient
+      .from("radiotv_salas")
+      .select("*, radiotv:radiotv_id(*)");
+
+    if (respostaRadioTvSalas.error) {
+      console.warn("RadioTV vinculado nao carregou:", respostaRadioTvSalas.error);
+    } else {
+      radiotvSalas = respostaRadioTvSalas.data || [];
+    }
+
     const dados = {
       pontos: pontos || [],
       status,
       playlists,
-      materiais
+      materiais,
+      radiotvSalas
     };
 
     salvarCacheCentral(dados);
@@ -570,9 +586,11 @@ function aplicarDadosCentral(dados) {
   const status = dados?.status || [];
   const playlists = dados?.playlists || [];
   const materiais = dados?.materiais || [];
+  const radiotvSalas = dados?.radiotvSalas || [];
 
   todasAsPlaylists = playlists;
   todosOsMateriais = materiais;
+  todosRadioTvSalas = radiotvSalas;
   playlistsAtivas = contarPlaylistsAtivas(playlists);
   todosOsPontos = combinarPontosComStatus(pontos, status);
   atualizarPainelFiltrado();
@@ -763,7 +781,6 @@ function renderizarTvsDoGrupo(grupo, pontos) {
       </div>
       <div class="grupo-topbar-acoes">
         <button type="button" id="btnEditarPastaGrupo">Editar pasta</button>
-        <button type="button" id="btnExcluirPastaGrupo" class="btn-perigo-grupo">Excluir pasta</button>
         <strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong>
       </div>
     </div>
@@ -792,9 +809,8 @@ function renderizarTvsDoGrupo(grupo, pontos) {
         <h3>${escaparHtml(nome)}</h3>
 
         <div class="card-info">
-          <p>${escaparHtml(ponto.descricao_tv || ponto.tipo_tv || nomePonto(ponto))}</p>
+          <p>${escaparHtml(grupo.nome)}</p>
           <span class="codigo-pill">${escaparHtml(codigo)}</span>
-          <button class="btn-delete-tv" type="button" data-codigo="${escaparHtml(codigo)}" title="Excluir TV">×</button>
         </div>
 
         <button class="btn-detalhes" type="button" data-codigo="${escaparHtml(codigo)}">
@@ -813,23 +829,12 @@ function renderizarTvsDoGrupo(grupo, pontos) {
 
   document.getElementById("btnEditarPastaTopbar")?.addEventListener("click", () => abrirModalEditarPasta(grupo));
   document.getElementById("btnEditarPastaGrupo")?.addEventListener("click", () => abrirModalEditarPasta(grupo));
-  document.getElementById("btnExcluirPastaGrupo")?.addEventListener("click", () => {
-    abrirModalEditarPasta(grupo);
-    apagarPastaAtual();
-  });
 
   lista.querySelectorAll(".btn-detalhes").forEach(botao => {
     botao.addEventListener("click", () => {
       const codigo = botao.dataset.codigo || "";
       const ponto = todosOsPontos.find(item => normalizarCodigo(item.codigo_final) === normalizarCodigo(codigo));
       if (ponto) abrirSala(ponto);
-    });
-  });
-
-  lista.querySelectorAll(".btn-delete-tv").forEach(botao => {
-    botao.addEventListener("click", event => {
-      event.stopPropagation();
-      deletarTvGrupo(botao.dataset.codigo || "");
     });
   });
 }
@@ -934,7 +939,7 @@ function abrirModalEditarSala() {
   imagemSalaSelecionada = null;
 
   setValor("editSalaNome", nomeTvPonto(salaAtual));
-  setValor("editSalaEndereco", predioPonto(salaAtual));
+  setValor("editSalaEndereco", predioPonto(salaAtual)); // oculto: subtitulo do ponto vem da pasta
   setValor("editSalaImagem", imagemPonto(salaAtual));
 
   const preview = document.getElementById("editSalaPreview");
@@ -959,12 +964,13 @@ async function salvarEdicaoSala() {
   }
 
   const nome = getValor("editSalaNome");
-  const endereco = getValor("editSalaEndereco");
+  const grupoNomeFixo = nomeGrupoPonto(salaAtual);
+  const endereco = predioPonto(salaAtual);
 
   const dadosAtualizados = {
     nome,
     endereco,
-    grupo_nome: nomeGrupoPonto(salaAtual),
+    grupo_nome: grupoNomeFixo,
     predio: endereco
   };
 
@@ -1418,13 +1424,37 @@ function renderizarHistoricosSala() {
   const status = document.getElementById("salaHistoricoStatus");
 
   if (radioTv) {
-    radioTv.innerHTML = `
-      <div class="radio-tv-item">
-        <strong>1.</strong>
-        <span>Nenhum item cadastrado</span>
-        <time>Noticias, rodape ou musica</time>
-      </div>
-    `;
+    const codigo = salaAtual?.codigo_final || salaAtual?.codigo || "";
+    const itens = radioTvDaSala(codigo);
+
+    if (!itens.length) {
+      radioTv.innerHTML = `
+        <div class="radio-tv-item">
+          <strong>1.</strong>
+          <span>Nenhum item cadastrado</span>
+          <time>Noticias, rodape ou musica</time>
+        </div>
+      `;
+    } else {
+      radioTv.innerHTML = itens.map((vinculo, index) => {
+        const item = vinculo.radiotv || vinculo;
+        const nome = item.tipo === "aviso"
+          ? `Aviso: ${item.titulo || item.texto_aviso || "Sem titulo"}`
+          : item.tipo === "youtube_live"
+            ? "YouTube ao vivo"
+            : `${item.artista || ""} ${item.artista ? "—" : ""} ${item.titulo || "RadioTV"}`.trim();
+
+        const tipo = item.tipo === "aviso" ? "Rodape" : item.tipo === "youtube_live" ? "Tela cheia" : (item.site || item.tipo || "RadioTV");
+
+        return `
+          <div class="radio-tv-item">
+            <strong>${index + 1}.</strong>
+            <span>${escaparHtml(nome)}</span>
+            <time>${escaparHtml(tipo)}</time>
+          </div>
+        `;
+      }).join("");
+    }
   }
 
   if (status) {
@@ -1506,7 +1536,11 @@ function materiaisDaSala(codigoSala) {
 }
 
 function radioTvDaSala(codigoSala) {
-  return [];
+  const codigoNormalizado = normalizarCodigo(codigoSala);
+
+  return todosRadioTvSalas.filter(item => {
+    return normalizarCodigo(item.codigo_ponto || item.codigo_cliente || item.ponto_codigo || item.codigo || "") === codigoNormalizado;
+  });
 }
 
 function contarPlaylistsAtivas(playlists) {
@@ -1858,6 +1892,44 @@ async function apagarPastaAtual() {
 }
 
 
+
+async function apagarSalaAtual() {
+  if (!salaAtual) return;
+
+  const codigo = salaAtual.codigo_final || salaAtual.codigo;
+  const nome = nomeTvPonto(salaAtual) || salaAtual.nome || codigo;
+
+  const confirmar = window.confirm(`Apagar o ponto "${nome}"?\n\nA playlist vinculada a este ponto também deixará de aparecer no painel.`);
+  if (!confirmar) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABELA_SALAS)
+      .delete()
+      .eq("codigo", codigo);
+
+    if (error) throw error;
+
+    todosOsPontos = todosOsPontos.filter(item => normalizarCodigo(item.codigo_final || item.codigo) !== normalizarCodigo(codigo));
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    fecharModalEditarSala();
+
+    document.body.classList.remove("modo-sala");
+    const salaDetalhe = document.getElementById("salaDetalhe");
+    if (salaDetalhe) salaDetalhe.hidden = true;
+
+    if (grupoAtual) {
+      const pontosDoGrupo = todosOsPontos.filter(item => !ehRegistroPasta(item) && chaveGrupoPonto(item) === grupoAtual.chave);
+      renderizarTvsDoGrupo(grupoAtual, pontosDoGrupo);
+    } else {
+      atualizarPainelFiltrado();
+    }
+  } catch (erro) {
+    console.error("Erro ao apagar ponto:", erro);
+    alert("Não foi possível apagar este ponto.");
+  }
+}
+
 async function deletarTvGrupo(codigo) {
   if (!codigo) return;
 
@@ -2030,32 +2102,46 @@ async function adicionarItemBibliotecaNaSala() {
   const codigoAtual = salaAtual.codigo_final || salaAtual.codigo;
   const destinos = codigosDestinoBibliotecaSala(codigoAtual);
 
-  const nome = origemBibliotecaSala === "biblioteca"
-    ? (itemBibliotecaSelecionado.nome || itemBibliotecaSelecionado.arquivo_nome || "Arquivo da biblioteca")
-    : (itemBibliotecaSelecionado.tipo === "aviso" ? `Aviso: ${itemBibliotecaSelecionado.titulo || ""}` : `${itemBibliotecaSelecionado.artista || ""} — ${itemBibliotecaSelecionado.titulo || "RadioTV"}`);
-
-  const url = origemBibliotecaSala === "biblioteca"
-    ? (itemBibliotecaSelecionado.arquivo_url || itemBibliotecaSelecionado.capa_url || "")
-    : (itemBibliotecaSelecionado.url || "");
-
-  const tipo = origemBibliotecaSala === "biblioteca"
-    ? (`biblioteca_${itemBibliotecaSelecionado.tipo || "arquivo"}`)
-    : (`radiotv_${itemBibliotecaSelecionado.tipo || "item"}`);
-
-  const registros = destinos.map(codigo => ({
-    codigo_ponto: codigo,
-    nome: nome.trim() || "Item selecionado",
-    arquivo_url: url,
-    arquivo_nome: itemBibliotecaSelecionado.arquivo_nome || itemBibliotecaSelecionado.titulo || nome,
-    arquivo_tipo: tipo,
-    arquivo_tamanho: itemBibliotecaSelecionado.arquivo_tamanho || 0,
-    data_postagem: new Date().toISOString(),
-    data_encerramento: null,
-    status: "ativo",
-    ordem: materiaisDaSala(codigo).length + 1
-  }));
-
   try {
+    if (origemBibliotecaSala === "radiotv") {
+      const registrosRadioTv = destinos.map(codigo => ({
+        codigo_ponto: codigo,
+        radiotv_id: itemBibliotecaSelecionado.id,
+        ativo: true
+      }));
+
+      const { data, error } = await supabaseClient
+        .from("radiotv_salas")
+        .insert(registrosRadioTv)
+        .select("*, radiotv:radiotv_id(*)");
+
+      if (error) throw error;
+
+      todosRadioTvSalas = [...(data || registrosRadioTv), ...todosRadioTvSalas];
+      sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+      renderizarHistoricosSala();
+      setTexto("salaTotalRadioTv", radioTvDaSala(codigoAtual).length);
+      fecharModalBibliotecaSala();
+      return;
+    }
+
+    const nome = itemBibliotecaSelecionado.nome || itemBibliotecaSelecionado.arquivo_nome || "Arquivo da biblioteca";
+    const url = itemBibliotecaSelecionado.arquivo_url || itemBibliotecaSelecionado.capa_url || "";
+    const tipo = `biblioteca_${itemBibliotecaSelecionado.tipo || "arquivo"}`;
+
+    const registros = destinos.map(codigo => ({
+      codigo_ponto: codigo,
+      nome: nome.trim() || "Item selecionado",
+      arquivo_url: url,
+      arquivo_nome: itemBibliotecaSelecionado.arquivo_nome || nome,
+      arquivo_tipo: tipo,
+      arquivo_tamanho: itemBibliotecaSelecionado.arquivo_tamanho || 0,
+      data_postagem: new Date().toISOString(),
+      data_encerramento: null,
+      status: "ativo",
+      ordem: materiaisDaSala(codigo).length + 1
+    }));
+
     const { data, error } = await supabaseClient
       .from("materiais_salas")
       .insert(registros)
@@ -2070,6 +2156,9 @@ async function adicionarItemBibliotecaNaSala() {
     fecharModalBibliotecaSala();
   } catch (erro) {
     console.error("Erro ao adicionar item selecionado:", erro);
-    alert("Não foi possível adicionar este item na TV.");
+    alert(origemBibliotecaSala === "radiotv"
+      ? "Não foi possível vincular este item do RadioTV. Confira se a tabela radiotv_salas foi criada."
+      : "Não foi possível adicionar este item na TV.");
   }
 }
+
