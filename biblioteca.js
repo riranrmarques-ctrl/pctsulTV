@@ -435,3 +435,16 @@ async function carregarResumoSalas() {
     console.error("Erro ao carregar resumo:", erro);
   }
 }
+
+
+function gerarCapaSite(url) {
+  if (!url) return "";
+
+  try {
+    const dominio = new URL(url).hostname;
+
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(dominio)}&sz=128`;
+  } catch {
+    return "";
+  }
+}
