@@ -75,14 +75,10 @@ async function abrirModalArquivo(arquivo) {
 
   setTexto("nomeArquivoBiblioteca", arquivo.name);
   setTexto("detalheArquivoBiblioteca", `${tipo === "site" ? "Site TXT" : "Moldura PNG"} • ${formatarTamanho(arquivo.size)}`);
-  setValor("nomeBiblioteca", nomeArquivoSemExtensao(arquivo.name));
-  setValor("urlDetectadaBiblioteca", "");
 
-  const campoUrl = document.getElementById("campoUrlDetectada");
   const preview = document.getElementById("previewArquivoBiblioteca");
 
   if (preview) preview.innerHTML = tipo === "site" ? "TXT" : "PNG";
-  if (campoUrl) campoUrl.hidden = tipo !== "site";
 
   if (tipo === "site") {
     const texto = await arquivo.text();
@@ -133,7 +129,7 @@ async function salvarArquivoBiblioteca() {
   }
 
   const nome = getValor("nomeBiblioteca") || nomeArquivoSemExtensao(arquivoSelecionado.name);
-  const urlDigitada = getValor("urlDetectadaBiblioteca") || urlDetectadaTxt;
+const urlDigitada = urlDetectadaTxt;
 
   if (tipo === "site" && !urlDigitada) {
     alert("O TXT precisa conter uma URL ou você precisa informar a URL no campo.");
