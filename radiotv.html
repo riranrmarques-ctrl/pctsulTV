@@ -4,22 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PCTSUL | RadioTV</title>
-  <link rel="stylesheet" href="radiotv.css?v=1">
+  <link rel="stylesheet" href="radiotv.css?v=2">
 </head>
 <body>
+
 <div id="preloader" class="preloader">
-  <div class="preloader-conteudo"><img src="logoanimada.gif" alt="PC SUL" class="preloader-logo"></div>
+  <div class="preloader-conteudo">
+    <img src="logoanimada.gif" alt="PC SUL" class="preloader-logo">
+  </div>
 </div>
 
 <div class="dashboard-shell">
   <aside class="sidebar">
-    <div class="brand"><img src="logo.png" class="brand-logo" alt="PC SUL"></div>
+    <div class="brand">
+      <img src="logo.png" class="brand-logo" alt="PC SUL">
+    </div>
+
     <nav class="menu-lateral">
-      <a href="salas.html" class="menu-item"><span class="menu-icone"><svg viewBox="0 0 24 24"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><circle cx="12" cy="12" r="5"></circle></svg></span><span>Pontos</span></a>
-      <a href="usuarios.html" class="menu-item"><span class="menu-icone"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg></span><span>Usuarios</span></a>
-      <a href="biblioteca.html" class="menu-item"><span class="menu-icone"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h8"></path><path d="M8 12h8"></path><path d="M8 17h5"></path></svg></span><span>Biblioteca</span></a>
-      <a href="ativador.html" class="menu-item"><span class="menu-icone"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"></path></svg></span><span>Ativador</span></a>
-      <a href="radiotv.html" class="menu-item ativo"><span class="menu-icone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></span><span>RadioTv</span></a>
+      <a href="salas.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><circle cx="12" cy="12" r="5"></circle>
+          </svg>
+        </span>
+        <span>Pontos</span>
+      </a>
+
+      <a href="usuarios.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>
+        </span>
+        <span>Usuarios</span>
+      </a>
+
+      <a href="biblioteca.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h8"></path><path d="M8 12h8"></path><path d="M8 17h5"></path></svg>
+        </span>
+        <span>Biblioteca</span>
+      </a>
+
+      <a href="ativador.html" class="menu-item">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"></path></svg>
+        </span>
+        <span>Ativador</span>
+      </a>
+
+      <a href="radiotv.html" class="menu-item ativo">
+        <span class="menu-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+        </span>
+        <span>RadioTv</span>
+      </a>
     </nav>
 
     <div class="sidebar-spacer"></div>
@@ -33,9 +70,16 @@
     </section>
 
     <section class="usuario-card">
-      <div class="usuario-card-topo"><div class="usuario-card-texto"><span>Sessao ativa</span><strong>Administrador</strong></div></div>
+      <div class="usuario-card-topo">
+        <div class="usuario-card-texto">
+          <span>Sessao ativa</span>
+          <strong>Administrador</strong>
+        </div>
+      </div>
       <div class="usuario-status"><span></span>Acesso liberado</div>
-      <button type="button" onclick="window.location.href='salas.html'">Encerrar sessao <span>→</span></button>
+      <button type="button" onclick="window.location.href='salas.html'">
+        Encerrar sessao <span>→</span>
+      </button>
     </section>
   </aside>
 
@@ -43,19 +87,47 @@
     <header class="cabecalho-painel">
       <div class="cabecalho-texto">
         <h1>RadioTV</h1>
-        <p>Gerencie músicas, playlists, avisos de rodapé e transmissões ao vivo em tela cheia.</p>
+        <p>Gerencie músicas, links externos, avisos de rodapé e transmissões ao vivo em tela cheia.</p>
       </div>
-      <button id="btnAdicionarRadioTv" class="btn-adicionar" type="button">+ Adicionar</button>
+
+      <button id="btnAdicionarRadioTv" class="btn-adicionar" type="button">
+        + Adicionar
+      </button>
     </header>
 
     <section class="filtros-radiotv">
-      <label class="campo-busca"><span>⌕</span><input id="buscaRadioTv" type="search" placeholder="Buscar por título, artista, site ou aviso"></label>
-      <label class="campo-select"><span>Tipo</span><select id="filtroTipoRadioTv"><option value="todos">Todos</option><option value="musica">Música</option><option value="playlist">Playlist</option><option value="aviso">Aviso</option><option value="youtube_live">YouTube ao vivo</option></select></label>
-      <label class="campo-select"><span>Status</span><select id="filtroStatusRadioTv"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option></select></label>
+      <label class="campo-busca">
+        <span>⌕</span>
+        <input id="buscaRadioTv" type="search" placeholder="Buscar por título, artista, site ou aviso">
+      </label>
+
+      <label class="campo-select">
+        <span>Tipo</span>
+        <select id="filtroTipoRadioTv">
+          <option value="todos">Todos</option>
+          <option value="musica">Música</option>
+          <option value="link_externo">Link externo</option>
+          <option value="aviso">Aviso</option>
+          <option value="youtube_live">YouTube ao vivo</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Status</span>
+        <select id="filtroStatusRadioTv">
+          <option value="todos">Todos</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+        </select>
+      </label>
     </section>
 
     <section class="radiotv-box">
-      <div class="radiotv-topo"><h2>Lista RadioTV</h2><span id="contadorLista">0 itens</span></div>
+      <div class="radiotv-topo">
+        <h2>Lista RadioTV</h2>
+        <span id="contadorLista">0 itens</span>
+      </div>
+
       <div id="listaRadioTv" class="radiotv-lista"></div>
     </section>
 
@@ -65,37 +137,143 @@
 
 <div id="modalEscolherTipo" class="modal-radiotv" hidden>
   <div class="modal-card modal-tipos-card">
-    <div class="modal-topo"><h3>O que deseja adicionar?</h3><button id="btnFecharEscolhaTipo" type="button">×</button></div>
+    <div class="modal-topo">
+      <h3>O que deseja adicionar?</h3>
+      <button id="btnFecharEscolhaTipo" type="button">×</button>
+    </div>
+
     <div class="tipo-grid">
-      <button type="button" data-tipo="musica"><strong>Música</strong><span>Artista, música, site e URL</span></button>
-      <button type="button" data-tipo="playlist"><strong>Playlist</strong><span>Nome da playlist, site e URL</span></button>
-      <button type="button" data-tipo="aviso"><strong>Aviso</strong><span>Texto de rodapé com cores</span></button>
-      <button type="button" data-tipo="youtube_live"><strong>YouTube ao vivo</strong><span>Transmissão em tela cheia</span></button>
+      <button type="button" data-tipo="musica">
+        <strong>🎵 Música</strong>
+        <span>Upload interno de arquivo de áudio</span>
+      </button>
+      <button type="button" data-tipo="link_externo">
+        <strong>🔗 Link externo</strong>
+        <span>Cantor, música/álbum, site e URL</span>
+      </button>
+      <button type="button" data-tipo="aviso">
+        <strong>📢 Aviso</strong>
+        <span>Título, texto, cores e velocidade</span>
+      </button>
+      <button type="button" data-tipo="youtube_live">
+        <strong>📺 YouTube ao vivo</strong>
+        <span>Link com início e encerramento</span>
+      </button>
     </div>
   </div>
 </div>
 
 <div id="modalEditarRadioTv" class="modal-radiotv" hidden>
   <div class="modal-card">
-    <div class="modal-topo"><h3 id="modalTituloRadioTv">Adicionar item</h3><button id="btnFecharRadioTv" type="button">×</button></div>
+    <div class="modal-topo">
+      <h3 id="modalTituloRadioTv">Adicionar item</h3>
+      <button id="btnFecharRadioTv" type="button">×</button>
+    </div>
+
     <input id="radioTvId" type="hidden">
     <input id="radioTvTipo" type="hidden">
 
-    <div id="camposMidia" class="modal-grid">
-      <label class="campo-artista"><span>Artista / Cantor</span><input id="radioTvArtista" type="text" placeholder="Ex: Djavan"></label>
-      <label><span>Título / Música / Playlist</span><input id="radioTvTitulo" type="text" placeholder="Ex: Oceano"></label>
-      <label><span>Site / Plataforma</span><input id="radioTvSite" type="text" placeholder="Ex: YouTube, Spotify, Site externo"></label>
-      <label class="campo-largo"><span>URL</span><input id="radioTvUrl" type="url" placeholder="https://..."></label>
+    <div id="camposMusica" class="modal-grid" hidden>
+      <div class="arquivo-musica campo-largo">
+        <div>
+          <span>Arquivo de áudio</span>
+          <strong id="nomeArquivoMusica">Nenhum arquivo selecionado</strong>
+          <small>MP3, WAV, OGG ou M4A</small>
+        </div>
+        <button id="btnSelecionarMusica" type="button">Selecionar mídia</button>
+        <input id="inputArquivoMusica" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a" hidden>
+      </div>
+
+      <label>
+        <span>Cantor / Artista</span>
+        <input id="musicaArtista" type="text" placeholder="Ex: Djavan">
+      </label>
+
+      <label>
+        <span>Nome da música</span>
+        <input id="musicaTitulo" type="text" placeholder="Ex: Oceano">
+      </label>
+    </div>
+
+    <div id="camposLinkExterno" class="modal-grid" hidden>
+      <label>
+        <span>Cantor / Banda</span>
+        <input id="linkArtista" type="text" placeholder="Ex: Djavan">
+      </label>
+
+      <label>
+        <span>Música, álbum ou playlist</span>
+        <input id="linkTitulo" type="text" placeholder="Ex: Oceano">
+      </label>
+
+      <label>
+        <span>Site / Plataforma</span>
+        <input id="linkSite" type="text" placeholder="Ex: Spotify, YouTube Music">
+      </label>
+
+      <label class="campo-largo">
+        <span>URL</span>
+        <input id="linkUrl" type="url" placeholder="https://...">
+      </label>
     </div>
 
     <div id="camposAviso" class="modal-grid" hidden>
-      <label class="campo-largo"><span>Texto do aviso</span><input id="radioTvTextoAviso" type="text" placeholder="Ex: Bem-vindo ao PCTSUL"></label>
-      <label><span>Cor do fundo</span><input id="radioTvCorFundo" type="color" value="#000000"></label>
-      <label><span>Cor do texto</span><input id="radioTvCorTexto" type="color" value="#ffffff"></label>
+      <label>
+        <span>Título do aviso</span>
+        <input id="avisoTitulo" type="text" placeholder="Ex: Aviso importante">
+      </label>
+
+      <label>
+        <span>Velocidade do rolamento</span>
+        <select id="avisoVelocidade">
+          <option value="lenta">Lenta</option>
+          <option value="normal" selected>Normal</option>
+          <option value="rapida">Rápida</option>
+        </select>
+      </label>
+
+      <label class="campo-largo">
+        <span>Texto geral</span>
+        <input id="avisoTexto" type="text" placeholder="Ex: Bem-vindo ao PCTSUL">
+      </label>
+
+      <label>
+        <span>Cor do fundo da tag</span>
+        <input id="avisoCorFundo" type="color" value="#000000">
+      </label>
+
+      <label>
+        <span>Cor do texto</span>
+        <input id="avisoCorTexto" type="color" value="#ffffff">
+      </label>
     </div>
 
-    <div id="previewAviso" class="preview-aviso" hidden><span>Prévia do aviso</span><strong id="textoPreviewAviso">Bem-vindo ao PCTSUL</strong></div>
-    <label class="switch-linha"><span>Item ativo</span><input id="radioTvAtivo" type="checkbox" checked></label>
+    <div id="previewAviso" class="preview-aviso" hidden>
+      <span>Prévia do aviso</span>
+      <strong id="textoPreviewAviso">Bem-vindo ao PCTSUL</strong>
+    </div>
+
+    <div id="camposYoutubeLive" class="modal-grid" hidden>
+      <label class="campo-largo">
+        <span>Link da transmissão</span>
+        <input id="youtubeUrl" type="url" placeholder="https://www.youtube.com/watch?v=...">
+      </label>
+
+      <label>
+        <span>Exibir a partir de</span>
+        <input id="youtubeInicio" type="datetime-local">
+      </label>
+
+      <label>
+        <span>Encerrar em</span>
+        <input id="youtubeFim" type="datetime-local">
+      </label>
+    </div>
+
+    <label class="switch-linha">
+      <span>Item ativo</span>
+      <input id="radioTvAtivo" type="checkbox" checked>
+    </label>
 
     <div class="modal-acoes">
       <button id="btnCancelarRadioTv" type="button">Cancelar</button>
@@ -105,6 +283,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="radiotv.js?v=1"></script>
+<script src="radiotv.js?v=2"></script>
 </body>
 </html>
