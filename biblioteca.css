@@ -91,10 +91,22 @@ button:hover {
 }
 
 .menu-icone {
-  width: 20px;
-  text-align: center;
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 
+.menu-icone svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .sidebar-spacer {
   flex: 1;
 }
