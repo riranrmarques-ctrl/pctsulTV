@@ -449,3 +449,34 @@ function gerarCapaSite(url) {
     return "";
   }
 }
+
+async function renomearArquivoBiblioteca(id) {
+  const item = arquivosBiblioteca.find(arquivo => String(arquivo.id) === String(id));
+  if (!item) return;
+
+  const novoNome = prompt("Novo nome do arquivo:", item.nome || item.arquivo_nome || "");
+
+  if (novoNome === null) return;
+
+  const nomeFinal = novoNome.trim();
+
+  if (!nomeFinal) {
+    alert("Informe um nome válido.");
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABELA_BIBLIOTECA)
+      .update({ nome: nomeFinal })
+      .eq("id", id);
+
+    if (error) throw error;
+
+    item.nome = nomeFinal;
+    renderizarBiblioteca();
+  } catch (erro) {
+    console.error("Erro ao renomear:", erro);
+    alert("Não foi possível renomear o arquivo.");
+  }
+}
