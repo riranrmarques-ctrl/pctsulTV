@@ -320,18 +320,22 @@ function tipoLabel(tipo) {
 }
 
 function extrairUrlDoTexto(texto) {
-  const match = String(texto || "").match(/https?:\/\/[^\s]+/i);
-  return match ? match[0].trim() : "";
-}
+  const conteudo = String(texto || "");
 
-function gerarCapaSite(url) {
-  if (!url) return "";
-  try {
-    const dominio = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(dominio)}&sz=128`;
-  } catch {
-    return "";
+  const match = conteudo.match(/URL=(.+)/i);
+
+  if (!match) return "";
+
+  let url = match[1].trim();
+
+  if (
+    !url.startsWith("http://") &&
+    !url.startsWith("https://")
+  ) {
+    url = "https://" + url;
   }
+
+  return url;
 }
 
 function mensagemErroBiblioteca(erro) {
