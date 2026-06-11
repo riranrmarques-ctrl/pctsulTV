@@ -148,9 +148,15 @@ function configurarVoltarSala() {
 
   btnVoltar.addEventListener("click", () => {
     document.body.classList.remove("modo-sala");
+
     const salaDetalhe = document.getElementById("salaDetalhe");
     if (salaDetalhe) salaDetalhe.hidden = true;
-    grupoAtual = null;
+
+    const listaPontos = document.getElementById("listaPontos");
+    if (listaPontos) listaPontos.hidden = false;
+
+    // Se a TV foi aberta de dentro de uma pasta, volta para essa pasta.
+    // Se não tiver pasta atual, volta para a tela geral.
     atualizarRotuloBotaoNovo();
     atualizarPainelFiltrado();
   });
@@ -725,13 +731,10 @@ function renderizarGrupos(pontos) {
   grupos.forEach(grupo => {
     const imagem = imagemPonto(grupo.pontos[0]);
     const totalTvs = grupo.pontos.length;
-    const ativos = grupo.pontos.filter(p => p.status_final === "ativo").length;
-    const statusGrupo = ativos > 0 ? "ativo" : "inativo";
-
     lista.innerHTML += `
       <article class="point-card pasta-card" data-grupo="${escaparHtml(grupo.chave)}">
         <div class="card-topo">
-          <span class="status-pill ${classeStatusVisual(statusGrupo)}">${textoStatus(statusGrupo)}</span>
+          <span class="status-pill pasta-pill">Pasta</span>
           <span class="telas-topo">${totalTvs} ${totalTvs === 1 ? "TV" : "TVs"}</span>
         </div>
 
@@ -801,7 +804,6 @@ function renderizarTvsDoGrupo(grupo, pontos) {
       <article class="point-card tv-card" data-codigo="${escaparHtml(codigo)}">
         <div class="card-topo">
           <span class="status-pill ${classeStatusVisual(status)}">${textoStatus(status)}</span>
-          <span class="telas-topo">${midias} ${midias === 1 ? "mídia" : "mídias"}</span>
         </div>
 
         <img src="${escaparHtml(imagem)}" alt="${escaparHtml(nome)}" loading="lazy">
@@ -904,7 +906,7 @@ function abrirSala(ponto) {
   salaAtual = ponto;
 
   const nome = nomePonto(ponto);
-  const endereco = enderecoPonto(ponto);
+  const endereco = grupoAtual?.nome || nomeGrupoPonto(ponto) || enderecoPonto(ponto);
   const imagem = imagemPonto(ponto);
   const codigo = ponto.codigo_final || "------";
 

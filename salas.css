@@ -2646,3 +2646,21 @@ a,
   gap: 12px;
   align-items: center;
 }
+
+
+/* ===== V6 AJUSTES FINOS ===== */
+
+.pasta-pill {
+  background: #ffffff !important;
+  color: #050505 !important;
+  font-weight: 950;
+}
+
+.tv-card .telas-topo {
+  display: none !important;
+}
+
+.pasta-card .status-pill {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
