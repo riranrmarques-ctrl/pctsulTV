@@ -13,6 +13,7 @@ let urlDetectadaTxt = "";
 document.addEventListener("DOMContentLoaded", () => {
   configurarEventos();
   carregarBiblioteca();
+  carregarResumoSalas();
 });
 
 function configurarEventos() {
