@@ -1059,7 +1059,7 @@ function configurarAcoesMateriais() {
   document.querySelectorAll(".btn-renomear-material").forEach(botao => {
     botao.addEventListener("click", () => {
       animarBotao(botao);
-      renomearMaterial(botao.dataset.id);
+      editarMaterial(botao.dataset.id);
     });
   });
 
@@ -1078,30 +1078,74 @@ function configurarAcoesMateriais() {
   });
 }
 
-async function renomearMaterial(id) {
+async function editarMaterial(id) {
   const material = buscarMaterialPorId(id);
   if (!material) return;
 
   const nomeAtual = material.nome || material.arquivo_nome || "Material sem nome";
-  const novoNome = window.prompt("Novo nome do arquivo:", nomeAtual);
-  if (!novoNome || novoNome.trim() === nomeAtual) return;
+  const duracaoAtual = normalizarDuracaoMaterial(material.duracao || "00:30") || "00:30";
+  const vencimentoAtual = dataParaInputData(material.data_encerramento || material.data_fim || "");
+
+  const novoNome = window.prompt("Nome do arquivo:", nomeAtual);
+  if (novoNome === null) return;
+
+  const novoVencimento = window.prompt("Vencimento (AAAA-MM-DD):", vencimentoAtual);
+  if (novoVencimento === null) return;
+
+  const novaDuracaoBruta = window.prompt("Duração (MM:SS):", duracaoAtual);
+  if (novaDuracaoBruta === null) return;
+
+  const novaDuracao = normalizarDuracaoMaterial(novaDuracaoBruta);
+  if (!novaDuracao) {
+    alert("Informe a duração no formato 00:00. Os segundos precisam ficar entre 00 e 59.");
+    return;
+  }
+
+  const vencimentoFormatado = normalizarDataVencimentoMaterial(novoVencimento);
+  if (!vencimentoFormatado) {
+    alert("Informe o vencimento no formato AAAA-MM-DD.");
+    return;
+  }
+
+  const dadosAtualizados = {
+    nome: novoNome.trim() || nomeAtual,
+    data_encerramento: vencimentoFormatado,
+    duracao: novaDuracao
+  };
 
   try {
     const { error } = await supabaseClient
       .from("materiais_salas")
-      .update({ nome: novoNome.trim() })
+      .update(dadosAtualizados)
       .eq("id", id);
 
     if (error) throw error;
 
-    material.nome = novoNome.trim();
+    Object.assign(material, dadosAtualizados);
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
     renderizarPlaylistSala(material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo);
-    mostrarStatusFlutuante("Nome atualizado");
+    mostrarStatusFlutuante("Material atualizado");
   } catch (erro) {
-    console.error("Erro ao renomear material:", erro);
-    mostrarStatusFlutuante("Nao foi possivel renomear", "erro");
+    console.error("Erro ao editar material:", erro);
+    mostrarStatusFlutuante("Nao foi possivel editar", "erro");
   }
+}
+
+function dataParaInputData(valor) {
+  if (!valor) return "";
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return String(valor).slice(0, 10);
+  return data.toISOString().slice(0, 10);
+}
+
+function normalizarDataVencimentoMaterial(valor) {
+  const texto = String(valor || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) return "";
+
+  const data = new Date(`${texto}T23:59:00`);
+  if (Number.isNaN(data.getTime())) return "";
+
+  return `${texto}T23:59:00`;
 }
 
 async function baixarMaterial(id) {
@@ -1438,7 +1482,7 @@ function pingRecente(data) {
   const d = new Date(data);
   if (Number.isNaN(d.getTime())) return false;
 
-  const limiteOffline = 5 * 60 * 1000;
+  const limiteOffline = 12 * 60 * 1000;
   return Date.now() - d.getTime() <= limiteOffline;
 }
 
