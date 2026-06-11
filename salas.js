@@ -18,6 +18,11 @@ let salaAtual = null;
 let grupoAtual = null;
 let imagemSalaSelecionada = null;
 let materialSalaSelecionado = null;
+let pastaEditando = null;
+let origemBibliotecaSala = "biblioteca";
+let itemBibliotecaSelecionado = null;
+let itensBibliotecaSala = [];
+let itensRadioTvSala = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
@@ -28,6 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarNovoPonto();
   configurarAdicionarMaterial();
   configurarCopiarCodigoSala();
+  configurarModalPasta();
+  configurarBibliotecaSala();
+  atualizarRotuloBotaoNovo();
 });
 
 function iniciarLoginCentral() {
@@ -141,6 +149,8 @@ function configurarVoltarSala() {
     document.body.classList.remove("modo-sala");
     const salaDetalhe = document.getElementById("salaDetalhe");
     if (salaDetalhe) salaDetalhe.hidden = true;
+    grupoAtual = null;
+    atualizarRotuloBotaoNovo();
     atualizarPainelFiltrado();
   });
 }
@@ -189,21 +199,90 @@ function configurarEdicaoSala() {
 }
 
 async function criarNovoPonto() {
+  if (grupoAtual) {
+    return criarNovoPontoDentroDaPasta();
+  }
+
+  return criarNovaPasta();
+}
+
+async function criarNovaPasta() {
+  const btnNovoPonto = document.getElementById("btnNovoPonto");
+  const textoOriginal = btnNovoPonto ? btnNovoPonto.innerHTML : "";
+
+  const nome = window.prompt("Nome da nova pasta/sala:", "Nova sala");
+  if (nome === null) return;
+
+  const nomeFinal = nome.trim() || "Nova sala";
+  const predio = window.prompt("Subtexto / prédio:", "Prédio não informado");
+  if (predio === null) return;
+
+  const codigo = `PASTA_${gerarCodigoPonto()}`;
+
+  const novaPasta = {
+    codigo,
+    nome: nomeFinal,
+    grupo_nome: nomeFinal,
+    predio: predio.trim() || "Prédio não informado",
+    endereco: predio.trim() || "Prédio não informado",
+    imagem_url: "",
+    status: "pasta",
+    tipo_ponto: "pasta",
+    total_telas: 0,
+    disponivel: true,
+    eh_pasta: true
+  };
+
+  if (btnNovoPonto) {
+    btnNovoPonto.disabled = true;
+    btnNovoPonto.innerHTML = "<span>+</span> Criando...";
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(TABELA_SALAS)
+      .insert(novaPasta)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    const pastaCriada = combinarPontosComStatus([data || novaPasta])[0];
+
+    todosOsPontos = [pastaCriada, ...todosOsPontos];
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    atualizarPainelFiltrado();
+  } catch (erro) {
+    console.error("Erro ao criar pasta:", erro);
+    alert(mensagemErroNovoPonto(erro));
+  } finally {
+    if (btnNovoPonto) {
+      btnNovoPonto.disabled = false;
+      btnNovoPonto.innerHTML = textoOriginal || "<span>+</span> Nova pasta";
+    }
+  }
+}
+
+async function criarNovoPontoDentroDaPasta() {
+  if (!grupoAtual) return criarNovaPasta();
+
   const btnNovoPonto = document.getElementById("btnNovoPonto");
   const textoOriginal = btnNovoPonto ? btnNovoPonto.innerHTML : "";
   const codigo = gerarCodigoPonto();
+  const totalAtual = todosOsPontos.filter(ponto => !ehRegistroPasta(ponto) && chaveGrupoPonto(ponto) === grupoAtual.chave).length;
 
   const novoPonto = {
     codigo,
-    nome: "TV 01",
-    grupo_nome: "Nova sala",
-    predio: "Predio nao informado",
-    endereco: "Predio nao informado",
+    nome: `TV ${String(totalAtual + 1).padStart(2, "0")}`,
+    grupo_nome: grupoAtual.nome,
+    predio: grupoAtual.predio,
+    endereco: grupoAtual.predio,
     imagem_url: "",
     status: "cadastrado",
     tipo_ponto: "sala",
     total_telas: 0,
-    disponivel: true
+    disponivel: true,
+    eh_pasta: false
   };
 
   if (btnNovoPonto) {
@@ -221,10 +300,11 @@ async function criarNovoPonto() {
     if (error) throw error;
 
     const pontoCriado = combinarPontosComStatus([data || novoPonto])[0];
-
     todosOsPontos = [pontoCriado, ...todosOsPontos];
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
-    atualizarPainelFiltrado();
+
+    const pontosDoGrupo = todosOsPontos.filter(ponto => !ehRegistroPasta(ponto) && chaveGrupoPonto(ponto) === grupoAtual.chave);
+    renderizarTvsDoGrupo(grupoAtual, pontosDoGrupo);
     abrirSala(pontoCriado);
     abrirModalEditarSala();
   } catch (erro) {
@@ -567,7 +647,7 @@ function atualizarPainelFiltrado() {
   atualizarResumo(todosOsPontos);
 
   if (grupoAtual) {
-    const pontosDoGrupo = pontos.filter(ponto => chaveGrupoPonto(ponto) === grupoAtual.chave);
+    const pontosDoGrupo = pontos.filter(ponto => !ehRegistroPasta(ponto) && chaveGrupoPonto(ponto) === grupoAtual.chave);
     renderizarTvsDoGrupo(grupoAtual, pontosDoGrupo);
   } else {
     renderizarGrupos(pontos);
@@ -575,9 +655,10 @@ function atualizarPainelFiltrado() {
 }
 
 function atualizarResumo(pontos) {
-  const total = pontos.length;
-  const ativos = pontos.filter(p => p.status_final === "ativo").length;
-  const inativos = pontos.filter(p => p.status_final !== "ativo").length;
+  const pontosReais = pontos.filter(p => !ehRegistroPasta(p));
+  const total = pontosReais.length;
+  const ativos = pontosReais.filter(p => p.status_final === "ativo").length;
+  const inativos = pontosReais.filter(p => p.status_final !== "ativo").length;
 
   setTexto("totalPontosResumo", total);
   setTexto("pontosAtivosResumo", ativos);
@@ -638,11 +719,12 @@ function renderizarGrupos(pontos) {
 
         <img src="${escaparHtml(imagem)}" alt="${escaparHtml(grupo.nome)}" loading="lazy">
 
-        <h3>${escaparHtml(grupo.nome)}</h3>
+        <h3 class="texto-editavel pasta-titulo" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.nome)}</h3>
 
         <div class="card-info">
-          <p>${escaparHtml(grupo.predio)}</p>
+          <p class="texto-editavel pasta-subtexto" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.predio)}</p>
           <span class="codigo-pill">Pasta</span>
+          <button class="btn-mini-editar-pasta" type="button" data-grupo="${escaparHtml(grupo.chave)}">Editar</button>
         </div>
 
         <button class="btn-abrir-grupo" type="button" data-grupo="${escaparHtml(grupo.chave)}">
@@ -660,6 +742,16 @@ function renderizarGrupos(pontos) {
       if (!grupo) return;
       grupoAtual = { chave: grupo.chave, nome: grupo.nome, predio: grupo.predio };
       renderizarTvsDoGrupo(grupoAtual, grupo.pontos);
+      atualizarRotuloBotaoNovo();
+    });
+  });
+
+  lista.querySelectorAll(".pasta-titulo, .pasta-subtexto, .btn-mini-editar-pasta").forEach(elemento => {
+    elemento.addEventListener("click", event => {
+      event.stopPropagation();
+      const chave = elemento.dataset.grupo || "";
+      const grupo = grupos.find(item => item.chave === chave);
+      if (grupo) abrirModalEditarPasta(grupo);
     });
   });
 }
@@ -675,9 +767,9 @@ function renderizarTvsDoGrupo(grupo, pontos) {
       <button type="button" id="btnVoltarGrupos">← Voltar</button>
       <div>
         <h2>${escaparHtml(grupo.nome)}</h2>
-        <p>${escaparHtml(grupo.predio)}</p>
+        <p class="texto-editavel pasta-subtexto" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.predio)}</p>
       </div>
-      <strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong>
+      <div class="grupo-topbar-acoes"><button type="button" id="btnNovaTvGrupo">+ Novo ponto</button><strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong></div>
     </div>
   `;
 
@@ -718,8 +810,11 @@ function renderizarTvsDoGrupo(grupo, pontos) {
 
   document.getElementById("btnVoltarGrupos")?.addEventListener("click", () => {
     grupoAtual = null;
+    atualizarRotuloBotaoNovo();
     atualizarPainelFiltrado();
   });
+
+  document.getElementById("btnNovaTvGrupo")?.addEventListener("click", criarNovoPontoDentroDaPasta);
 
   lista.querySelectorAll(".btn-detalhes").forEach(botao => {
     botao.addEventListener("click", () => {
@@ -743,14 +838,28 @@ function agruparPontosPorSala(pontos) {
         chave,
         nome,
         predio,
+        pasta: null,
         pontos: []
       });
     }
 
-    mapa.get(chave).pontos.push(ponto);
+    const grupo = mapa.get(chave);
+
+    if (ehRegistroPasta(ponto)) {
+      grupo.pasta = ponto;
+      grupo.nome = nome;
+      grupo.predio = predio;
+    } else {
+      grupo.pontos.push(ponto);
+    }
   });
 
   return [...mapa.values()].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
+function ehRegistroPasta(ponto) {
+  const codigo = String(ponto?.codigo_final || ponto?.codigo || "").toUpperCase();
+  return ponto?.eh_pasta === true || ponto?.tipo_ponto === "pasta" || codigo.startsWith("PASTA_") || codigo.startsWith("PASTA-");
 }
 
 function chaveGrupoPonto(ponto) {
@@ -1644,4 +1753,279 @@ function escaparHtml(valor) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+
+function atualizarRotuloBotaoNovo() {
+  const btn = document.getElementById("btnNovoPonto");
+  if (!btn) return;
+  btn.innerHTML = grupoAtual ? "<span>+</span>Novo ponto" : "<span>+</span>Nova pasta";
+}
+
+function configurarModalPasta() {
+  document.getElementById("btnFecharEditarPasta")?.addEventListener("click", fecharModalEditarPasta);
+  document.getElementById("btnCancelarEditarPasta")?.addEventListener("click", fecharModalEditarPasta);
+  document.getElementById("btnSalvarEditarPasta")?.addEventListener("click", salvarEdicaoPasta);
+  document.getElementById("btnApagarPasta")?.addEventListener("click", apagarPastaAtual);
+}
+
+function abrirModalEditarPasta(grupo) {
+  pastaEditando = grupo;
+  setValor("editPastaNome", grupo.nome || "");
+  setValor("editPastaPredio", grupo.predio || "");
+  const modal = document.getElementById("modalEditarPasta");
+  if (modal) modal.hidden = false;
+}
+
+function fecharModalEditarPasta() {
+  pastaEditando = null;
+  const modal = document.getElementById("modalEditarPasta");
+  if (modal) modal.hidden = true;
+}
+
+async function salvarEdicaoPasta() {
+  if (!pastaEditando) return;
+
+  const nome = getValor("editPastaNome") || pastaEditando.nome;
+  const predio = getValor("editPastaPredio") || pastaEditando.predio;
+
+  const registrosGrupo = todosOsPontos.filter(ponto => chaveGrupoPonto(ponto) === pastaEditando.chave);
+  const codigos = registrosGrupo.map(ponto => ponto.codigo_final || ponto.codigo).filter(Boolean);
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABELA_SALAS)
+      .update({ grupo_nome: nome, predio, endereco: predio })
+      .in("codigo", codigos);
+
+    if (error) throw error;
+
+    todosOsPontos = todosOsPontos.map(ponto => {
+      if (!codigos.includes(ponto.codigo_final || ponto.codigo)) return ponto;
+      return { ...ponto, grupo_nome: nome, predio, endereco: predio };
+    });
+
+    if (grupoAtual && grupoAtual.chave === pastaEditando.chave) {
+      grupoAtual = { chave: normalizarBusca(`${nome}-${predio}`), nome, predio };
+    }
+
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    fecharModalEditarPasta();
+    atualizarPainelFiltrado();
+  } catch (erro) {
+    console.error("Erro ao editar pasta:", erro);
+    alert("Não foi possível editar a pasta.");
+  }
+}
+
+async function apagarPastaAtual() {
+  if (!pastaEditando) return;
+
+  const registrosGrupo = todosOsPontos.filter(ponto => chaveGrupoPonto(ponto) === pastaEditando.chave);
+  const codigos = registrosGrupo.map(ponto => ponto.codigo_final || ponto.codigo).filter(Boolean);
+  const totalTvs = registrosGrupo.filter(ponto => !ehRegistroPasta(ponto)).length;
+
+  const confirmar = window.confirm(`Apagar a pasta "${pastaEditando.nome}"?\n\nIsso também remove ${totalTvs} TV(s) desta pasta.`);
+  if (!confirmar) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABELA_SALAS)
+      .delete()
+      .in("codigo", codigos);
+
+    if (error) throw error;
+
+    todosOsPontos = todosOsPontos.filter(ponto => !codigos.includes(ponto.codigo_final || ponto.codigo));
+    grupoAtual = null;
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    fecharModalEditarPasta();
+    atualizarRotuloBotaoNovo();
+    atualizarPainelFiltrado();
+  } catch (erro) {
+    console.error("Erro ao apagar pasta:", erro);
+    alert("Não foi possível apagar a pasta.");
+  }
+}
+
+function configurarBibliotecaSala() {
+  document.getElementById("btnAbrirBibliotecaSala")?.addEventListener("click", abrirModalBibliotecaSala);
+  document.getElementById("btnFecharBibliotecaSala")?.addEventListener("click", fecharModalBibliotecaSala);
+  document.getElementById("btnCancelarBibliotecaSala")?.addEventListener("click", fecharModalBibliotecaSala);
+  document.getElementById("btnConfirmarBibliotecaSala")?.addEventListener("click", adicionarItemBibliotecaNaSala);
+  document.getElementById("buscaBibliotecaSala")?.addEventListener("input", renderizarListaBibliotecaSala);
+
+  document.querySelectorAll(".biblioteca-tabs button").forEach(botao => {
+    botao.addEventListener("click", () => {
+      origemBibliotecaSala = botao.dataset.origem || "biblioteca";
+      document.querySelectorAll(".biblioteca-tabs button").forEach(b => b.classList.remove("ativo"));
+      botao.classList.add("ativo");
+      itemBibliotecaSelecionado = null;
+      renderizarListaBibliotecaSala();
+    });
+  });
+}
+
+async function abrirModalBibliotecaSala() {
+  if (!salaAtual) {
+    alert("Abra uma TV antes de adicionar itens da biblioteca.");
+    return;
+  }
+
+  const modal = document.getElementById("modalBibliotecaSala");
+  if (modal) modal.hidden = false;
+
+  renderizarDestinosBibliotecaSala();
+
+  try {
+    const [bib, radio] = await Promise.all([
+      supabaseClient.from("biblioteca").select("*").order("created_at", { ascending: false }),
+      supabaseClient.from("radiotv").select("*").order("created_at", { ascending: false })
+    ]);
+
+    if (!bib.error) itensBibliotecaSala = bib.data || [];
+    if (!radio.error) itensRadioTvSala = radio.data || [];
+
+    renderizarListaBibliotecaSala();
+  } catch (erro) {
+    console.error("Erro ao carregar biblioteca/RadioTV:", erro);
+    renderizarListaBibliotecaSala();
+  }
+}
+
+function fecharModalBibliotecaSala() {
+  itemBibliotecaSelecionado = null;
+  setValor("buscaBibliotecaSala", "");
+  const modal = document.getElementById("modalBibliotecaSala");
+  if (modal) modal.hidden = true;
+}
+
+function renderizarListaBibliotecaSala() {
+  const lista = document.getElementById("listaBibliotecaSala");
+  if (!lista) return;
+
+  const busca = normalizarBusca(getValor("buscaBibliotecaSala"));
+  const itens = origemBibliotecaSala === "biblioteca" ? itensBibliotecaSala : itensRadioTvSala;
+
+  const filtrados = itens.filter(item => {
+    const texto = normalizarBusca(`${item.nome || ""} ${item.titulo || ""} ${item.artista || ""} ${item.site || ""} ${item.arquivo_nome || ""} ${item.tipo || ""}`);
+    return !busca || texto.includes(busca);
+  });
+
+  if (!filtrados.length) {
+    lista.innerHTML = `<div class="playlist-vazia">Nenhum item encontrado.</div>`;
+    return;
+  }
+
+  lista.innerHTML = filtrados.map(item => {
+    const id = String(item.id);
+    const nome = origemBibliotecaSala === "biblioteca"
+      ? (item.nome || item.arquivo_nome || "Arquivo")
+      : (item.tipo === "musica" || item.tipo === "link_externo" ? `${item.artista || ""} — ${item.titulo || ""}` : item.titulo || item.texto_aviso || "RadioTV");
+    const sub = origemBibliotecaSala === "biblioteca"
+      ? (item.tipo || item.arquivo_nome || "Biblioteca")
+      : (item.site || item.tipo || "RadioTV");
+
+    return `
+      <button type="button" class="biblioteca-item-select ${itemBibliotecaSelecionado?.id == item.id ? "selecionado" : ""}" data-id="${escaparHtml(id)}">
+        <strong>${escaparHtml(nome)}</strong>
+        <span>${escaparHtml(sub)}</span>
+      </button>
+    `;
+  }).join("");
+
+  lista.querySelectorAll(".biblioteca-item-select").forEach(botao => {
+    botao.addEventListener("click", () => {
+      const id = botao.dataset.id || "";
+      itemBibliotecaSelecionado = filtrados.find(item => String(item.id) === String(id));
+      renderizarListaBibliotecaSala();
+    });
+  });
+}
+
+function renderizarDestinosBibliotecaSala() {
+  const container = document.getElementById("bibliotecaSalasExtras");
+  if (!container || !salaAtual) return;
+
+  const codigoAtual = normalizarCodigo(salaAtual.codigo_final || salaAtual.codigo || "");
+  const chave = chaveGrupoPonto(salaAtual);
+  const tvsDaPasta = todosOsPontos.filter(ponto => !ehRegistroPasta(ponto) && chaveGrupoPonto(ponto) === chave && normalizarCodigo(ponto.codigo_final || ponto.codigo || "") !== codigoAtual);
+
+  if (!tvsDaPasta.length) {
+    container.innerHTML = `<div class="material-salas-vazia">Nenhuma outra TV nesta sala.</div>`;
+    return;
+  }
+
+  container.innerHTML = tvsDaPasta.map(ponto => {
+    const codigo = ponto.codigo_final || ponto.codigo || "";
+    return `
+      <label>
+        <input type="checkbox" value="${escaparHtml(codigo)}">
+        <strong>${escaparHtml(nomeTvPonto(ponto))}</strong>
+        <span>${escaparHtml(codigo)}</span>
+      </label>
+    `;
+  }).join("");
+}
+
+function codigosDestinoBibliotecaSala(codigoAtual) {
+  const codigos = [codigoAtual];
+  document.querySelectorAll("#bibliotecaSalasExtras input:checked").forEach(input => {
+    const codigo = String(input.value || "").trim();
+    if (codigo && !codigos.includes(codigo)) codigos.push(codigo);
+  });
+  return codigos;
+}
+
+async function adicionarItemBibliotecaNaSala() {
+  if (!salaAtual || !itemBibliotecaSelecionado) {
+    alert("Selecione um item para adicionar.");
+    return;
+  }
+
+  const codigoAtual = salaAtual.codigo_final || salaAtual.codigo;
+  const destinos = codigosDestinoBibliotecaSala(codigoAtual);
+
+  const nome = origemBibliotecaSala === "biblioteca"
+    ? (itemBibliotecaSelecionado.nome || itemBibliotecaSelecionado.arquivo_nome || "Arquivo da biblioteca")
+    : (itemBibliotecaSelecionado.tipo === "aviso" ? `Aviso: ${itemBibliotecaSelecionado.titulo || ""}` : `${itemBibliotecaSelecionado.artista || ""} — ${itemBibliotecaSelecionado.titulo || "RadioTV"}`);
+
+  const url = origemBibliotecaSala === "biblioteca"
+    ? (itemBibliotecaSelecionado.arquivo_url || itemBibliotecaSelecionado.capa_url || "")
+    : (itemBibliotecaSelecionado.url || "");
+
+  const tipo = origemBibliotecaSala === "biblioteca"
+    ? (`biblioteca_${itemBibliotecaSelecionado.tipo || "arquivo"}`)
+    : (`radiotv_${itemBibliotecaSelecionado.tipo || "item"}`);
+
+  const registros = destinos.map(codigo => ({
+    codigo_ponto: codigo,
+    nome: nome.trim() || "Item selecionado",
+    arquivo_url: url,
+    arquivo_nome: itemBibliotecaSelecionado.arquivo_nome || itemBibliotecaSelecionado.titulo || nome,
+    arquivo_tipo: tipo,
+    arquivo_tamanho: itemBibliotecaSelecionado.arquivo_tamanho || 0,
+    data_postagem: new Date().toISOString(),
+    data_encerramento: null,
+    status: "ativo",
+    ordem: materiaisDaSala(codigo).length + 1
+  }));
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("materiais_salas")
+      .insert(registros)
+      .select("*");
+
+    if (error) throw error;
+
+    todosOsMateriais = [...(data || registros), ...todosOsMateriais];
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+    renderizarPlaylistSala(codigoAtual);
+    setTexto("salaTotalMidias", materiaisDaSala(codigoAtual).length);
+    fecharModalBibliotecaSala();
+  } catch (erro) {
+    console.error("Erro ao adicionar item selecionado:", erro);
+    alert("Não foi possível adicionar este item na TV.");
+  }
 }

@@ -208,7 +208,7 @@
       <label class="campo-select"><span>Status</span><select id="filtroStatus"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option><option value="desativado">Desativados</option></select></label>
       <label class="campo-select"><span>Tipo de ponto</span><select id="filtroTipo"><option value="todos">Todos</option><option value="academia">Academia</option><option value="campus">Campus</option><option value="loja">Loja</option></select></label>
       <label class="campo-select"><span>Ordenar por</span><select id="ordenarPontos"><option value="recentes">Mais recentes</option><option value="nome">Nome</option><option value="status">Status</option></select></label>
-      <button id="btnNovoPonto" class="btn-novo-ponto" type="button"><span>+</span>Novo ponto</button>
+      <button id="btnNovoPonto" class="btn-novo-ponto" type="button"><span>+</span>Nova pasta</button>
     </section>
 
     <section id="listaPontos" class="pontos-box"></section>
@@ -234,7 +234,7 @@
           </div>
           <div class="sala-acoes">
             <button id="btnEditarSala" type="button">Editar</button>
-            <a href="biblioteca.html" class="button-link">Biblioteca</a>
+            <button id="btnAbrirBibliotecaSala" type="button" class="btn-biblioteca-sala">Biblioteca</button>
             <button id="btnAdicionarMaterial" type="button" class="btn-upgrade-sala">Adicionar material</button>
             <input id="inputMaterialSala" type="file" accept="video/*,image/*,.txt,text/plain" hidden>
           </div>
@@ -275,7 +275,38 @@
   </div>
 </div>
 
+
+<div id="modalEditarPasta" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card">
+    <div class="modal-editar-topo"><h3>Editar pasta</h3><button id="btnFecharEditarPasta" type="button">×</button></div>
+    <div class="modal-editar-grid">
+      <label><span>Nome da sala/pasta</span><input id="editPastaNome" type="text" placeholder="Ex: Coworking"></label>
+      <label><span>Subtexto / prédio</span><input id="editPastaPredio" type="text" placeholder="Ex: Bloco A"></label>
+    </div>
+    <div class="modal-editar-acoes modal-pasta-acoes">
+      <button id="btnApagarPasta" type="button" class="btn-apagar-pasta">Apagar pasta</button>
+      <span></span>
+      <button id="btnCancelarEditarPasta" type="button">Cancelar</button>
+      <button id="btnSalvarEditarPasta" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalBibliotecaSala" class="modal-editar-sala" hidden>
+  <div class="modal-editar-card modal-biblioteca-card">
+    <div class="modal-editar-topo"><h3>Adicionar da Biblioteca / RadioTV</h3><button id="btnFecharBibliotecaSala" type="button">×</button></div>
+    <div class="biblioteca-tabs">
+      <button type="button" class="ativo" data-origem="biblioteca">Biblioteca</button>
+      <button type="button" data-origem="radiotv">RadioTV</button>
+    </div>
+    <label class="campo-busca-modal"><span>Buscar</span><input id="buscaBibliotecaSala" type="search" placeholder="Buscar arquivo ou RadioTV"></label>
+    <div id="listaBibliotecaSala" class="lista-biblioteca-sala"></div>
+    <div class="material-destinos"><span>Adicionar tambem para outras TVs desta sala</span><div id="bibliotecaSalasExtras" class="material-salas-extras"></div></div>
+    <div class="modal-editar-acoes"><button id="btnCancelarBibliotecaSala" type="button">Cancelar</button><button id="btnConfirmarBibliotecaSala" type="button">Adicionar selecionado</button></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="salas.js?v=300"></script>
+<script src="salas.js?v=400"></script>
 </body>
 </html>

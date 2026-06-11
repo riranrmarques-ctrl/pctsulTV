@@ -2147,3 +2147,194 @@ body,
     text-align: left;
   }
 }
+
+/* Ajustes de pastas/subsalas */
+body {
+  user-select: none;
+}
+
+input,
+textarea,
+select,
+button,
+.texto-editavel {
+  user-select: text;
+}
+
+.btn-novo-ponto {
+  white-space: nowrap;
+}
+
+.pasta-titulo,
+.pasta-subtexto {
+  cursor: pointer;
+}
+
+.pasta-titulo:hover,
+.pasta-subtexto:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.btn-mini-editar-pasta {
+  margin-left: 8px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: #050505;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.grupo-topbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.grupo-topbar-acoes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#btnNovaTvGrupo {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #050505;
+  font-weight: 900;
+}
+
+.modal-pasta-acoes {
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+}
+
+.btn-apagar-pasta {
+  border: 0 !important;
+  background: rgba(239, 61, 61, .16) !important;
+  color: #ff5f5f !important;
+}
+
+/* Botão Biblioteca dentro da TV */
+.btn-biblioteca-sala {
+  min-height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #050505;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.btn-biblioteca-sala:hover {
+  background: #f3f3f3;
+}
+
+/* Mini página Biblioteca / RadioTV dentro da TV */
+.modal-biblioteca-card {
+  width: min(720px, 96vw);
+}
+
+.biblioteca-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.biblioteca-tabs button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  font-weight: 900;
+}
+
+.biblioteca-tabs button.ativo {
+  background: #fff;
+  color: #050505;
+}
+
+.campo-busca-modal {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.campo-busca-modal span {
+  color: #aeb5bd;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.campo-busca-modal input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  outline: 0;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+
+.lista-biblioteca-sala {
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 16px;
+}
+
+.biblioteca-item-select {
+  width: 100%;
+  min-height: 58px;
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 12px;
+  background: rgba(255,255,255,.05);
+  color: #fff;
+  text-align: left;
+}
+
+.biblioteca-item-select strong {
+  font-size: 14px;
+}
+
+.biblioteca-item-select span {
+  color: #aeb5bd;
+  font-size: 12px;
+}
+
+.biblioteca-item-select.selecionado {
+  border-color: #fff;
+  background: rgba(255,255,255,.16);
+}
+
+@media (max-width: 720px) {
+  .grupo-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grupo-topbar-acoes {
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .modal-pasta-acoes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
