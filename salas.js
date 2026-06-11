@@ -1096,7 +1096,7 @@ function configurarAcoesMateriais() {
   });
 }
 
-async function editarMaterial(id) {
+function editarMaterial(id) {
   const material = buscarMaterialPorId(id);
   if (!material) return;
 
@@ -1104,31 +1104,51 @@ async function editarMaterial(id) {
   const duracaoAtual = normalizarDuracaoMaterial(material.duracao || "00:30") || "00:30";
   const vencimentoAtual = dataParaInputData(material.data_encerramento || material.data_fim || "");
 
-  const novoNome = window.prompt("Nome do arquivo:", nomeAtual);
-  if (novoNome === null) return;
+  setValor("editMaterialNome", nomeAtual);
+  setValor("editMaterialVencimento", vencimentoAtual);
+  setValor("editMaterialDuracao", duracaoAtual);
 
-  const novoVencimento = window.prompt("Vencimento (AAAA-MM-DD):", vencimentoAtual);
-  if (novoVencimento === null) return;
+  const modal = document.getElementById("modalEditarMaterial");
+  if (modal) {
+    modal.dataset.id = String(id);
+    modal.hidden = false;
+  }
+}
 
-  const novaDuracaoBruta = window.prompt("Duração (MM:SS):", duracaoAtual);
-  if (novaDuracaoBruta === null) return;
+function fecharModalEditarMaterial() {
+  const modal = document.getElementById("modalEditarMaterial");
+  if (!modal) return;
 
-  const novaDuracao = normalizarDuracaoMaterial(novaDuracaoBruta);
-  if (!novaDuracao) {
-    alert("Informe a duração no formato 00:00. Os segundos precisam ficar entre 00 e 59.");
+  modal.hidden = true;
+  modal.dataset.id = "";
+}
+
+async function salvarEdicaoMaterial() {
+  const modal = document.getElementById("modalEditarMaterial");
+  const id = modal?.dataset.id || "";
+  const material = buscarMaterialPorId(id);
+
+  if (!material) return;
+
+  const nomeAtual = material.nome || material.arquivo_nome || "Material sem nome";
+  const novoNome = getValor("editMaterialNome") || nomeAtual;
+  const vencimento = getValor("editMaterialVencimento");
+  const duracao = normalizarDuracaoMaterial(getValor("editMaterialDuracao"));
+
+  if (!vencimento) {
+    alert("Informe o vencimento.");
     return;
   }
 
-  const vencimentoFormatado = normalizarDataVencimentoMaterial(novoVencimento);
-  if (!vencimentoFormatado) {
-    alert("Informe o vencimento no formato AAAA-MM-DD.");
+  if (!duracao) {
+    alert("Informe a duração no formato 00:00.");
     return;
   }
 
   const dadosAtualizados = {
-    nome: novoNome.trim() || nomeAtual,
-    data_encerramento: vencimentoFormatado,
-    duracao: novaDuracao
+    nome: novoNome.trim(),
+    data_encerramento: `${vencimento}T23:59:00`,
+    duracao
   };
 
   try {
@@ -1141,7 +1161,10 @@ async function editarMaterial(id) {
 
     Object.assign(material, dadosAtualizados);
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
-    renderizarPlaylistSala(material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo);
+
+    const codigo = material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo;
+    renderizarPlaylistSala(codigo);
+    fecharModalEditarMaterial();
     mostrarStatusFlutuante("Material atualizado");
   } catch (erro) {
     console.error("Erro ao editar material:", erro);
