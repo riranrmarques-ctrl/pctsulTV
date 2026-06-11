@@ -2338,3 +2338,110 @@ button,
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== AJUSTES V3: PASTAS / TVs ===== */
+* {
+  caret-color: transparent;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  caret-color: auto;
+  user-select: text;
+}
+
+button,
+a,
+.point-card,
+.pasta-card,
+.tv-card,
+.card-info,
+.card-topo,
+.grupo-topbar,
+.btn-abrir-grupo,
+.btn-detalhes {
+  user-select: none !important;
+}
+
+.pasta-card .pasta-titulo,
+.pasta-card .pasta-subtexto {
+  cursor: default;
+  text-decoration: none !important;
+}
+
+.grupo-topbar-textos {
+  cursor: pointer;
+  flex: 1;
+}
+
+.grupo-topbar-textos:hover h2,
+.grupo-topbar-textos:hover p {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.grupo-topbar-acoes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.grupo-topbar-acoes button,
+.btn-voltar-grupos {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #050505;
+  font-weight: 900;
+}
+
+.grupo-topbar-acoes .btn-perigo-grupo {
+  background: rgba(239, 61, 61, .18);
+  color: #ff5f5f;
+}
+
+.btn-delete-tv {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(239,61,61,.14);
+  color: #ef3d3d;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.btn-delete-tv:hover {
+  background: #ef3d3d;
+  color: #ffffff;
+}
+
+.btn-biblioteca-sala {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border: none !important;
+  border-radius: 10px;
+  background: #ffffff !important;
+  color: #050505 !important;
+  font-weight: 900;
+  text-decoration: none !important;
+}
+
+@media (max-width: 780px) {
+  .grupo-topbar-acoes {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

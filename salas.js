@@ -719,12 +719,11 @@ function renderizarGrupos(pontos) {
 
         <img src="${escaparHtml(imagem)}" alt="${escaparHtml(grupo.nome)}" loading="lazy">
 
-        <h3 class="texto-editavel pasta-titulo" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.nome)}</h3>
+        <h3 class="pasta-titulo">${escaparHtml(grupo.nome)}</h3>
 
         <div class="card-info">
-          <p class="texto-editavel pasta-subtexto" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.predio)}</p>
+          <p class="pasta-subtexto">${escaparHtml(grupo.predio)}</p>
           <span class="codigo-pill">Pasta</span>
-          <button class="btn-mini-editar-pasta" type="button" data-grupo="${escaparHtml(grupo.chave)}">Editar</button>
         </div>
 
         <button class="btn-abrir-grupo" type="button" data-grupo="${escaparHtml(grupo.chave)}">
@@ -746,14 +745,7 @@ function renderizarGrupos(pontos) {
     });
   });
 
-  lista.querySelectorAll(".pasta-titulo, .pasta-subtexto, .btn-mini-editar-pasta").forEach(elemento => {
-    elemento.addEventListener("click", event => {
-      event.stopPropagation();
-      const chave = elemento.dataset.grupo || "";
-      const grupo = grupos.find(item => item.chave === chave);
-      if (grupo) abrirModalEditarPasta(grupo);
-    });
-  });
+
 }
 
 function renderizarTvsDoGrupo(grupo, pontos) {
@@ -764,12 +756,16 @@ function renderizarTvsDoGrupo(grupo, pontos) {
 
   lista.innerHTML = `
     <div class="grupo-topbar">
-      <button type="button" id="btnVoltarGrupos">← Voltar</button>
-      <div>
+      <button type="button" id="btnVoltarGrupos" class="btn-voltar-grupos">Voltar</button>
+      <div class="grupo-topbar-textos" id="btnEditarPastaTopbar" title="Editar nome e subtexto da pasta">
         <h2>${escaparHtml(grupo.nome)}</h2>
-        <p class="texto-editavel pasta-subtexto" data-grupo="${escaparHtml(grupo.chave)}" title="Clique para editar">${escaparHtml(grupo.predio)}</p>
+        <p>${escaparHtml(grupo.predio)}</p>
       </div>
-      <div class="grupo-topbar-acoes"><button type="button" id="btnNovaTvGrupo">+ Novo ponto</button><strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong></div>
+      <div class="grupo-topbar-acoes">
+        <button type="button" id="btnEditarPastaGrupo">Editar pasta</button>
+        <button type="button" id="btnExcluirPastaGrupo" class="btn-perigo-grupo">Excluir pasta</button>
+        <strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong>
+      </div>
     </div>
   `;
 
@@ -798,6 +794,7 @@ function renderizarTvsDoGrupo(grupo, pontos) {
         <div class="card-info">
           <p>${escaparHtml(ponto.descricao_tv || ponto.tipo_tv || nomePonto(ponto))}</p>
           <span class="codigo-pill">${escaparHtml(codigo)}</span>
+          <button class="btn-delete-tv" type="button" data-codigo="${escaparHtml(codigo)}" title="Excluir TV">×</button>
         </div>
 
         <button class="btn-detalhes" type="button" data-codigo="${escaparHtml(codigo)}">
@@ -814,13 +811,25 @@ function renderizarTvsDoGrupo(grupo, pontos) {
     atualizarPainelFiltrado();
   });
 
-  document.getElementById("btnNovaTvGrupo")?.addEventListener("click", criarNovoPontoDentroDaPasta);
+  document.getElementById("btnEditarPastaTopbar")?.addEventListener("click", () => abrirModalEditarPasta(grupo));
+  document.getElementById("btnEditarPastaGrupo")?.addEventListener("click", () => abrirModalEditarPasta(grupo));
+  document.getElementById("btnExcluirPastaGrupo")?.addEventListener("click", () => {
+    abrirModalEditarPasta(grupo);
+    apagarPastaAtual();
+  });
 
   lista.querySelectorAll(".btn-detalhes").forEach(botao => {
     botao.addEventListener("click", () => {
       const codigo = botao.dataset.codigo || "";
       const ponto = todosOsPontos.find(item => normalizarCodigo(item.codigo_final) === normalizarCodigo(codigo));
       if (ponto) abrirSala(ponto);
+    });
+  });
+
+  lista.querySelectorAll(".btn-delete-tv").forEach(botao => {
+    botao.addEventListener("click", event => {
+      event.stopPropagation();
+      deletarTvGrupo(botao.dataset.codigo || "");
     });
   });
 }
@@ -1759,7 +1768,7 @@ function escaparHtml(valor) {
 function atualizarRotuloBotaoNovo() {
   const btn = document.getElementById("btnNovoPonto");
   if (!btn) return;
-  btn.innerHTML = grupoAtual ? "<span>+</span>Novo ponto" : "<span>+</span>Nova pasta";
+  btn.innerHTML = grupoAtual ? "<span>+</span> Novo ponto" : "<span>+</span> Nova pasta";
 }
 
 function configurarModalPasta() {
@@ -1845,6 +1854,41 @@ async function apagarPastaAtual() {
   } catch (erro) {
     console.error("Erro ao apagar pasta:", erro);
     alert("Não foi possível apagar a pasta.");
+  }
+}
+
+
+async function deletarTvGrupo(codigo) {
+  if (!codigo) return;
+
+  const ponto = todosOsPontos.find(item => normalizarCodigo(item.codigo_final || item.codigo) === normalizarCodigo(codigo));
+  const nome = ponto ? (nomeTvPonto(ponto) || ponto.nome || codigo) : codigo;
+
+  const confirmar = window.confirm(`Deseja apagar a TV "${nome}"?
+
+A playlist vinculada a esta TV também deixará de aparecer no painel.`);
+  if (!confirmar) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABELA_SALAS)
+      .delete()
+      .eq("codigo", codigo);
+
+    if (error) throw error;
+
+    todosOsPontos = todosOsPontos.filter(item => normalizarCodigo(item.codigo_final || item.codigo) !== normalizarCodigo(codigo));
+    sessionStorage.removeItem(CACHE_CENTRAL_KEY);
+
+    if (grupoAtual) {
+      const pontosDoGrupo = todosOsPontos.filter(item => !ehRegistroPasta(item) && chaveGrupoPonto(item) === grupoAtual.chave);
+      renderizarTvsDoGrupo(grupoAtual, pontosDoGrupo);
+    } else {
+      atualizarPainelFiltrado();
+    }
+  } catch (erro) {
+    console.error("Erro ao apagar TV:", erro);
+    alert("Não foi possível apagar esta TV.");
   }
 }
 
