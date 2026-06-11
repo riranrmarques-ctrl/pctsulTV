@@ -2173,3 +2173,18 @@ async function adicionarItemBibliotecaNaSala() {
   }
 }
 
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const loading = document.getElementById("loadingScreen");
+
+    if (!loading) return;
+
+    loading.classList.add("ocultar");
+
+    setTimeout(() => {
+      loading.remove();
+    }, 400);
+
+  }, 1200);
+});
+
