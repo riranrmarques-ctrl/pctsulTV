@@ -275,6 +275,35 @@
   </div>
 </div>
 
+  <div id="modalEditarMaterial" class="modal-editar-material" hidden>
+  <div class="modal-editar-material-card">
+    <div class="modal-editar-material-topo">
+      <h3>Editar material</h3>
+      <button id="btnFecharEditarMaterial" type="button">×</button>
+    </div>
+
+    <label>
+      <span>Nome do arquivo</span>
+      <input id="editMaterialNome" type="text">
+    </label>
+
+    <label>
+      <span>Vencimento</span>
+      <input id="editMaterialVencimento" type="date">
+    </label>
+
+    <label>
+      <span>Duração</span>
+      <input id="editMaterialDuracao" type="text" maxlength="5" placeholder="00:30">
+    </label>
+
+    <div class="modal-editar-material-acoes">
+      <button id="btnCancelarEditarMaterial" type="button">Cancelar</button>
+      <button id="btnSalvarEditarMaterial" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="salas.js?v=205"></script>
 </body>
