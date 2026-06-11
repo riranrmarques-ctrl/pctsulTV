@@ -563,7 +563,7 @@ async function carregarcentralpainel(opcoes = {}) {
 
     const respostaRadioTvSalas = await supabaseClient
       .from("radiotv_salas")
-      .select("*, radiotv:radiotv_id(*)");
+      .select("*");
 
     if (respostaRadioTvSalas.error) {
       console.warn("RadioTV vinculado nao carregou:", respostaRadioTvSalas.error);
