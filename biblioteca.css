@@ -579,3 +579,53 @@ button:hover {
     width: 100%;
   }
 }
+
+.campo-select {
+  position: relative;
+  min-height: 48px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 10px;
+  background: rgba(255,255,255,.045);
+  overflow: hidden;
+}
+
+.campo-select::after {
+  content: "⌄";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-46%);
+  color: #ffffff;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.campo-select select {
+  width: 100%;
+  height: 100%;
+  padding: 17px 42px 6px 14px;
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.campo-select select option {
+  background: #111315;
+  color: #ffffff;
+}
+
+.campo-select span {
+  position: absolute;
+  top: 7px;
+  left: 14px;
+  color: #aeb5bd;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  pointer-events: none;
+}
