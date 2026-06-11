@@ -2664,3 +2664,65 @@ a,
   text-transform: uppercase;
   letter-spacing: .04em;
 }
+
+
+/* ===== AJUSTES FINAIS SOLICITADOS ===== */
+.assinatura-final {
+  left: 220px;
+  right: 0;
+  width: auto;
+  text-align: center;
+}
+
+.pasta-card {
+  background: linear-gradient(180deg, #242629 0%, #1c1e21 100%) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+.pasta-card .pasta-titulo,
+.pasta-card .pasta-subtexto,
+.pasta-card h3,
+.pasta-card .card-info p {
+  color: #ffffff !important;
+}
+
+.pasta-card .pasta-subtexto,
+.pasta-card .card-info p {
+  opacity: .82;
+}
+
+.pasta-card .card-info {
+  grid-template-columns: 1fr !important;
+}
+
+.pasta-card .codigo-pill {
+  display: none !important;
+}
+
+.btn-abrir-grupo {
+  background: #ffffff !important;
+  color: #050505 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.btn-abrir-grupo:hover {
+  background: #f1f1f1 !important;
+  color: #050505 !important;
+}
+
+.sala-historicos-radiotv-unico {
+  grid-template-columns: 1fr !important;
+}
+
+.sala-historicos-radiotv-unico section {
+  width: 100%;
+}
+
+@media (max-width: 1060px) {
+  .assinatura-final {
+    left: 0;
+    width: 100%;
+  }
+}

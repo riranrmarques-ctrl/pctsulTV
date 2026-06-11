@@ -24,6 +24,7 @@ let itemBibliotecaSelecionado = null;
 let itensBibliotecaSala = [];
 let itensRadioTvSala = [];
 let todosRadioTvSalas = [];
+let intervaloAtualizacaoStatus = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   iniciarLoginCentral();
@@ -50,6 +51,7 @@ function iniciarLoginCentral() {
     if (loginBox) loginBox.style.display = "none";
     if (conteudoPainel) conteudoPainel.style.display = "block";
     carregarcentralpainel();
+    iniciarAtualizacaoStatusPeriodica();
   }
 
   function bloquearPainel() {
@@ -486,6 +488,14 @@ async function confirmarAdicionarMaterial() {
   await adicionarMaterialSala(materialSalaSelecionado);
 }
 
+function iniciarAtualizacaoStatusPeriodica() {
+  if (intervaloAtualizacaoStatus) return;
+
+  intervaloAtualizacaoStatus = setInterval(() => {
+    carregarcentralpainel({ forcarAtualizacao: true });
+  }, 5 * 60 * 1000);
+}
+
 function lerCacheCentral() {
   try {
     const bruto = sessionStorage.getItem(CACHE_CENTRAL_KEY);
@@ -744,7 +754,6 @@ function renderizarGrupos(pontos) {
 
         <div class="card-info">
           <p class="pasta-subtexto">${escaparHtml(grupo.predio)}</p>
-          <span class="codigo-pill">Pasta</span>
         </div>
 
         <button class="btn-abrir-grupo" type="button" data-grupo="${escaparHtml(grupo.chave)}">
