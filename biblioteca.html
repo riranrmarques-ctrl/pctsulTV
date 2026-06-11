@@ -10,53 +10,79 @@
 
 <div class="dashboard-shell">
   <aside class="sidebar">
-    <div class="brand">
-      <img src="logo.png" class="brand-logo" alt="PC SUL">
+  <div class="brand">
+    <img src="logo.png" class="brand-logo" alt="PC SUL">
+  </div>
+
+  <nav class="menu-lateral">
+    <a href="salas.html" class="menu-item">
+      <span class="menu-icone">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><circle cx="12" cy="12" r="5"></circle>
+        </svg>
+      </span>
+      <span>Pontos</span>
+    </a>
+
+    <a href="usuarios.html" class="menu-item">
+      <span class="menu-icone">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path>
+        </svg>
+      </span>
+      <span>Usuarios</span>
+    </a>
+
+    <a href="biblioteca.html" class="menu-item ativo">
+      <span class="menu-icone">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h8"></path><path d="M8 12h8"></path><path d="M8 17h5"></path>
+        </svg>
+      </span>
+      <span>Biblioteca</span>
+    </a>
+
+    <a href="ativador.html" class="menu-item">
+      <span class="menu-icone">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13 2 4 14h7l-1 8 9-12h-7z"></path>
+        </svg>
+      </span>
+      <span>Ativador</span>
+    </a>
+
+    <a href="radiotv.html" class="menu-item">
+      <span class="menu-icone">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </span>
+      <span>RadioTv</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-spacer"></div>
+
+  <section class="resumo-card">
+    <h3>Resumo rapido</h3>
+    <div class="resumo-linha"><span>Total de arquivos</span><strong id="totalArquivos">0</strong></div>
+    <div class="resumo-linha"><span>Sites TXT</span><strong id="totalSites">0</strong></div>
+    <div class="resumo-linha"><span>Molduras PNG</span><strong id="totalMolduras">0</strong></div>
+  </section>
+
+  <section class="usuario-card">
+    <div class="usuario-card-topo">
+      <div class="usuario-card-texto">
+        <span>Sessao ativa</span>
+        <strong>Administrador</strong>
+      </div>
     </div>
-
-    <nav class="menu-lateral">
-      <a href="salas.html" class="menu-item">
-        <span class="menu-icone">⌾</span>
-        <span>Pontos</span>
-      </a>
-
-      <a href="usuarios.html" class="menu-item">
-        <span class="menu-icone">♙</span>
-        <span>Usuarios</span>
-      </a>
-
-      <a href="biblioteca.html" class="menu-item ativo">
-        <span class="menu-icone">▤</span>
-        <span>Biblioteca</span>
-      </a>
-
-      <a href="ativador.html" class="menu-item">
-        <span class="menu-icone">⚡</span>
-        <span>Ativador</span>
-      </a>
-
-      <a href="radiotv.html" class="menu-item">
-        <span class="menu-icone">◎</span>
-        <span>RadioTv</span>
-      </a>
-    </nav>
-
-    <div class="sidebar-spacer"></div>
-
-    <section class="resumo-card">
-      <h3>Resumo rápido</h3>
-      <div class="resumo-linha"><span>Total de arquivos</span><strong id="totalArquivos">0</strong></div>
-      <div class="resumo-linha"><span>Sites TXT</span><strong id="totalSites">0</strong></div>
-      <div class="resumo-linha"><span>Molduras PNG</span><strong id="totalMolduras">0</strong></div>
-    </section>
-
-    <section class="usuario-card">
-      <span>Sessão ativa</span>
-      <strong>Administrador</strong>
-      <div class="usuario-status"><i></i>Acesso liberado</div>
-      <button type="button" onclick="window.location.href='salas.html'">Voltar ao painel →</button>
-    </section>
-  </aside>
+    <div class="usuario-status"><span></span>Acesso liberado</div>
+    <button type="button" onclick="window.location.href='salas.html'">
+      Voltar ao painel <span>→</span>
+    </button>
+  </section>
+</aside>
 
   <main class="conteudo-principal">
     <header class="cabecalho-painel">
