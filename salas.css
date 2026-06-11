@@ -2445,3 +2445,135 @@ a,
     justify-content: flex-start;
   }
 }
+
+
+/* ===== AJUSTE FINAL DOS FILTROS DA TELA DE PASTAS/PONTOS ===== */
+
+.filtros-pontos,
+.filtros-pontos-clean {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) 170px 190px 160px;
+  align-items: stretch;
+  gap: 12px;
+  margin: 22px 0 24px;
+}
+
+.campo-busca,
+.campo-select {
+  min-height: 52px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 10px;
+  background: rgba(255,255,255,.045);
+  color: #fff;
+  box-shadow: none;
+}
+
+.campo-busca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+.campo-busca span {
+  color: #aeb5bd;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.campo-busca input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.campo-busca input::placeholder {
+  color: #aeb5bd;
+}
+
+.campo-select {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+}
+
+.campo-select::after {
+  content: "⌄";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-48%);
+  color: #ffffff;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.campo-select span {
+  position: absolute;
+  top: 7px;
+  left: 14px;
+  color: #aeb5bd;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  pointer-events: none;
+}
+
+.campo-select select {
+  width: 100%;
+  height: 100%;
+  padding: 18px 40px 6px 14px;
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.campo-select select option {
+  background: #111315;
+  color: #ffffff;
+}
+
+.btn-novo-ponto {
+  min-height: 52px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #050505;
+  font-size: 14px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.btn-novo-ponto span {
+  margin-right: 6px;
+}
+
+@media (max-width: 1100px) {
+  .filtros-pontos,
+  .filtros-pontos-clean {
+    grid-template-columns: 1fr 160px 180px;
+  }
+
+  .btn-novo-ponto {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .filtros-pontos,
+  .filtros-pontos-clean {
+    grid-template-columns: 1fr;
+  }
+}

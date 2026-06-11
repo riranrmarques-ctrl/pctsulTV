@@ -86,7 +86,7 @@ function iniciarLoginCentral() {
 }
 
 function configurarFiltros() {
-  ["buscaPontos", "filtroStatus", "filtroTipo", "ordenarPontos"].forEach(id => {
+  ["buscaPontos", "filtroStatus", "ordenarPontos"].forEach(id => {
     const elemento = document.getElementById(id);
     if (!elemento) return;
     elemento.addEventListener("input", atualizarPainelFiltrado);

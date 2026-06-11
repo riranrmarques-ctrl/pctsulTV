@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
 
   <title>PCTSUL | Gerenciador de TVs</title>
-  <link rel="stylesheet" href="salas.css?v=300">
+  <link rel="stylesheet" href="salas.css?v=601">
 
   <style>
     * { box-sizing: border-box; }
@@ -203,11 +203,31 @@
       </div>
     </header>
 
-    <section class="filtros-pontos">
-      <label class="campo-busca"><span>⌕</span><input id="buscaPontos" type="search" placeholder="Buscar por nome, endereco ou codigo"></label>
-      <label class="campo-select"><span>Status</span><select id="filtroStatus"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option><option value="desativado">Desativados</option></select></label>
-      <label class="campo-select"><span>Tipo de ponto</span><select id="filtroTipo"><option value="todos">Todos</option><option value="academia">Academia</option><option value="campus">Campus</option><option value="loja">Loja</option></select></label>
-      <label class="campo-select"><span>Ordenar por</span><select id="ordenarPontos"><option value="recentes">Mais recentes</option><option value="nome">Nome</option><option value="status">Status</option></select></label>
+    <section class="filtros-pontos filtros-pontos-clean">
+      <label class="campo-busca campo-busca-grande">
+        <span>⌕</span>
+        <input id="buscaPontos" type="search" placeholder="Buscar por pasta, prédio, ponto ou código">
+      </label>
+
+      <label class="campo-select">
+        <span>Status</span>
+        <select id="filtroStatus">
+          <option value="todos">Todos</option>
+          <option value="ativo">Ativos</option>
+          <option value="inativo">Inativos</option>
+          <option value="desativado">Desativados</option>
+        </select>
+      </label>
+
+      <label class="campo-select">
+        <span>Ordenar por</span>
+        <select id="ordenarPontos">
+          <option value="recentes">Mais recentes</option>
+          <option value="nome">Nome</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
       <button id="btnNovoPonto" class="btn-novo-ponto" type="button"><span>+</span>Nova pasta</button>
     </section>
 
@@ -307,6 +327,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="salas.js?v=501"></script>
+<script src="salas.js?v=601"></script>
 </body>
 </html>
