@@ -403,3 +403,28 @@ function escaparHtml(valor) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+async function carregarResumoSalas() {
+  try {
+    const { data: salas, error } = await supabaseClient
+      .from("salas")
+      .select("*");
+
+    if (error) throw error;
+
+    const total = salas.length;
+    const ativos = salas.filter(sala => sala.status === "ativo").length;
+    const inativos = total - ativos;
+
+    const telas = salas.reduce((soma, sala) => {
+      return soma + Number(sala.total_telas || 0);
+    }, 0);
+
+    setTexto("totalPontosResumo", total);
+    setTexto("pontosAtivosResumo", ativos);
+    setTexto("pontosInativosResumo", inativos);
+    setTexto("playlistsAtivasResumo", telas);
+  } catch (erro) {
+    console.error("Erro ao carregar resumo:", erro);
+  }
+}
