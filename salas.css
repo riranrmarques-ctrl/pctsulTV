@@ -2726,3 +2726,25 @@ a,
     width: 100%;
   }
 }
+
+.loading-screen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#05080a;
+  transition:opacity .4s ease;
+}
+
+.loading-screen img{
+  width:180px;
+  max-width:70vw;
+  height:auto;
+}
+
+.loading-screen.ocultar{
+  opacity:0;
+  pointer-events:none;
+}
