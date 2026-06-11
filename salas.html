@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
 
   <title>PCTSUL | Gerenciador de TVs</title>
-  <link rel="stylesheet" href="salas.css?v=203">
+  <link rel="stylesheet" href="salas.css?v=204">
 
   <style>
     * { box-sizing: border-box; }
@@ -234,7 +234,7 @@
           </div>
           <div class="sala-acoes">
             <button id="btnEditarSala" type="button">Editar</button>
-            <a href="biblioteca.html" class="button-link">Biblioteca</a>
+            <button id="btnBibliotecaSala" type="button" class="btn-biblioteca" onclick="window.location.href='biblioteca.html'">Biblioteca</button>
             <button id="btnAdicionarMaterial" type="button" class="btn-upgrade-sala">Adicionar material</button>
             <input id="inputMaterialSala" type="file" accept="video/*,image/*,.txt,text/plain" hidden>
           </div>
@@ -269,13 +269,13 @@
   <div class="modal-editar-card modal-material-card">
     <div class="modal-editar-topo"><h3>Adicionar material</h3><button id="btnFecharAdicionarMaterial" type="button">×</button></div>
     <div class="material-selecionado"><span>Arquivo selecionado</span><strong id="materialSelecionadoNome">Nenhum arquivo selecionado</strong></div>
-    <div class="modal-editar-grid"><label><span>Postagem</span><input id="materialDataPostagem" type="datetime-local"></label><label><span>Encerramento</span><input id="materialDataEncerramento" type="datetime-local"></label></div>
+    <div class="modal-editar-grid"><label><span>Postagem</span><input id="materialDataPostagem" type="datetime-local"></label><label><span>Encerramento</span><input id="materialDataEncerramento" type="datetime-local"></label><label class="campo-duracao-material"><span>Duração do arquivo</span><input id="materialDuracao" type="text" maxlength="5" inputmode="numeric" placeholder="00:30" value="00:30"></label></div>
     <div class="material-destinos"><span>Enviar tambem para</span><div id="materialSalasExtras" class="material-salas-extras"></div></div>
     <div class="modal-editar-acoes"><button id="btnCancelarAdicionarMaterial" type="button">Cancelar</button><button id="btnConfirmarAdicionarMaterial" type="button">Enviar material</button></div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="salas.js?v=203"></script>
+<script src="salas.js?v=204"></script>
 </body>
 </html>
