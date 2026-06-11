@@ -297,10 +297,15 @@ async function deletarArquivoBiblioteca(id) {
 
     arquivosBiblioteca = arquivosBiblioteca.filter(arquivo => String(arquivo.id) !== String(id));
     renderizarBiblioteca();
-  } catch (erro) {
-    console.error("Erro ao deletar:", erro);
-    alert("Não foi possível deletar o arquivo.");
-  }
+ catch (erro) {
+  console.error("ERRO COMPLETO:", erro);
+
+  alert(
+    erro?.message ||
+    erro?.error_description ||
+    JSON.stringify(erro) ||
+    "Erro desconhecido"
+  );
 }
 
 function tipoBibliotecaArquivo(arquivo) {
