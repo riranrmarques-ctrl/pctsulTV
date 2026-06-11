@@ -2060,3 +2060,47 @@ body,
     flex-direction: column;
   }
 }
+
+
+/* Atualização: botão Biblioteca preto e duração do material */
+.sala-acoes .btn-biblioteca {
+  height: 46px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: #050505;
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sala-acoes .btn-biblioteca:hover {
+  background: #111111;
+}
+
+.campo-duracao-material input {
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.playlist-datas {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sala-playlist-item {
+  grid-template-columns: 42px 34px minmax(200px, 1fr) minmax(270px, 340px) 132px;
+}
+
+@media (max-width: 980px) {
+  .sala-playlist-item {
+    grid-template-columns: 34px 28px 1fr;
+  }
+
+  .playlist-datas,
+  .playlist-acoes {
+    grid-column: 1 / -1;
+  }
+}
