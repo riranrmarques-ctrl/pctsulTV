@@ -27,7 +27,25 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarNovoPonto();
   configurarAdicionarMaterial();
   configurarCopiarCodigoSala();
+  configurarModalEditarMaterial();
 });
+
+function configurarModalEditarMaterial() {
+  const btnFechar = document.getElementById("btnFecharEditarMaterial");
+  const btnCancelar = document.getElementById("btnCancelarEditarMaterial");
+  const btnSalvar = document.getElementById("btnSalvarEditarMaterial");
+  const inputDuracao = document.getElementById("editMaterialDuracao");
+
+  if (btnFechar) btnFechar.addEventListener("click", fecharModalEditarMaterial);
+  if (btnCancelar) btnCancelar.addEventListener("click", fecharModalEditarMaterial);
+  if (btnSalvar) btnSalvar.addEventListener("click", salvarEdicaoMaterial);
+
+  if (inputDuracao) {
+    inputDuracao.addEventListener("input", () => {
+      inputDuracao.value = mascaraDuracaoMaterial(inputDuracao.value);
+    });
+  }
+}
 
 function iniciarLoginCentral() {
   const loginBox = document.getElementById("loginBox");
