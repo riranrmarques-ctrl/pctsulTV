@@ -15,6 +15,7 @@ let todasAsPlaylists = [];
 let todosOsMateriais = [];
 let playlistsAtivas = 0;
 let salaAtual = null;
+let grupoAtual = null;
 let imagemSalaSelecionada = null;
 let materialSalaSelecionado = null;
 
@@ -27,25 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   configurarNovoPonto();
   configurarAdicionarMaterial();
   configurarCopiarCodigoSala();
-  configurarModalEditarMaterial();
 });
-
-function configurarModalEditarMaterial() {
-  const btnFechar = document.getElementById("btnFecharEditarMaterial");
-  const btnCancelar = document.getElementById("btnCancelarEditarMaterial");
-  const btnSalvar = document.getElementById("btnSalvarEditarMaterial");
-  const inputDuracao = document.getElementById("editMaterialDuracao");
-
-  if (btnFechar) btnFechar.addEventListener("click", fecharModalEditarMaterial);
-  if (btnCancelar) btnCancelar.addEventListener("click", fecharModalEditarMaterial);
-  if (btnSalvar) btnSalvar.addEventListener("click", salvarEdicaoMaterial);
-
-  if (inputDuracao) {
-    inputDuracao.addEventListener("input", () => {
-      inputDuracao.value = mascaraDuracaoMaterial(inputDuracao.value);
-    });
-  }
-}
 
 function iniciarLoginCentral() {
   const loginBox = document.getElementById("loginBox");
@@ -127,13 +110,6 @@ function configurarAdicionarMaterial() {
   const btnCancelar = document.getElementById("btnCancelarAdicionarMaterial");
   const btnFechar = document.getElementById("btnFecharAdicionarMaterial");
   const btnConfirmar = document.getElementById("btnConfirmarAdicionarMaterial");
-  const inputDuracao = document.getElementById("materialDuracao");
-
-  if (inputDuracao) {
-    inputDuracao.addEventListener("input", () => {
-      inputDuracao.value = mascaraDuracaoMaterial(inputDuracao.value);
-    });
-  }
 
   if (btnCancelar) btnCancelar.addEventListener("click", fecharModalAdicionarMaterial);
   if (btnFechar) btnFechar.addEventListener("click", fecharModalAdicionarMaterial);
@@ -165,6 +141,7 @@ function configurarVoltarSala() {
     document.body.classList.remove("modo-sala");
     const salaDetalhe = document.getElementById("salaDetalhe");
     if (salaDetalhe) salaDetalhe.hidden = true;
+    atualizarPainelFiltrado();
   });
 }
 
@@ -218,7 +195,9 @@ async function criarNovoPonto() {
 
   const novoPonto = {
     codigo,
-    nome: "Nova sala",
+    nome: "TV 01",
+    grupo_nome: "Nova sala",
+    predio: "Predio nao informado",
     endereco: "Predio nao informado",
     imagem_url: "",
     status: "cadastrado",
@@ -262,7 +241,6 @@ async function criarNovoPonto() {
 async function adicionarMaterialSala(arquivo) {
   const dataPostagem = getValor("materialDataPostagem");
   const dataEncerramento = getValor("materialDataEncerramento");
-  const duracaoMaterial = normalizarDuracaoMaterial(getValor("materialDuracao") || "00:30");
 
   if (!salaAtual) {
     alert("Abra uma sala antes de adicionar material.");
@@ -297,7 +275,6 @@ async function adicionarMaterialSala(arquivo) {
       arquivo_nome: arquivo.name,
       arquivo_tipo: arquivo.type || tipoArquivoPorNome(arquivo.name),
       arquivo_tamanho: arquivo.size || 0,
-      duracao: duracaoMaterial,
       data_postagem: dataPostagem || null,
       data_encerramento: dataEncerramento || null,
       status: "ativo",
@@ -342,7 +319,6 @@ function abrirModalAdicionarMaterial(arquivo) {
   setTexto("materialSelecionadoNome", arquivo.name || "Material selecionado");
   setValor("materialDataPostagem", dataInputLocal(new Date()));
   setValor("materialDataEncerramento", dataInputLocal(somarDias(new Date(), 30)));
-  setValor("materialDuracao", "00:30");
   renderizarDestinosMaterial();
 
   const modal = document.getElementById("modalAdicionarMaterial");
@@ -358,7 +334,6 @@ function fecharModalAdicionarMaterial() {
   setTexto("materialSelecionadoNome", "Nenhum arquivo selecionado");
   setValor("materialDataPostagem", "");
   setValor("materialDataEncerramento", "");
-  setValor("materialDuracao", "");
   const destinos = document.getElementById("materialSalasExtras");
   if (destinos) destinos.innerHTML = "";
 }
@@ -400,29 +375,6 @@ function codigosDestinoMaterial(codigoAtual) {
   return Array.from(codigos);
 }
 
-function mascaraDuracaoMaterial(valor) {
-  const apenasNumeros = String(valor || "").replace(/\D/g, "").slice(0, 4);
-
-  if (apenasNumeros.length <= 2) return apenasNumeros;
-
-  return `${apenasNumeros.slice(0, 2)}:${apenasNumeros.slice(2)}`;
-}
-
-function normalizarDuracaoMaterial(valor) {
-  const texto = String(valor || "").trim();
-  const partes = texto.split(":");
-
-  if (partes.length !== 2) return "";
-
-  const minutos = Number(partes[0]);
-  const segundos = Number(partes[1]);
-
-  if (!Number.isInteger(minutos) || !Number.isInteger(segundos)) return "";
-  if (minutos < 0 || minutos > 99 || segundos < 0 || segundos > 59) return "";
-
-  return `${String(minutos).padStart(2, "0")}:${String(segundos).padStart(2, "0")}`;
-}
-
 async function confirmarAdicionarMaterial() {
   if (!materialSalaSelecionado) {
     alert("Selecione um arquivo para adicionar.");
@@ -431,14 +383,6 @@ async function confirmarAdicionarMaterial() {
 
   const dataPostagem = getValor("materialDataPostagem");
   const dataEncerramento = getValor("materialDataEncerramento");
-  const duracaoMaterial = normalizarDuracaoMaterial(getValor("materialDuracao"));
-
-  if (!duracaoMaterial) {
-    alert("Informe a duração no formato 00:00. Os segundos precisam ficar entre 00 e 59.");
-    return;
-  }
-
-  setValor("materialDuracao", duracaoMaterial);
 
   if (!dataPostagem || !dataEncerramento) {
     alert("Informe a postagem e o encerramento do material.");
@@ -613,7 +557,7 @@ function atualizarPainelFiltrado() {
   const ordenar = document.getElementById("ordenarPontos")?.value || "recentes";
 
   let pontos = todosOsPontos.filter(ponto => {
-    const texto = normalizarBusca(`${ponto.nome || ""} ${ponto.nome_ponto || ""} ${ponto.endereco || ""} ${ponto.cidade || ""} ${ponto.codigo_final || ""}`);
+    const texto = normalizarBusca(`${nomePonto(ponto)} ${nomeGrupoPonto(ponto)} ${predioPonto(ponto)} ${enderecoPonto(ponto)} ${ponto.cidade || ""} ${ponto.codigo_final || ""}`);
     const combinaBusca = !busca || texto.includes(busca);
     const combinaStatus = filtroStatus === "todos" || ponto.status_final === filtroStatus;
     return combinaBusca && combinaStatus;
@@ -621,7 +565,13 @@ function atualizarPainelFiltrado() {
 
   pontos = ordenarPontos(pontos, ordenar);
   atualizarResumo(todosOsPontos);
-  renderizarPontos(pontos);
+
+  if (grupoAtual) {
+    const pontosDoGrupo = pontos.filter(ponto => chaveGrupoPonto(ponto) === grupoAtual.chave);
+    renderizarTvsDoGrupo(grupoAtual, pontosDoGrupo);
+  } else {
+    renderizarGrupos(pontos);
+  }
 }
 
 function atualizarResumo(pontos) {
@@ -656,41 +606,46 @@ function ordenarPontos(pontos, ordenar) {
 }
 
 function renderizarPontos(pontos) {
+  renderizarGrupos(pontos);
+}
+
+function renderizarGrupos(pontos) {
   const lista = document.getElementById("listaPontos");
   if (!lista) return;
 
+  grupoAtual = null;
   lista.innerHTML = "";
 
   if (!pontos.length) {
-    lista.innerHTML = `<div class="empty-state">Nenhum ponto encontrado.</div>`;
+    lista.innerHTML = `<div class="empty-state">Nenhuma sala encontrada.</div>`;
     return;
   }
 
-  pontos.forEach((ponto, index) => {
-    const nome = nomePonto(ponto);
-    const status = ponto.status_final;
-    const imagem = imagemPonto(ponto);
-    const endereco = enderecoPonto(ponto);
-    const codigo = ponto.codigo_final || "------";
-    const totalTelas = totalTelasPonto(ponto, index);
+  const grupos = agruparPontosPorSala(pontos);
+
+  grupos.forEach(grupo => {
+    const imagem = imagemPonto(grupo.pontos[0]);
+    const totalTvs = grupo.pontos.length;
+    const ativos = grupo.pontos.filter(p => p.status_final === "ativo").length;
+    const statusGrupo = ativos > 0 ? "ativo" : "inativo";
 
     lista.innerHTML += `
-      <article class="point-card" data-codigo="${escaparHtml(codigo)}">
+      <article class="point-card pasta-card" data-grupo="${escaparHtml(grupo.chave)}">
         <div class="card-topo">
-          <span class="status-pill ${classeStatusVisual(status)}">${textoStatus(status)}</span>
-          <span class="telas-topo">${totalTelas} ${totalTelas === 1 ? "tela" : "telas"}</span>
+          <span class="status-pill ${classeStatusVisual(statusGrupo)}">${textoStatus(statusGrupo)}</span>
+          <span class="telas-topo">${totalTvs} ${totalTvs === 1 ? "TV" : "TVs"}</span>
         </div>
 
-        <img src="${escaparHtml(imagem)}" alt="${escaparHtml(nome)}" loading="lazy">
+        <img src="${escaparHtml(imagem)}" alt="${escaparHtml(grupo.nome)}" loading="lazy">
 
-        <h3>${escaparHtml(nome)}</h3>
+        <h3>${escaparHtml(grupo.nome)}</h3>
 
         <div class="card-info">
-          <p>${escaparHtml(endereco)}</p>
-          <span class="codigo-pill">${escaparHtml(codigo)}</span>
+          <p>${escaparHtml(grupo.predio)}</p>
+          <span class="codigo-pill">Pasta</span>
         </div>
 
-        <button class="btn-detalhes" type="button" data-codigo="${escaparHtml(codigo)}">
+        <button class="btn-abrir-grupo" type="button" data-grupo="${escaparHtml(grupo.chave)}">
           <span>Entrar na sala</span>
           <strong>→</strong>
         </button>
@@ -698,13 +653,128 @@ function renderizarPontos(pontos) {
     `;
   });
 
+  lista.querySelectorAll(".btn-abrir-grupo").forEach(botao => {
+    botao.addEventListener("click", () => {
+      const chave = botao.dataset.grupo || "";
+      const grupo = grupos.find(item => item.chave === chave);
+      if (!grupo) return;
+      grupoAtual = { chave: grupo.chave, nome: grupo.nome, predio: grupo.predio };
+      renderizarTvsDoGrupo(grupoAtual, grupo.pontos);
+    });
+  });
+}
+
+function renderizarTvsDoGrupo(grupo, pontos) {
+  const lista = document.getElementById("listaPontos");
+  if (!lista) return;
+
+  const pontosOrdenados = ordenarPontos(pontos, document.getElementById("ordenarPontos")?.value || "nome");
+
+  lista.innerHTML = `
+    <div class="grupo-topbar">
+      <button type="button" id="btnVoltarGrupos">← Voltar</button>
+      <div>
+        <h2>${escaparHtml(grupo.nome)}</h2>
+        <p>${escaparHtml(grupo.predio)}</p>
+      </div>
+      <strong>${pontosOrdenados.length} ${pontosOrdenados.length === 1 ? "TV" : "TVs"}</strong>
+    </div>
+  `;
+
+  if (!pontosOrdenados.length) {
+    lista.innerHTML += `<div class="empty-state">Nenhuma TV encontrada nesta sala.</div>`;
+  }
+
+  pontosOrdenados.forEach((ponto, index) => {
+    const nome = nomeTvPonto(ponto, index);
+    const status = ponto.status_final;
+    const imagem = imagemPonto(ponto);
+    const codigo = ponto.codigo_final || "------";
+    const midias = materiaisDaSala(codigo).length;
+
+    lista.innerHTML += `
+      <article class="point-card tv-card" data-codigo="${escaparHtml(codigo)}">
+        <div class="card-topo">
+          <span class="status-pill ${classeStatusVisual(status)}">${textoStatus(status)}</span>
+          <span class="telas-topo">${midias} ${midias === 1 ? "mídia" : "mídias"}</span>
+        </div>
+
+        <img src="${escaparHtml(imagem)}" alt="${escaparHtml(nome)}" loading="lazy">
+
+        <h3>${escaparHtml(nome)}</h3>
+
+        <div class="card-info">
+          <p>${escaparHtml(ponto.descricao_tv || ponto.tipo_tv || nomePonto(ponto))}</p>
+          <span class="codigo-pill">${escaparHtml(codigo)}</span>
+        </div>
+
+        <button class="btn-detalhes" type="button" data-codigo="${escaparHtml(codigo)}">
+          <span>Abrir playlist</span>
+          <strong>→</strong>
+        </button>
+      </article>
+    `;
+  });
+
+  document.getElementById("btnVoltarGrupos")?.addEventListener("click", () => {
+    grupoAtual = null;
+    atualizarPainelFiltrado();
+  });
+
   lista.querySelectorAll(".btn-detalhes").forEach(botao => {
     botao.addEventListener("click", () => {
       const codigo = botao.dataset.codigo || "";
-      const ponto = pontos.find(item => normalizarCodigo(item.codigo_final) === normalizarCodigo(codigo));
+      const ponto = todosOsPontos.find(item => normalizarCodigo(item.codigo_final) === normalizarCodigo(codigo));
       if (ponto) abrirSala(ponto);
     });
   });
+}
+
+function agruparPontosPorSala(pontos) {
+  const mapa = new Map();
+
+  pontos.forEach(ponto => {
+    const chave = chaveGrupoPonto(ponto);
+    const nome = nomeGrupoPonto(ponto);
+    const predio = predioPonto(ponto);
+
+    if (!mapa.has(chave)) {
+      mapa.set(chave, {
+        chave,
+        nome,
+        predio,
+        pontos: []
+      });
+    }
+
+    mapa.get(chave).pontos.push(ponto);
+  });
+
+  return [...mapa.values()].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
+function chaveGrupoPonto(ponto) {
+  return normalizarBusca(`${nomeGrupoPonto(ponto)}-${predioPonto(ponto)}`);
+}
+
+function nomeGrupoPonto(ponto) {
+  const direto = ponto.grupo_nome || ponto.nome_grupo || ponto.pasta_nome || ponto.sala_nome || ponto.nome_sala || ponto.predio_sala;
+  if (direto) return String(direto).trim();
+
+  const nome = nomePonto(ponto);
+  return nome
+    .replace(/TV\s*\d+/ig, "")
+    .replace(/0?\d+$/g, "")
+    .replace(/[\-_]+$/g, "")
+    .trim() || nome;
+}
+
+function predioPonto(ponto) {
+  return ponto.predio || ponto.nome_predio || ponto.bloco || ponto.endereco || ponto.endereco_completo || "Prédio não informado";
+}
+
+function nomeTvPonto(ponto, index = 0) {
+  return ponto.tv_nome || ponto.nome_tv || ponto.sub_sala || ponto.apelido_tv || ponto.nome || ponto.nome_ponto || `TV ${String(index + 1).padStart(2, "0")}`;
 }
 
 function abrirSala(ponto) {
@@ -745,8 +815,8 @@ function abrirModalEditarSala() {
 
   imagemSalaSelecionada = null;
 
-  setValor("editSalaNome", nomePonto(salaAtual));
-  setValor("editSalaEndereco", salaAtual.endereco || salaAtual.endereco_completo || salaAtual.localizacao || "");
+  setValor("editSalaNome", nomeTvPonto(salaAtual));
+  setValor("editSalaEndereco", predioPonto(salaAtual));
   setValor("editSalaImagem", imagemPonto(salaAtual));
 
   const preview = document.getElementById("editSalaPreview");
@@ -775,7 +845,9 @@ async function salvarEdicaoSala() {
 
   const dadosAtualizados = {
     nome,
-    endereco
+    endereco,
+    grupo_nome: nomeGrupoPonto(salaAtual),
+    predio: endereco
   };
 
   const btnSalvar = document.getElementById("btnSalvarEditarSala");
@@ -797,6 +869,8 @@ async function salvarEdicaoSala() {
       codigo,
       nome: dadosAtualizados.nome,
       endereco: dadosAtualizados.endereco,
+      grupo_nome: dadosAtualizados.grupo_nome,
+      predio: dadosAtualizados.predio,
       imagem_url: dadosAtualizados.imagem_url,
       cidade: salaAtual.cidade || salaAtual.regiao || salaAtual.bairro || null,
       status: salaAtual.status || "cadastrado",
@@ -822,7 +896,9 @@ async function salvarEdicaoSala() {
         ...ponto,
         ...dadosAtualizados,
         nome_ponto: dadosAtualizados.nome,
-        endereco_completo: dadosAtualizados.endereco
+        endereco_completo: dadosAtualizados.endereco,
+        grupo_nome: dadosAtualizados.grupo_nome,
+        predio: dadosAtualizados.predio
       };
     });
 
@@ -979,7 +1055,6 @@ function renderizarPlaylistSala(codigoSala) {
       <div class="playlist-datas">
         <time><span>Postagem</span>${escaparHtml(formatarData(item.data_postagem || item.created_at))}</time>
         <time><span>Vencimento</span>${escaparHtml(formatarData(item.data_encerramento || item.data_fim || ""))}</time>
-        <time><span>Duração</span>${escaparHtml(normalizarDuracaoMaterial(item.duracao || "00:30") || "00:30")}</time>
       </div>
       <div class="playlist-acoes">
         <button type="button" class="btn-renomear-material" data-id="${escaparHtml(item.id)}">✎</button>
@@ -1077,7 +1152,7 @@ function configurarAcoesMateriais() {
   document.querySelectorAll(".btn-renomear-material").forEach(botao => {
     botao.addEventListener("click", () => {
       animarBotao(botao);
-      editarMaterial(botao.dataset.id);
+      renomearMaterial(botao.dataset.id);
     });
   });
 
@@ -1096,97 +1171,30 @@ function configurarAcoesMateriais() {
   });
 }
 
-function editarMaterial(id) {
+async function renomearMaterial(id) {
   const material = buscarMaterialPorId(id);
   if (!material) return;
 
   const nomeAtual = material.nome || material.arquivo_nome || "Material sem nome";
-  const duracaoAtual = normalizarDuracaoMaterial(material.duracao || "00:30") || "00:30";
-  const vencimentoAtual = dataParaInputData(material.data_encerramento || material.data_fim || "");
-
-  setValor("editMaterialNome", nomeAtual);
-  setValor("editMaterialVencimento", vencimentoAtual);
-  setValor("editMaterialDuracao", duracaoAtual);
-
-  const modal = document.getElementById("modalEditarMaterial");
-  if (modal) {
-    modal.dataset.id = String(id);
-    modal.hidden = false;
-  }
-}
-
-function fecharModalEditarMaterial() {
-  const modal = document.getElementById("modalEditarMaterial");
-  if (!modal) return;
-
-  modal.hidden = true;
-  modal.dataset.id = "";
-}
-
-async function salvarEdicaoMaterial() {
-  const modal = document.getElementById("modalEditarMaterial");
-  const id = modal?.dataset.id || "";
-  const material = buscarMaterialPorId(id);
-
-  if (!material) return;
-
-  const nomeAtual = material.nome || material.arquivo_nome || "Material sem nome";
-  const novoNome = getValor("editMaterialNome") || nomeAtual;
-  const vencimento = getValor("editMaterialVencimento");
-  const duracao = normalizarDuracaoMaterial(getValor("editMaterialDuracao"));
-
-  if (!vencimento) {
-    alert("Informe o vencimento.");
-    return;
-  }
-
-  if (!duracao) {
-    alert("Informe a duração no formato 00:00.");
-    return;
-  }
-
-  const dadosAtualizados = {
-    nome: novoNome.trim(),
-    data_encerramento: `${vencimento}T23:59:00`,
-    duracao
-  };
+  const novoNome = window.prompt("Novo nome do arquivo:", nomeAtual);
+  if (!novoNome || novoNome.trim() === nomeAtual) return;
 
   try {
     const { error } = await supabaseClient
       .from("materiais_salas")
-      .update(dadosAtualizados)
+      .update({ nome: novoNome.trim() })
       .eq("id", id);
 
     if (error) throw error;
 
-    Object.assign(material, dadosAtualizados);
+    material.nome = novoNome.trim();
     sessionStorage.removeItem(CACHE_CENTRAL_KEY);
-
-    const codigo = material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo;
-    renderizarPlaylistSala(codigo);
-    fecharModalEditarMaterial();
-    mostrarStatusFlutuante("Material atualizado");
+    renderizarPlaylistSala(material.codigo_ponto || material.codigo_cliente || salaAtual?.codigo_final || salaAtual?.codigo);
+    mostrarStatusFlutuante("Nome atualizado");
   } catch (erro) {
-    console.error("Erro ao editar material:", erro);
-    mostrarStatusFlutuante("Nao foi possivel editar", "erro");
+    console.error("Erro ao renomear material:", erro);
+    mostrarStatusFlutuante("Nao foi possivel renomear", "erro");
   }
-}
-
-function dataParaInputData(valor) {
-  if (!valor) return "";
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return String(valor).slice(0, 10);
-  return data.toISOString().slice(0, 10);
-}
-
-function normalizarDataVencimentoMaterial(valor) {
-  const texto = String(valor || "").trim();
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) return "";
-
-  const data = new Date(`${texto}T23:59:00`);
-  if (Number.isNaN(data.getTime())) return "";
-
-  return `${texto}T23:59:00`;
 }
 
 async function baixarMaterial(id) {
@@ -1523,7 +1531,7 @@ function pingRecente(data) {
   const d = new Date(data);
   if (Number.isNaN(d.getTime())) return false;
 
-  const limiteOffline = 12 * 60 * 1000;
+  const limiteOffline = 5 * 60 * 1000;
   return Date.now() - d.getTime() <= limiteOffline;
 }
 
