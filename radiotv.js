@@ -1,8 +1,13 @@
 const SUPABASE_URL = "https://niqyhaiytiusvyspjsld.supabase.co";
 const SUPABASE_KEY = "sb_publishable_O6vm7g-Xiv4COo1mNHCBAw_jgEJbSDI";
 const TABELA_RADIOTV = "radiotv";
+const STORAGE_MUSICAS_BUCKET = "radiotv-musicas";
+
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let itensRadioTv = [];
+let arquivoMusicaSelecionado = null;
+let urlMusicaAtual = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   configurarEventos();
@@ -14,9 +19,7 @@ window.addEventListener("load", () => {
 });
 
 function configurarEventos() {
-  const btnAdicionar = document.getElementById("btnAdicionarRadioTv");
-  if (btnAdicionar) btnAdicionar.addEventListener("click", abrirEscolhaTipo);
-
+  document.getElementById("btnAdicionarRadioTv")?.addEventListener("click", abrirEscolhaTipo);
   document.getElementById("btnFecharEscolhaTipo")?.addEventListener("click", fecharEscolhaTipo);
   document.getElementById("btnFecharRadioTv")?.addEventListener("click", fecharModalRadioTv);
   document.getElementById("btnCancelarRadioTv")?.addEventListener("click", fecharModalRadioTv);
@@ -29,6 +32,15 @@ function configurarEventos() {
     });
   });
 
+  document.getElementById("btnSelecionarMusica")?.addEventListener("click", () => {
+    document.getElementById("inputArquivoMusica")?.click();
+  });
+
+  document.getElementById("inputArquivoMusica")?.addEventListener("change", event => {
+    arquivoMusicaSelecionado = event.target.files?.[0] || null;
+    setTexto("nomeArquivoMusica", arquivoMusicaSelecionado ? arquivoMusicaSelecionado.name : "Nenhum arquivo selecionado");
+  });
+
   ["buscaRadioTv", "filtroTipoRadioTv", "filtroStatusRadioTv"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -36,8 +48,9 @@ function configurarEventos() {
     el.addEventListener("change", renderizarRadioTv);
   });
 
-  ["radioTvTextoAviso", "radioTvCorFundo", "radioTvCorTexto"].forEach(id => {
+  ["avisoTitulo", "avisoTexto", "avisoCorFundo", "avisoCorTexto", "avisoVelocidade"].forEach(id => {
     document.getElementById(id)?.addEventListener("input", atualizarPreviewAviso);
+    document.getElementById(id)?.addEventListener("change", atualizarPreviewAviso);
   });
 }
 
@@ -49,6 +62,7 @@ async function carregarRadioTv() {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
+
     itensRadioTv = data || [];
     renderizarRadioTv();
   } catch (erro) {
@@ -58,22 +72,41 @@ async function carregarRadioTv() {
   }
 }
 
-function abrirEscolhaTipo() { document.getElementById("modalEscolherTipo").hidden = false; }
-function fecharEscolhaTipo() { document.getElementById("modalEscolherTipo").hidden = true; }
+function abrirEscolhaTipo() {
+  document.getElementById("modalEscolherTipo").hidden = false;
+}
+
+function fecharEscolhaTipo() {
+  document.getElementById("modalEscolherTipo").hidden = true;
+}
 
 function abrirModalRadioTv(tipo, item = null) {
   limparModalRadioTv();
+
   const tipoFinal = tipo || item?.tipo || "musica";
 
   setValor("radioTvTipo", tipoFinal);
   setValor("radioTvId", item?.id || "");
-  setValor("radioTvArtista", item?.artista || "");
-  setValor("radioTvTitulo", item?.titulo || "");
-  setValor("radioTvSite", item?.site || "");
-  setValor("radioTvUrl", item?.url || "");
-  setValor("radioTvTextoAviso", item?.texto_aviso || "");
-  setValor("radioTvCorFundo", item?.cor_fundo || "#000000");
-  setValor("radioTvCorTexto", item?.cor_texto || "#ffffff");
+  urlMusicaAtual = item?.url || "";
+
+  setValor("musicaArtista", item?.artista || "");
+  setValor("musicaTitulo", item?.titulo || "");
+  setTexto("nomeArquivoMusica", item?.url ? "Música já enviada" : "Nenhum arquivo selecionado");
+
+  setValor("linkArtista", item?.artista || "");
+  setValor("linkTitulo", item?.titulo || "");
+  setValor("linkSite", item?.site || "");
+  setValor("linkUrl", item?.url || "");
+
+  setValor("avisoTitulo", item?.titulo || "");
+  setValor("avisoTexto", item?.texto_aviso || "");
+  setValor("avisoCorFundo", item?.cor_fundo || "#000000");
+  setValor("avisoCorTexto", item?.cor_texto || "#ffffff");
+  setValor("avisoVelocidade", item?.velocidade || "normal");
+
+  setValor("youtubeUrl", item?.url || "");
+  setValor("youtubeInicio", dataParaInputLocal(item?.data_inicio || ""));
+  setValor("youtubeFim", dataParaInputLocal(item?.data_fim || ""));
 
   const ativo = document.getElementById("radioTvAtivo");
   if (ativo) ativo.checked = item ? item.ativo !== false : true;
@@ -88,30 +121,11 @@ function abrirModalRadioTv(tipo, item = null) {
 }
 
 function aplicarTipoModal(tipo) {
-  const aviso = tipo === "aviso";
-  document.getElementById("camposMidia").hidden = aviso;
-  document.getElementById("camposAviso").hidden = !aviso;
-  document.getElementById("previewAviso").hidden = !aviso;
-
-  const campoArtista = document.querySelector(".campo-artista");
-  if (campoArtista) campoArtista.hidden = tipo !== "musica";
-
-  const tituloInput = document.getElementById("radioTvTitulo");
-  const siteInput = document.getElementById("radioTvSite");
-  const urlInput = document.getElementById("radioTvUrl");
-
-  if (tituloInput) {
-    tituloInput.placeholder = tipo === "youtube_live"
-      ? "Ex: Aula magna ao vivo"
-      : tipo === "playlist" ? "Ex: Playlist ambiente corporativo" : "Ex: Oceano";
-  }
-
-  if (siteInput) {
-    siteInput.placeholder = tipo === "youtube_live" ? "YouTube" : "Ex: Spotify, YouTube, Site externo";
-    if (tipo === "youtube_live" && !siteInput.value) siteInput.value = "YouTube";
-  }
-
-  if (urlInput) urlInput.placeholder = tipo === "youtube_live" ? "https://www.youtube.com/watch?v=..." : "https://...";
+  document.getElementById("camposMusica").hidden = tipo !== "musica";
+  document.getElementById("camposLinkExterno").hidden = tipo !== "link_externo";
+  document.getElementById("camposAviso").hidden = tipo !== "aviso";
+  document.getElementById("previewAviso").hidden = tipo !== "aviso";
+  document.getElementById("camposYoutubeLive").hidden = tipo !== "youtube_live";
 }
 
 function fecharModalRadioTv() {
@@ -120,9 +134,25 @@ function fecharModalRadioTv() {
 }
 
 function limparModalRadioTv() {
-  ["radioTvId", "radioTvTipo", "radioTvArtista", "radioTvTitulo", "radioTvSite", "radioTvUrl", "radioTvTextoAviso"].forEach(id => setValor(id, ""));
-  setValor("radioTvCorFundo", "#000000");
-  setValor("radioTvCorTexto", "#ffffff");
+  arquivoMusicaSelecionado = null;
+  urlMusicaAtual = "";
+
+  [
+    "radioTvId", "radioTvTipo",
+    "musicaArtista", "musicaTitulo",
+    "linkArtista", "linkTitulo", "linkSite", "linkUrl",
+    "avisoTitulo", "avisoTexto",
+    "youtubeUrl", "youtubeInicio", "youtubeFim"
+  ].forEach(id => setValor(id, ""));
+
+  setValor("avisoCorFundo", "#000000");
+  setValor("avisoCorTexto", "#ffffff");
+  setValor("avisoVelocidade", "normal");
+  setTexto("nomeArquivoMusica", "Nenhum arquivo selecionado");
+
+  const inputArquivo = document.getElementById("inputArquivoMusica");
+  if (inputArquivo) inputArquivo.value = "";
+
   const ativo = document.getElementById("radioTvAtivo");
   if (ativo) ativo.checked = true;
 }
@@ -131,9 +161,8 @@ async function salvarRadioTv() {
   const id = getValor("radioTvId");
   const tipo = getValor("radioTvTipo") || "musica";
   const ativo = document.getElementById("radioTvAtivo")?.checked !== false;
-  const dados = montarDadosFormulario(tipo, ativo);
-  const erro = validarDadosRadioTv(tipo, dados);
 
+  const erro = validarFormulario(tipo);
   if (erro) {
     alert(erro);
     return;
@@ -148,6 +177,8 @@ async function salvarRadioTv() {
   }
 
   try {
+    const dados = await montarDadosFormulario(tipo, ativo);
+
     const resposta = id
       ? await supabaseClient.from(TABELA_RADIOTV).update(dados).eq("id", id).select("*").single()
       : await supabaseClient.from(TABELA_RADIOTV).insert(dados).select("*").single();
@@ -175,45 +206,139 @@ async function salvarRadioTv() {
   }
 }
 
-function montarDadosFormulario(tipo, ativo) {
-  const base = { tipo, ativo, updated_at: new Date().toISOString() };
+function validarFormulario(tipo) {
+  if (tipo === "musica") {
+    if (!arquivoMusicaSelecionado && !urlMusicaAtual) return "Selecione a mídia de áudio.";
+    if (!getValor("musicaArtista")) return "Informe o cantor/artista.";
+    if (!getValor("musicaTitulo")) return "Informe o nome da música.";
+    return "";
+  }
+
+  if (tipo === "link_externo") {
+    if (!getValor("linkArtista")) return "Informe o cantor/banda.";
+    if (!getValor("linkTitulo")) return "Informe a música, álbum ou playlist.";
+    if (!getValor("linkUrl")) return "Informe a URL.";
+    return "";
+  }
+
+  if (tipo === "aviso") {
+    if (!getValor("avisoTitulo")) return "Informe o título do aviso.";
+    if (!getValor("avisoTexto")) return "Informe o texto geral do aviso.";
+    return "";
+  }
+
+  if (tipo === "youtube_live") {
+    if (!getValor("youtubeUrl")) return "Informe o link da transmissão.";
+    if (!getValor("youtubeInicio")) return "Informe a hora de início.";
+    if (!getValor("youtubeFim")) return "Informe a hora de encerramento.";
+    if (new Date(getValor("youtubeFim")) <= new Date(getValor("youtubeInicio"))) return "O encerramento precisa ser depois do início.";
+    return "";
+  }
+
+  return "";
+}
+
+async function montarDadosFormulario(tipo, ativo) {
+  const base = {
+    tipo,
+    ativo,
+    updated_at: new Date().toISOString()
+  };
+
+  if (tipo === "musica") {
+    const url = arquivoMusicaSelecionado ? await enviarMusicaStorage(arquivoMusicaSelecionado) : urlMusicaAtual;
+
+    return {
+      ...base,
+      titulo: getValor("musicaTitulo"),
+      artista: getValor("musicaArtista"),
+      site: "Upload interno",
+      url,
+      texto_aviso: null,
+      cor_fundo: "#000000",
+      cor_texto: "#ffffff",
+      velocidade: null,
+      data_inicio: null,
+      data_fim: null,
+      modo_exibicao: "rodape"
+    };
+  }
+
+  if (tipo === "link_externo") {
+    return {
+      ...base,
+      titulo: getValor("linkTitulo"),
+      artista: getValor("linkArtista"),
+      site: getValor("linkSite") || "Link externo",
+      url: normalizarUrl(getValor("linkUrl")),
+      texto_aviso: null,
+      cor_fundo: "#000000",
+      cor_texto: "#ffffff",
+      velocidade: null,
+      data_inicio: null,
+      data_fim: null,
+      modo_exibicao: "rodape"
+    };
+  }
 
   if (tipo === "aviso") {
     return {
       ...base,
-      titulo: getValor("radioTvTextoAviso").slice(0, 80),
+      titulo: getValor("avisoTitulo"),
       artista: null,
       site: "Sistema",
       url: null,
-      texto_aviso: getValor("radioTvTextoAviso"),
-      cor_fundo: getValor("radioTvCorFundo") || "#000000",
-      cor_texto: getValor("radioTvCorTexto") || "#ffffff",
+      texto_aviso: getValor("avisoTexto"),
+      cor_fundo: getValor("avisoCorFundo") || "#000000",
+      cor_texto: getValor("avisoCorTexto") || "#ffffff",
+      velocidade: getValor("avisoVelocidade") || "normal",
+      data_inicio: null,
+      data_fim: null,
       modo_exibicao: "rodape"
     };
   }
 
   return {
     ...base,
-    titulo: getValor("radioTvTitulo"),
-    artista: tipo === "musica" ? getValor("radioTvArtista") : null,
-    site: getValor("radioTvSite") || (tipo === "youtube_live" ? "YouTube" : ""),
-    url: normalizarUrl(getValor("radioTvUrl")),
+    titulo: "YouTube ao vivo",
+    artista: null,
+    site: "YouTube",
+    url: normalizarUrl(getValor("youtubeUrl")),
     texto_aviso: null,
     cor_fundo: "#000000",
     cor_texto: "#ffffff",
-    modo_exibicao: tipo === "youtube_live" ? "fullscreen" : "rodape"
+    velocidade: null,
+    data_inicio: getValor("youtubeInicio"),
+    data_fim: getValor("youtubeFim"),
+    modo_exibicao: "fullscreen"
   };
 }
 
-function validarDadosRadioTv(tipo, dados) {
-  if (tipo === "aviso") {
-    if (!dados.texto_aviso) return "Informe o texto do aviso.";
-    return "";
-  }
-  if (tipo === "musica" && !dados.artista) return "Informe o artista/cantor.";
-  if (!dados.titulo) return "Informe o título.";
-  if (!dados.url) return "Informe a URL.";
-  return "";
+async function enviarMusicaStorage(arquivo) {
+  const nomeSeguro = (arquivo.name || "musica")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "-")
+    .replace(/-+/g, "-");
+
+  const caminho = `${Date.now()}-${nomeSeguro}`;
+
+  const { error } = await supabaseClient
+    .storage
+    .from(STORAGE_MUSICAS_BUCKET)
+    .upload(caminho, arquivo, {
+      cacheControl: "3600",
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data } = supabaseClient
+    .storage
+    .from(STORAGE_MUSICAS_BUCKET)
+    .getPublicUrl(caminho);
+
+  return data.publicUrl;
 }
 
 function renderizarRadioTv() {
@@ -286,7 +411,7 @@ async function deletarRadioTv(id) {
 
 function visualizarAviso(id) {
   const item = itensRadioTv.find(registro => String(registro.id) === String(id));
-  if (item) alert(item.texto_aviso || item.titulo || "Aviso sem texto");
+  if (item) alert(`${item.titulo || "Aviso"}\n\n${item.texto_aviso || ""}`);
 }
 
 function atualizarResumo() {
@@ -299,29 +424,49 @@ function atualizarResumo() {
 function atualizarPreviewAviso() {
   const preview = document.getElementById("textoPreviewAviso");
   if (!preview) return;
-  preview.textContent = getValor("radioTvTextoAviso") || "Bem-vindo ao PCTSUL";
-  preview.style.background = getValor("radioTvCorFundo") || "#000000";
-  preview.style.color = getValor("radioTvCorTexto") || "#ffffff";
+
+  const titulo = getValor("avisoTitulo");
+  const texto = getValor("avisoTexto") || "Bem-vindo ao PCTSUL";
+  preview.textContent = titulo ? `${titulo}: ${texto}` : texto;
+  preview.style.background = getValor("avisoCorFundo") || "#000000";
+  preview.style.color = getValor("avisoCorTexto") || "#ffffff";
 }
 
 function nomeItem(item) {
   if (item.tipo === "musica") return `${item.artista || "Artista"} — ${item.titulo || "Música"}`;
-  if (item.tipo === "aviso") return `Aviso: ${item.texto_aviso || item.titulo || "Sem texto"}`;
+  if (item.tipo === "link_externo") return `${item.artista || "Artista"} — ${item.titulo || "Link externo"}`;
+  if (item.tipo === "aviso") return `Aviso: ${item.titulo || "Sem título"}`;
+  if (item.tipo === "youtube_live") return "YouTube ao vivo";
   return item.titulo || "Item sem título";
 }
 
 function subtituloItem(item) {
-  if (item.tipo === "aviso") return `Fundo ${item.cor_fundo || "#000000"} • Texto ${item.cor_texto || "#ffffff"}`;
-  if (item.tipo === "youtube_live") return `Transmissão ao vivo em tela cheia • ${item.url || ""}`;
+  if (item.tipo === "aviso") return `${item.texto_aviso || ""} • Velocidade ${item.velocidade || "normal"}`;
+  if (item.tipo === "youtube_live") return `${formatarDataHora(item.data_inicio)} até ${formatarDataHora(item.data_fim)} • ${item.url || ""}`;
   return item.url || "";
 }
 
 function tipoLabel(tipo) {
   if (tipo === "musica") return "Música";
-  if (tipo === "playlist") return "Playlist";
+  if (tipo === "link_externo") return "Link externo";
   if (tipo === "aviso") return "Aviso";
   if (tipo === "youtube_live") return "YouTube ao vivo";
   return "Item";
+}
+
+function dataParaInputLocal(valor) {
+  if (!valor) return "";
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return "";
+  data.setMinutes(data.getMinutes() - data.getTimezoneOffset());
+  return data.toISOString().slice(0, 16);
+}
+
+function formatarDataHora(valor) {
+  if (!valor) return "-";
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return "-";
+  return data.toLocaleString("pt-BR");
 }
 
 function normalizarUrl(url) {
