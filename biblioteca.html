@@ -64,24 +64,46 @@
   <div class="sidebar-spacer"></div>
 
   <section class="resumo-card">
-    <h3>Resumo rapido</h3>
-    <div class="resumo-linha"><span>Total de arquivos</span><strong id="totalArquivos">0</strong></div>
-    <div class="resumo-linha"><span>Sites TXT</span><strong id="totalSites">0</strong></div>
-    <div class="resumo-linha"><span>Molduras PNG</span><strong id="totalMolduras">0</strong></div>
-  </section>
+  <h3>Resumo rapido</h3>
 
-  <section class="usuario-card">
-    <div class="usuario-card-topo">
-      <div class="usuario-card-texto">
-        <span>Sessao ativa</span>
-        <strong>Administrador</strong>
-      </div>
+  <div class="resumo-linha">
+    <span>Total de pontos</span>
+    <strong id="totalPontosResumo">0</strong>
+  </div>
+
+  <div class="resumo-linha positivo">
+    <span>Pontos ativos</span>
+    <strong id="pontosAtivosResumo">0</strong>
+  </div>
+
+  <div class="resumo-linha negativo">
+    <span>Pontos inativos</span>
+    <strong id="pontosInativosResumo">0</strong>
+  </div>
+
+  <div class="resumo-linha">
+    <span>Telas conectadas</span>
+    <strong id="playlistsAtivasResumo">0</strong>
+  </div>
+</section>
+
+<section class="usuario-card">
+  <div class="usuario-card-topo">
+    <div class="usuario-card-texto">
+      <span>Sessao ativa</span>
+      <strong>Administrador</strong>
     </div>
-    <div class="usuario-status"><span></span>Acesso liberado</div>
-    <button type="button" onclick="window.location.href='salas.html'">
-      Voltar ao painel <span>→</span>
-    </button>
-  </section>
+  </div>
+
+  <div class="usuario-status">
+    <span></span>
+    Acesso liberado
+  </div>
+
+  <button type="button" onclick="window.location.href='salas.html'">
+    Encerrar sessao <span>→</span>
+  </button>
+</section>
 </aside>
 
   <main class="conteudo-principal">
